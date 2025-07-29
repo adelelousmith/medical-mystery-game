@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Medical Mystery - Interactive Emergency Medicine Simulator for learning diagnostic skills">
+    <meta name="keywords" content="medical, emergency, simulation, education, diagnosis, healthcare">
+    <meta name="author" content="Medical Mystery Team">
+    <meta name="theme-color" content="#2563eb">
+    
+    <title>Medical Mystery - Emergency Medicine Simulator</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="game.js" as="script">
+    <link rel="preload" href="cases.js" as="script">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="loading-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <h2>Loading Medical Mystery...</h2>
+                <div class="loading-bar">
+                    <div class="loading-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Game Container -->
+        <div id="game-container">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Glossary Sidebar -->
+        <div id="glossary-sidebar" class="glossary-closed" role="complementary" aria-label="Medical Glossary">
+            <div class="glossary-header">
+                <h3><i class="fas fa-book-medical"></i> Medical Glossary</h3>
+                <button id="close-glossary" onclick="toggleGlossary()" aria-label="Close glossary">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+    <div class="glossary-content">
+        <div id="glossary-entries"></div>
+    </div>
+</div>
+
+        <!-- Case Selection Modal -->
+        <div id="case-modal" class="modal" role="dialog" aria-labelledby="case-modal-title" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="case-modal-title"><i class="fas fa-stethoscope"></i> Select Medical Case</h2>
+                    <button class="close-modal" onclick="closeCaseModal()" aria-label="Close case selection">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="case-grid" id="case-grid">
+                    <!-- Cases will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal" role="dialog" aria-labelledby="settings-modal-title" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="settings-modal-title"><i class="fas fa-cog"></i> Game Settings</h2>
+                    <button class="close-modal" onclick="closeSettingsModal()" aria-label="Close settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="settings-content">
+                    <div class="setting-group">
+                        <label for="difficulty">Difficulty Level:</label>
+                        <select id="difficulty" aria-describedby="difficulty-help">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                        <small id="difficulty-help">Affects time pressure and patient deterioration rate</small>
+                    </div>
+                    <div class="setting-group">
+                        <label for="timer-speed">Timer Speed:</label>
+                        <select id="timer-speed" aria-describedby="timer-help">
+                            <option value="slow">Slow (Educational)</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="fast">Fast (Challenging)</option>
+                        </select>
+                        <small id="timer-help">Controls how quickly time progresses</small>
+                    </div>
+                    <div class="setting-group">
+                        <label>
+                            <input type="checkbox" id="show-hints" checked>
+                            Show Hints
+                        </label>
+                        <small>Display helpful guidance during gameplay</small>
+                    </div>
+                    <div class="setting-group">
+                        <label>
+                            <input type="checkbox" id="sound-effects" checked>
+                            Sound Effects
+                        </label>
+                        <small>Play audio feedback for actions</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Modal -->
+        <div id="achievement-modal" class="modal" role="dialog" aria-labelledby="achievement-modal-title" aria-hidden="true">
+            <div class="modal-content achievement-content">
+                <div class="achievement-header">
+                    <i class="fas fa-trophy achievement-icon"></i>
+                    <h2 id="achievement-modal-title">Achievement Unlocked!</h2>
+                </div>
+                <div class="achievement-body">
+                    <h3 id="achievement-name">First Diagnosis</h3>
+                    <p id="achievement-description">Successfully diagnosed your first patient</p>
+                </div>
+                <button class="action-btn primary" onclick="closeAchievementModal()">
+                    <i class="fas fa-check"></i> Continue
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Action Buttons -->
+        <div class="floating-actions" role="navigation" aria-label="Game controls">
+            <button id="glossary-toggle" onclick="toggleGlossary()" title="Medical Glossary" aria-label="Open medical glossary">
+                <i class="fas fa-book-medical"></i>
+            </button>
+            <button id="settings-toggle" onclick="openSettingsModal()" title="Settings" aria-label="Open game settings">
+                <i class="fas fa-cog"></i>
+            </button>
+            <button id="stats-toggle" onclick="showStats()" title="Statistics" aria-label="View game statistics">
+                <i class="fas fa-chart-bar"></i>
+            </button>
+        </div>
+
+        <!-- Keyboard Shortcuts Help -->
+        <div id="keyboard-help" class="keyboard-help" aria-hidden="true">
+            <div class="keyboard-content">
+                <h3>Keyboard Shortcuts</h3>
+                <div class="shortcuts-grid">
+                    <div class="shortcut">
+                        <kbd>G</kbd>
+                        <span>Toggle Glossary</span>
+                    </div>
+                    <div class="shortcut">
+                        <kbd>S</kbd>
+                        <span>Settings</span>
+                    </div>
+                    <div class="shortcut">
+                        <kbd>?</kbd>
+                        <span>Show/Hide This Help</span>
+                    </div>
+                    <div class="shortcut">
+                        <kbd>ESC</kbd>
+                        <span>Close Modals</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+<script src="glossary.js"></script>
+    <script src="cases.js"></script>
+<script src="game.js"></script>
+    
+    <!-- Service Worker for PWA features -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(registrationError => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>
