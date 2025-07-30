@@ -353,6 +353,9 @@ class MedicalMysteryGame {
             this.render();
             this.startTimer();
             
+            // Scroll to top of page when case starts
+            window.scrollTo(0, 0);
+            
         } catch (error) {
             console.error('Error starting case:', error);
             this.playSound('error');
@@ -405,6 +408,7 @@ class MedicalMysteryGame {
                 </div>
 
                 <div class="game-content">
+                    ${this.renderPatientImage()}
                     ${this.renderHistorySection()}
                     ${this.renderPatientInterview()}
                     ${this.renderMedicalTests()}
@@ -431,6 +435,23 @@ class MedicalMysteryGame {
             console.error('Error rendering game:', error);
             this.showError('Failed to render game. Please refresh the page.');
         }
+    }
+
+    renderPatientImage() {
+        if (!this.gameState.currentCase.patientImage) return '';
+        
+        return `
+            <div class="section patient-image-section">
+                <h3><i class="fas fa-user-injured"></i> Patient</h3>
+                <div class="patient-image-container">
+                    <img src="${this.gameState.currentCase.patientImage}" alt="Patient" class="patient-image" />
+                    <div class="patient-info">
+                        <strong>${this.gameState.currentCase.patientHistory.demographics}</strong>
+                        <p>${this.gameState.currentCase.description}</p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     renderHistorySection() {
@@ -764,9 +785,17 @@ class MedicalMysteryGame {
         // Create a temporary notification
         const notification = document.createElement('div');
         notification.className = 'test-result-notification';
+        
+        const imageHtml = test.resultImage ? `
+            <div class="test-result-image">
+                <img src="${test.resultImage}" alt="${test.name} Result" />
+            </div>
+        ` : '';
+        
         notification.innerHTML = `
             <div class="test-result-content">
                 <h4><i class="fas fa-flask"></i> ${test.name} Results</h4>
+                ${imageHtml}
                 <p>${results}</p>
                 <button class="action-btn secondary" onclick="this.parentElement.parentElement.remove()">Close</button>
             </div>

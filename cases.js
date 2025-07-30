@@ -1,71 +1,5 @@
-// Medical Mystery Game - Case Database
-// Enhanced with procedural generation and emotional stakes
-
-// Procedural generation utilities
-const PATIENT_GENERATOR = {
-    ages: {
-        pediatric: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-        young: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
-        adult: [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50],
-        middle: [51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65],
-        senior: [66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
-    },
-    
-    names: {
-        male: ['James', 'Robert', 'John', 'Michael', 'David', 'William', 'Richard', 'Joseph', 'Thomas', 'Christopher', 'Charles', 'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth', 'Kevin', 'Brian', 'George', 'Timothy', 'Ronald', 'Jason', 'Edward', 'Jeffrey', 'Ryan', 'Jacob', 'Gary', 'Nicholas', 'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin', 'Scott', 'Brandon', 'Benjamin', 'Frank', 'Gregory', 'Raymond', 'Samuel', 'Patrick', 'Alexander', 'Jack', 'Dennis', 'Jerry', 'Tyler', 'Aaron', 'Jose', 'Adam', 'Nathan', 'Henry', 'Douglas', 'Zachary', 'Peter', 'Kyle', 'Walter', 'Ethan', 'Jeremy', 'Harold', 'Carl', 'Keith', 'Roger', 'Gerald', 'Eugene', 'Arthur', 'Terry', 'Sean', 'Christian', 'Lawrence', 'Austin', 'Joe', 'Jesse', 'Billy', 'Bryan', 'Bruce', 'Willie', 'Jordan', 'Dylan', 'Alan', 'Ralph', 'Gabriel', 'Roy', 'Juan', 'Wayne', 'Eugene', 'Logan', 'Randy', 'Louis', 'Russell', 'Vincent', 'Philip', 'Bobby', 'Johnny', 'Johnny'],
-        female: ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen', 'Nancy', 'Lisa', 'Betty', 'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen', 'Sandra', 'Donna', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen', 'Sandra', 'Donna', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen', 'Sandra', 'Donna', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen', 'Sandra', 'Donna', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy', 'Lisa', 'Nancy', 'Karen', 'Betty', 'Helen', 'Sandra', 'Donna', 'Ruth', 'Sharon', 'Michelle', 'Laura', 'Emily', 'Kimberly', 'Deborah', 'Dorothy']
-    },
-    
-    backgrounds: [
-        'Single parent struggling to make ends meet',
-        'Veteran with PTSD and limited support',
-        'College student away from home for the first time',
-        'Elderly person living alone',
-        'Pregnant woman in her third trimester',
-        'Teenager dealing with depression and bullying',
-        'Immigrant family with language barriers',
-        'Homeless person with no family contact',
-        'Professional athlete with career-threatening injury',
-        'Cancer survivor with ongoing complications',
-        'Addict trying to get clean',
-        'Person with developmental disabilities',
-        'Victim of domestic violence',
-        'Person with severe anxiety and panic attacks',
-        'Someone who recently lost a loved one'
-    ],
-    
-    emotionalStakes: [
-        'Patient is the sole caregiver for their elderly parent',
-        'Patient has young children at home',
-        'Patient is about to graduate medical school',
-        'Patient is getting married next week',
-        'Patient is the breadwinner for their family',
-        'Patient has a job interview tomorrow',
-        'Patient is pregnant and this is their first child',
-        'Patient is a first responder who helps others',
-        'Patient is a teacher with students depending on them',
-        'Patient is a musician with a big performance coming up'
-    ]
-};
-
-function generatePatient(caseType) {
-    const ageGroup = caseType === 'pediatric' ? 'pediatric' : 
-                    caseType === 'obstetric' ? 'young' : 'adult';
-    const age = PATIENT_GENERATOR.ages[ageGroup][Math.floor(Math.random() * PATIENT_GENERATOR.ages[ageGroup].length)];
-    const gender = Math.random() > 0.5 ? 'male' : 'female';
-    const name = PATIENT_GENERATOR.names[gender][Math.floor(Math.random() * PATIENT_GENERATOR.names[gender].length)];
-    const background = PATIENT_GENERATOR.backgrounds[Math.floor(Math.random() * PATIENT_GENERATOR.backgrounds.length)];
-    const emotionalStake = PATIENT_GENERATOR.emotionalStakes[Math.floor(Math.random() * PATIENT_GENERATOR.emotionalStakes.length)];
-    
-    return {
-        name,
-        age,
-        gender,
-        background,
-        emotionalStake,
-        demographics: `${age}-year-old ${gender}`
-    };
-}
+// Medical Mystery Game - TOMY-Inspired Case Database
+// Enhanced with realistic patient images and test results
 
 // Time pressure mechanics
 const TIME_PRESSURE = {
@@ -75,17 +9,241 @@ const TIME_PRESSURE = {
     ROUTINE: 12  // 12 minutes for routine cases
 };
 
-// Enhanced medical cases with procedural generation and emotional stakes
+// Enhanced medical cases inspired by TOMY Medical Mysteries Investigation Game
 const medicalCases = {
+    // EASY CASES - Good for beginners
+    pediatric_fever: {
+        id: "pediatric_fever",
+        title: "Pediatric Fever - 3-Year-Old",
+        specialty: "Pediatrics",
+        difficulty: "easy",
+        icon: "fas fa-thermometer-half",
+        timeLimit: TIME_PRESSURE.ROUTINE,
+        correctDiagnosis: "viral_upper_respiratory",
+        description: "A 3-year-old girl presents with fever of 102°F, runny nose, and mild cough. Parents are concerned about the fever.",
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPjMteWVhci1vbGQgZmVtYWxlPC90ZXh0Pgo8L3N2Zz4K",
+        patientHistory: {
+            demographics: "3-year-old female",
+            pastMedicalHistory: [
+                "No significant medical history",
+                "Up to date on vaccinations",
+                "No known allergies"
+            ],
+            socialHistory: [
+                "Attends daycare 3 days per week",
+                "Lives with both parents and older sibling",
+                "No recent travel"
+            ],
+            emotionalContext: "First-time parents, very anxious about the fever. Child is otherwise active and eating normally."
+        },
+        questions: [
+            {
+                id: "fever_duration",
+                text: "How long has the fever been present?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "other_symptoms",
+                text: "Are there any other symptoms besides fever?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "appetite",
+                text: "Is the child eating and drinking normally?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "activity_level",
+                text: "Is the child active and playful?",
+                category: "symptoms",
+                critical: false
+            }
+        ],
+        tests: [
+            {
+                id: "temperature",
+                name: "Temperature Check",
+                description: "Measure body temperature",
+                cost: 25,
+                timeRequired: 1,
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkZldmVyIFRlbXBlcmF0dXJlPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZGMDAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij4xMDLwr0Y8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkVsZXZhdGVkPC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "throat_culture",
+                name: "Throat Culture",
+                description: "Test for strep throat",
+                cost: 75,
+                timeRequired: 3,
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPlN0cmVwIFRocm9hdCBUZXN0PC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5ORUdBVElWRTwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Tm8gYmFjdGVyaWEgZGV0ZWN0ZWQ8L3RleHQ+Cjwvc3ZnPgo="
+            },
+            {
+                id: "cbc",
+                name: "Complete Blood Count",
+                description: "Check white blood cell count",
+                cost: 100,
+                timeRequired: 4,
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNvbXBsZXRlIEJsb29kIENvdW50PC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5OT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPldCQzogMTIsNTAwL8K4TC9swqBM4oI8L3RleHQ+Cjwvc3ZnPgo="
+            }
+        ],
+        diagnosisOptions: [
+            {
+                id: "viral_upper_respiratory",
+                name: "Viral Upper Respiratory Infection",
+                description: "Common cold virus causing fever and mild symptoms",
+                correct: true,
+                consequences: "Supportive care: rest, fluids, fever management",
+                emotionalImpact: "Parents relieved to know it's a common illness"
+            },
+            {
+                id: "strep_throat",
+                name: "Strep Throat",
+                description: "Bacterial infection requiring antibiotics",
+                correct: false,
+                consequences: "Unnecessary antibiotics, potential side effects",
+                emotionalImpact: "Parents concerned about medication side effects"
+            },
+            {
+                id: "ear_infection",
+                name: "Ear Infection",
+                description: "Middle ear infection",
+                correct: false,
+                consequences: "Missed diagnosis, continued symptoms",
+                emotionalImpact: "Child continues to suffer unnecessarily"
+            }
+        ]
+    },
+
+    // MEDIUM CASES - Moderate complexity
+    adult_abdominal_pain: {
+        id: "adult_abdominal_pain",
+        title: "Acute Abdominal Pain - 45-Year-Old",
+        specialty: "Emergency Medicine",
+        difficulty: "medium",
+        icon: "fas fa-stomach",
+        timeLimit: TIME_PRESSURE.MODERATE,
+        correctDiagnosis: "appendicitis",
+        description: "A 45-year-old woman presents with severe right lower abdominal pain that started 6 hours ago. Pain is constant and worsening.",
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CjxwYXRoIGQ9Ik0xNzAgMjAwIEwyMzAgMjAwIiBzdHJva2U9IiNGRjAwMDAiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij40NS15ZWFyLW9sZCBmZW1hbGU8L3RleHQ+Cjwvc3ZnPgo=",
+        patientHistory: {
+            demographics: "45-year-old female",
+            pastMedicalHistory: [
+                "No previous surgeries",
+                "No chronic medical conditions",
+                "No known allergies"
+            ],
+            socialHistory: [
+                "Works as an office manager",
+                "Lives with husband and two teenage children",
+                "No recent travel or dietary changes"
+            ],
+            emotionalContext: "Patient is very anxious about the pain and worried about missing work. Family is supportive."
+        },
+        questions: [
+            {
+                id: "pain_location",
+                text: "Where exactly is the pain located?",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "pain_character",
+                text: "How would you describe the pain?",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "nausea_vomiting",
+                text: "Do you have nausea or vomiting?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "fever",
+                text: "Do you have a fever?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "appetite",
+                text: "When did you last eat?",
+                category: "symptoms",
+                critical: false
+            }
+        ],
+        tests: [
+            {
+                id: "cbc",
+                name: "Complete Blood Count",
+                description: "Check for infection markers",
+                cost: 100,
+                timeRequired: 3,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNvbXBsZXRlIEJsb29kIENvdW50PC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjE4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5OT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPldCQzogMTIsNTAwL8K4TC9swqBM4oI8L3RleHQ+Cjwvc3ZnPgo="
+            },
+            {
+                id: "ct_abdomen",
+                name: "CT Scan Abdomen",
+                description: "Imaging to visualize appendix and surrounding structures",
+                cost: 500,
+                timeRequired: 6,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNUIFNjYW4gQWJkb21lbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNGRjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+QUJOT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkluZmxhbWVkIGFwcGVuZGl4PC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "urinalysis",
+                name: "Urinalysis",
+                description: "Rule out urinary tract infection",
+                cost: 50,
+                timeRequired: 2,
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPlVyaW5hbHlzaXM8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBGRjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPk5PUk1BTDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Tm8gYWNldG9uZSBvciBnbHVjb3NlPC90ZXh0Pgo8L3N2Zz4K"
+            }
+        ],
+        diagnosisOptions: [
+            {
+                id: "appendicitis",
+                name: "Acute Appendicitis",
+                description: "Inflamed appendix requiring surgical removal",
+                correct: true,
+                consequences: "Emergency appendectomy required",
+                emotionalImpact: "Patient relieved to have definitive diagnosis and treatment plan"
+            },
+            {
+                id: "ovarian_cyst",
+                name: "Ovarian Cyst Rupture",
+                description: "Benign cyst causing pain",
+                correct: false,
+                consequences: "Delayed surgery, risk of complications",
+                emotionalImpact: "Patient suffers unnecessary pain and anxiety"
+            },
+            {
+                id: "kidney_stone",
+                name: "Kidney Stone",
+                description: "Mineral deposit in urinary tract",
+                correct: false,
+                consequences: "Incorrect treatment, continued symptoms",
+                emotionalImpact: "Patient receives inappropriate care"
+            }
+        ]
+    },
+
+    // HARD CASES - Most challenging
     cardiac: {
         id: "cardiac",
         title: "Code Blue - Cardiac Arrest",
         specialty: "Cardiology",
-        difficulty: "expert",
+        difficulty: "hard",
         icon: "fas fa-heartbeat",
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "myocardial_infarction",
         description: "A 58-year-old male collapses in the waiting room. Bystanders report he was complaining of chest pain and shortness of breath before losing consciousness. The patient is unresponsive with no pulse.",
+        patientImage: getPatientImage("cardiac"),
         patientHistory: {
             demographics: "58-year-old male",
             pastMedicalHistory: [
@@ -141,7 +299,8 @@ const medicalCases = {
                 description: "Electrocardiogram to assess heart rhythm and detect ischemia",
                 cost: 150,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPjEyLUxlYWQgRUNHPC90ZXh0Pgo8cGF0aCBkPSJNNTAgMjAwIEwxMDAgMTgwIEwxNTAgMjAwIEwyMDAgMTgwIEwyNTAgMjAwIEwzMDAgMTgwIEwzNTAgMjAwIiBzdHJva2U9IiNGRjAwMDAiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZGMDAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5TVEVNSSBFTEVWQVRJT048L3RleHQ+Cjwvc3ZnPgo="
             },
             {
                 id: "troponin",
@@ -149,7 +308,8 @@ const medicalCases = {
                 description: "Blood test to detect heart muscle damage",
                 cost: 200,
                 timeRequired: 3,
-                critical: true
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPlRyb3BvbmluIFRlc3Q8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkYwMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPkVMVkFURUQ8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPjE1LjIgbmcvbUw8L3RleHQ+Cjwvc3ZnPgo="
             },
             {
                 id: "chest_xray",
@@ -157,7 +317,8 @@ const medicalCases = {
                 description: "Imaging to rule out other causes of chest pain",
                 cost: 100,
                 timeRequired: 4,
-                critical: false
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNoZXN0IFgtUmF5PC90ZXh0Pgo8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5OT1JNQUw8L3RleHQ+Cjwvc3ZnPgo="
             },
             {
                 id: "cardiac_enzymes",
@@ -165,7 +326,8 @@ const medicalCases = {
                 description: "Comprehensive blood work for cardiac markers",
                 cost: 300,
                 timeRequired: 5,
-                critical: false
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNhcmRpYWMgRW56eW1lcyBQYW5lbDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNGRjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+RUxFVkFURUQ8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkNLLU1COiA0NSBuZy9tTDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+TEROOiAyODAgVS9MPC90ZXh0Pgo8L3N2Zz4K"
             }
         ],
         diagnosisOptions: [
@@ -178,668 +340,257 @@ const medicalCases = {
                 emotionalImpact: "Patient's family is devastated but grateful for quick action"
             },
             {
-                id: "angina",
-                name: "Stable Angina",
-                description: "Chest pain due to reduced blood flow to heart",
-                correct: false,
-                consequences: "Delayed treatment could lead to heart attack",
-                emotionalImpact: "Patient's condition worsens, family blames medical team"
-            },
-            {
                 id: "aortic_dissection",
                 name: "Aortic Dissection",
                 description: "Tear in the aorta wall",
                 correct: false,
-                consequences: "Life-threatening emergency requiring immediate surgery",
-                emotionalImpact: "Patient dies, family sues hospital for misdiagnosis"
+                consequences: "Missed critical diagnosis, potential death",
+                emotionalImpact: "Family devastated by preventable loss"
             },
             {
-                id: "pneumonia",
-                name: "Pneumonia",
-                description: "Lung infection causing chest pain",
+                id: "pulmonary_embolism",
+                name: "Pulmonary Embolism",
+                description: "Blood clot in the lungs",
                 correct: false,
-                consequences: "Patient receives wrong treatment, cardiac condition worsens",
-                emotionalImpact: "Patient suffers additional complications, family loses trust"
+                consequences: "Incorrect treatment, continued risk",
+                emotionalImpact: "Patient receives inappropriate care"
             }
         ]
     },
 
-    trauma: {
-        id: "trauma",
-        title: "Trauma Alert - Multi-System Injury",
-        specialty: "Emergency Medicine",
+    // EXPERT CASES - Most challenging
+    trauma_multiple: {
+        id: "trauma_multiple",
+        title: "Multi-System Trauma - Motor Vehicle Accident",
+        specialty: "Trauma Surgery",
         difficulty: "expert",
-        icon: "fas fa-ambulance",
+        icon: "fas fa-car-crash",
         timeLimit: TIME_PRESSURE.CRITICAL,
-        correctDiagnosis: "internal_bleeding",
-        description: "A 24-year-old male arrives via ambulance after a high-speed motorcycle accident. Patient is conscious but confused, with multiple injuries and signs of shock.",
+        correctDiagnosis: "multiple_trauma",
+        description: "A 32-year-old male is brought in by ambulance after a high-speed motor vehicle accident. Patient is unconscious with multiple injuries.",
+        patientImage: getPatientImage("trauma_multiple"),
         patientHistory: {
-            demographics: "24-year-old male",
+            demographics: "32-year-old male",
             pastMedicalHistory: [
-                "No significant medical history",
-                "Previous motorcycle accident (minor injuries)",
+                "No known medical conditions",
+                "No previous surgeries",
                 "No known allergies"
             ],
             socialHistory: [
-                "Motorcycle enthusiast",
                 "Works as a software engineer",
-                "Recently engaged",
-                "No helmet use (patient admits)"
+                "Lives with partner and young child",
+                "No history of substance abuse"
             ],
-            emotionalContext: "Patient's fiancée arrives in hysterics. They were planning their wedding for next month."
+            emotionalContext: "Partner is in the waiting room, extremely distressed. Patient is the primary caregiver for their 2-year-old child."
         },
         questions: [
             {
                 id: "consciousness",
-                text: "Is the patient alert and oriented?",
+                text: "What is the patient's level of consciousness?",
                 category: "neurological",
-                critical: true
-            },
-            {
-                id: "abdominal_pain",
-                text: "Does the patient have severe abdominal pain?",
-                category: "symptoms",
-                critical: true
-            },
-            {
-                id: "bleeding",
-                text: "Is there visible bleeding or bruising?",
-                category: "symptoms",
                 critical: true
             },
             {
                 id: "breathing",
-                text: "Is the patient breathing normally?",
+                text: "Is the patient breathing adequately?",
                 category: "respiratory",
                 critical: true
             },
             {
-                id: "extremity_movement",
-                text: "Can the patient move all extremities?",
-                category: "neurological",
+                id: "circulation",
+                text: "What is the patient's blood pressure and pulse?",
+                category: "cardiovascular",
                 critical: true
+            },
+            {
+                id: "bleeding",
+                text: "Is there active bleeding?",
+                category: "trauma",
+                critical: true
+            },
+            {
+                id: "deformities",
+                text: "Are there obvious deformities or fractures?",
+                category: "orthopedic",
+                critical: false
             }
         ],
         tests: [
             {
-                id: "ct_scan",
-                name: "CT Scan (Head/Abdomen)",
-                description: "Comprehensive imaging to assess internal injuries",
-                cost: 800,
-                timeRequired: 3,
-                critical: true
-            },
-            {
-                id: "xray_series",
-                name: "X-Ray Series",
-                description: "Chest, pelvis, and extremity X-rays",
+                id: "ct_head",
+                name: "CT Head",
+                description: "Imaging to assess brain injury",
                 cost: 400,
-                timeRequired: 2,
-                critical: true
+                timeRequired: 3,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNUIEhlYWQ8L3RleHQ+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE4MCIgcj0iMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBGRjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPk5PUk1BTDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Tm8gaW50cmFjcmFuaWFsIGhlbW9ycmhhZ2U8L3RleHQ+Cjwvc3ZnPgo="
             },
             {
-                id: "blood_work",
-                name: "Complete Blood Count",
-                description: "Blood tests to assess for internal bleeding",
+                id: "ct_chest",
+                name: "CT Chest",
+                description: "Imaging to assess chest trauma",
+                cost: 400,
+                timeRequired: 3,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNUIENoZXN0PC90ZXh0Pgo8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5OT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPk5vIGZsdWlkIGFjY3VtdWxhdGlvbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Tm8gcG5ldW1vdGhvcmF4PC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "ct_abdomen",
+                name: "CT Abdomen",
+                description: "Imaging to assess abdominal trauma",
+                cost: 400,
+                timeRequired: 3,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNUIFNjYW4gQWJkb21lbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNGRjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+QUJOT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkluZmxhbWVkIGFwcGVuZGl4PC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "xray_cervical",
+                name: "Cervical Spine X-Ray",
+                description: "Imaging to assess neck injury",
                 cost: 150,
-                timeRequired: 1,
-                critical: true
-            },
-            {
-                id: "ultrasound",
-                name: "FAST Ultrasound",
-                description: "Focused assessment for trauma",
-                cost: 200,
-                timeRequired: 1,
-                critical: true
+                timeRequired: 2,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNlcnZpY2FsIFNwaW5lIFgtUmF5PC90ZXh0Pgo8cGF0aCBkPSJNMTUwIDE4MCBMMjAwIDE2MCBMMjUwIDE4MCBMMzAwIDE2MCBMMzUwIDE4MCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz4KPHRleHQgeD0iMjAwIiB5PSIyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMEZGMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+Tk9STUFMPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjMwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij5ObyBmcmFjdHVyZSBvciBkaXNsb2NhdGlvbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+QWxpZ25tZW50IGlzIG5vcm1hbDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Q29tcGxldGUgY2VydmljYWwgc3BpbmU8L3RleHQ+Cjwvc3ZnPgo="
             }
         ],
         diagnosisOptions: [
             {
-                id: "internal_bleeding",
-                name: "Internal Bleeding with Hemorrhagic Shock",
-                description: "Severe internal bleeding causing life-threatening shock",
+                id: "multiple_trauma",
+                name: "Multiple System Trauma",
+                description: "Complex injury involving multiple body systems",
                 correct: true,
-                consequences: "Immediate surgery required to stop bleeding",
-                emotionalImpact: "Patient survives but fiancée is traumatized by the experience"
+                consequences: "Immediate stabilization, multiple surgical interventions required",
+                emotionalImpact: "Family devastated but grateful for comprehensive care"
             },
             {
-                id: "head_injury",
-                name: "Traumatic Brain Injury",
-                description: "Severe head injury with intracranial bleeding",
+                id: "isolated_head_injury",
+                name: "Isolated Head Injury",
+                description: "Brain injury without other significant trauma",
                 correct: false,
-                consequences: "Delayed treatment leads to permanent brain damage",
-                emotionalImpact: "Patient becomes permanently disabled, family devastated"
+                consequences: "Missed injuries, inadequate treatment",
+                emotionalImpact: "Patient suffers from incomplete care"
             },
             {
-                id: "spinal_injury",
+                id: "spinal_cord_injury",
                 name: "Spinal Cord Injury",
-                description: "Damage to spinal cord causing paralysis",
+                description: "Damage to spinal cord",
                 correct: false,
-                consequences: "Patient becomes paralyzed due to delayed treatment",
-                emotionalImpact: "Patient's life completely changed, family struggles with care"
-            },
-            {
-                id: "minor_injuries",
-                name: "Minor Injuries Only",
-                description: "Superficial injuries with no internal damage",
-                correct: false,
-                consequences: "Patient dies from undetected internal bleeding",
-                emotionalImpact: "Patient dies, family sues for medical malpractice"
+                consequences: "Incomplete assessment, missed injuries",
+                emotionalImpact: "Patient receives suboptimal care"
             }
         ]
     },
 
-    pediatric: {
-        id: "pediatric",
-        title: "Pediatric Emergency - Respiratory Distress",
+    // Additional cases for variety
+    pediatric_asthma: {
+        id: "pediatric_asthma",
+        title: "Pediatric Asthma Exacerbation - 8-Year-Old",
         specialty: "Pediatrics",
-        difficulty: "hard",
-        icon: "fas fa-baby",
+        difficulty: "medium",
+        icon: "fas fa-lungs",
         timeLimit: TIME_PRESSURE.URGENT,
-        correctDiagnosis: "croup",
-        description: "A 3-year-old girl is brought to the ER by her frantic mother. The child is struggling to breathe and making a high-pitched sound when inhaling. She has a fever and has been coughing for the past 2 days.",
+        correctDiagnosis: "asthma_exacerbation",
+        description: "An 8-year-old boy presents with severe difficulty breathing, wheezing, and chest tightness. Parents report he has a history of asthma.",
+        patientImage: getPatientImage("pediatric_asthma"),
         patientHistory: {
-            demographics: "3-year-old female",
+            demographics: "8-year-old male",
             pastMedicalHistory: [
-                "No significant medical history",
-                "Up to date on vaccinations",
-                "No known allergies"
+                "Asthma diagnosed at age 3",
+                "Uses albuterol inhaler as needed",
+                "No other medical conditions"
             ],
             socialHistory: [
-                "Attends daycare",
-                "Lives with single mother",
-                "Mother works two jobs to support them",
-                "No other family nearby"
+                "Lives with both parents and younger sibling",
+                "Active in sports and outdoor activities",
+                "Recently started soccer season"
             ],
-            emotionalContext: "Mother is extremely anxious and blames herself for not bringing the child in sooner. She's worried about missing work and losing her job."
+            emotionalContext: "Parents are very anxious about the breathing difficulty. Child is scared and crying."
         },
         questions: [
             {
                 id: "breathing_difficulty",
-                text: "Is the child having difficulty breathing?",
+                text: "How severe is the breathing difficulty?",
                 category: "respiratory",
                 critical: true
             },
             {
-                id: "fever",
-                text: "Does the child have a fever?",
-                category: "symptoms",
-                critical: false
-            },
-            {
-                id: "cough",
-                text: "Is the child coughing?",
-                category: "symptoms",
-                critical: false
-            },
-            {
-                id: "stridor",
-                text: "Is there a high-pitched sound when breathing in?",
+                id: "wheezing",
+                text: "Can you hear wheezing?",
                 category: "respiratory",
                 critical: true
             },
             {
-                id: "activity_level",
-                text: "Is the child less active than usual?",
-                category: "behavioral",
+                id: "triggers",
+                text: "What triggered this episode?",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "medication",
+                text: "Has the rescue inhaler been used?",
+                category: "treatment",
                 critical: false
             }
         ],
         tests: [
             {
-                id: "pulse_oximetry",
+                id: "pulse_ox",
                 name: "Pulse Oximetry",
-                description: "Non-invasive oxygen saturation monitoring",
-                cost: 50,
+                description: "Measure oxygen saturation",
+                cost: 25,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPlB1bHNlIE94aW1ldHJ5PC90ZXh0Pgo8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjMwIiBmaWxsPSIjRkYwMDAwIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkYwMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPjkyJTwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+TWlsZGx5IGRlY3JlYXNlZDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+UmF0ZTo5OCBicG08L3RleHQ+Cjwvc3ZnPgo="
+            },
+            {
+                id: "peak_flow",
+                name: "Peak Flow Measurement",
+                description: "Assess lung function",
+                cost: 50,
+                timeRequired: 2,
+                critical: true,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPlBlYWsgRmxvdyBUZXN0PC90ZXh0Pgo8cGF0aCBkPSJNNTAgMjAwIEwxMDAgMTgwIEwxNTAgMTYwIEwyMDAgMTQwIEwyNTAgMTIwIEwzMDAgMTAwIEwzNTAgODAiIHN0cm9rZT0iI0ZGMDAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkYwMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPjMwMCBML21pbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIzMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+TW9kZXJhdGUgcmVzdHJpY3Rpb248L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPjUwJSBvZiBwcmVkaWN0ZWQ8L3RleHQ+Cjwvc3ZnPgo="
             },
             {
                 id: "chest_xray",
                 name: "Chest X-Ray",
-                description: "Imaging to assess airway and lung condition",
+                description: "Rule out pneumonia or other causes",
                 cost: 100,
-                timeRequired: 2,
-                critical: true
-            },
-            {
-                id: "blood_work",
-                name: "Blood Work",
-                description: "Complete blood count and inflammatory markers",
-                cost: 150,
-                timeRequired: 3,
-                critical: false
-            },
-            {
-                id: "viral_test",
-                name: "Viral Panel",
-                description: "Testing for common respiratory viruses",
-                cost: 200,
                 timeRequired: 4,
-                critical: false
+                critical: false,
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNoZXN0IFgtUmF5PC90ZXh0Pgo8Y2lyY2xlIGN4PSIyMDAiIGN5PSIxODAiIHI9IjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwRkYwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE4Ij5OT1JNQUw8L3RleHQ+Cjwvc3ZnPgo="
             }
         ],
         diagnosisOptions: [
             {
-                id: "croup",
-                name: "Croup (Laryngotracheobronchitis)",
-                description: "Viral infection causing airway inflammation and narrowing",
+                id: "asthma_exacerbation",
+                name: "Asthma Exacerbation",
+                description: "Acute worsening of asthma symptoms",
                 correct: true,
-                consequences: "Treatment with humidified air, steroids, and monitoring",
-                emotionalImpact: "Child recovers quickly, mother relieved and grateful"
+                consequences: "Bronchodilators, steroids, oxygen therapy",
+                emotionalImpact: "Parents relieved with effective treatment"
             },
             {
-                id: "epiglottitis",
-                name: "Epiglottitis",
-                description: "Bacterial infection of the epiglottis",
+                id: "pneumonia",
+                name: "Pneumonia",
+                description: "Lung infection",
                 correct: false,
-                consequences: "Delayed treatment could lead to complete airway obstruction",
-                emotionalImpact: "Child's condition worsens, mother becomes hysterical"
+                consequences: "Inappropriate treatment, delayed asthma care",
+                emotionalImpact: "Child suffers from incorrect treatment"
             },
             {
                 id: "foreign_body",
                 name: "Foreign Body Aspiration",
                 description: "Object lodged in airway",
                 correct: false,
-                consequences: "Child could suffocate without immediate intervention",
-                emotionalImpact: "Child dies, mother blames herself for not watching more closely"
-            },
-            {
-                id: "asthma",
-                name: "Asthma Exacerbation",
-                description: "Acute asthma attack",
-                correct: false,
-                consequences: "Wrong treatment delays proper care",
-                emotionalImpact: "Child suffers unnecessarily, mother loses trust in medical team"
-            }
-        ]
-    },
-
-    obstetric: {
-        id: "obstetric",
-        title: "Obstetric Emergency - Preterm Labor",
-        specialty: "Obstetrics",
-        difficulty: "hard",
-        icon: "fas fa-baby-carriage",
-        timeLimit: TIME_PRESSURE.URGENT,
-        correctDiagnosis: "preterm_labor",
-        description: "A 32-year-old pregnant woman at 28 weeks gestation presents with regular contractions and lower back pain. She's extremely anxious about the health of her baby.",
-        patientHistory: {
-            demographics: "32-year-old pregnant female",
-            pastMedicalHistory: [
-                "First pregnancy",
-                "Gestational diabetes (diagnosed 2 weeks ago)",
-                "Previous miscarriage at 12 weeks",
-                "Anxiety and depression"
-            ],
-            socialHistory: [
-                "Married for 5 years",
-                "Works as a teacher",
-                "Has been trying to conceive for 3 years",
-                "Family history of preterm labor"
-            ],
-            emotionalContext: "Patient is terrified of losing another baby. Her husband is deployed overseas and can't be here. She's alone and extremely vulnerable."
-        },
-        questions: [
-            {
-                id: "contractions",
-                text: "Are the contractions regular and getting closer together?",
-                category: "obstetric",
-                critical: true
-            },
-            {
-                id: "water_broken",
-                text: "Has her water broken?",
-                category: "obstetric",
-                critical: true
-            },
-            {
-                id: "bleeding",
-                text: "Is there any vaginal bleeding?",
-                category: "obstetric",
-                critical: true
-            },
-            {
-                id: "fetal_movement",
-                text: "Is the baby moving normally?",
-                category: "obstetric",
-                critical: true
-            },
-            {
-                id: "pain_location",
-                text: "Where is the pain located?",
-                category: "symptoms",
-                critical: false
-            }
-        ],
-        tests: [
-            {
-                id: "fetal_monitoring",
-                name: "Fetal Heart Rate Monitoring",
-                description: "Continuous monitoring of baby's heart rate",
-                cost: 200,
-                timeRequired: 1,
-                critical: true
-            },
-            {
-                id: "ultrasound",
-                name: "Obstetric Ultrasound",
-                description: "Imaging to assess baby's position and amniotic fluid",
-                cost: 300,
-                timeRequired: 2,
-                critical: true
-            },
-            {
-                id: "cervical_exam",
-                name: "Cervical Examination",
-                description: "Manual examination of cervix dilation",
-                cost: 100,
-                timeRequired: 1,
-                critical: true
-            },
-            {
-                id: "lab_work",
-                name: "Laboratory Work",
-                description: "Blood tests and urinalysis",
-                cost: 150,
-                timeRequired: 3,
-                critical: false
-            }
-        ],
-        diagnosisOptions: [
-            {
-                id: "preterm_labor",
-                name: "Preterm Labor",
-                description: "Labor beginning before 37 weeks gestation",
-                correct: true,
-                consequences: "Immediate treatment to stop labor and prevent premature birth",
-                emotionalImpact: "Labor is successfully stopped, patient relieved but still anxious"
-            },
-            {
-                id: "placental_abruption",
-                name: "Placental Abruption",
-                description: "Premature separation of placenta from uterus",
-                correct: false,
-                consequences: "Emergency C-section required to save both lives",
-                emotionalImpact: "Baby is born premature but survives, mother traumatized"
-            },
-            {
-                id: "false_labor",
-                name: "False Labor (Braxton Hicks)",
-                description: "Practice contractions that are not true labor",
-                correct: false,
-                consequences: "Patient sent home, returns later with actual preterm labor",
-                emotionalImpact: "Patient feels dismissed and not taken seriously"
-            },
-            {
-                id: "preeclampsia",
-                name: "Preeclampsia",
-                description: "Pregnancy complication with high blood pressure",
-                correct: false,
-                consequences: "Delayed treatment leads to severe complications",
-                emotionalImpact: "Both mother and baby suffer, patient loses trust in care"
-            }
-        ]
-    },
-
-    psychiatric: {
-        id: "psychiatric",
-        title: "Psychiatric Crisis - Suicidal Ideation",
-        specialty: "Psychiatry",
-        difficulty: "hard",
-        icon: "fas fa-brain",
-        timeLimit: TIME_PRESSURE.MODERATE,
-        correctDiagnosis: "major_depression",
-        description: "A 16-year-old high school student is brought to the ER by her parents after they found a suicide note in her room. She appears withdrawn and refuses to speak.",
-        patientHistory: {
-            demographics: "16-year-old female",
-            pastMedicalHistory: [
-                "No previous psychiatric hospitalizations",
-                "No known medical conditions",
-                "No medications"
-            ],
-            socialHistory: [
-                "Honor student with high academic pressure",
-                "Recently broken up with boyfriend",
-                "Being bullied at school",
-                "Parents going through divorce",
-                "Lives with mother and stepfather"
-            ],
-            emotionalContext: "Parents are devastated and blame themselves. They had no idea their daughter was struggling so much. The patient feels like a burden to everyone."
-        },
-        questions: [
-            {
-                id: "suicidal_thoughts",
-                text: "Does the patient have current suicidal thoughts?",
-                category: "psychiatric",
-                critical: true
-            },
-            {
-                id: "depression_symptoms",
-                text: "Does the patient show signs of depression?",
-                category: "psychiatric",
-                critical: true
-            },
-            {
-                id: "sleep_changes",
-                text: "Has the patient's sleep pattern changed?",
-                category: "psychiatric",
-                critical: false
-            },
-            {
-                id: "appetite_changes",
-                text: "Has the patient's appetite changed?",
-                category: "psychiatric",
-                critical: false
-            },
-            {
-                id: "social_withdrawal",
-                text: "Has the patient withdrawn from friends and activities?",
-                category: "psychiatric",
-                critical: false
-            }
-        ],
-        tests: [
-            {
-                id: "psychiatric_eval",
-                name: "Psychiatric Evaluation",
-                description: "Comprehensive mental health assessment",
-                cost: 250,
-                timeRequired: 2,
-                critical: true
-            },
-            {
-                id: "blood_work",
-                name: "Blood Work",
-                description: "Rule out medical causes of depression",
-                cost: 150,
-                timeRequired: 3,
-                critical: false
-            },
-            {
-                id: "drug_screen",
-                name: "Drug Screen",
-                description: "Test for substance use",
-                cost: 100,
-                timeRequired: 2,
-                critical: false
-            },
-            {
-                id: "thyroid_test",
-                name: "Thyroid Function Test",
-                description: "Check for thyroid disorders",
-                cost: 200,
-                timeRequired: 4,
-                critical: false
-            }
-        ],
-        diagnosisOptions: [
-            {
-                id: "major_depression",
-                name: "Major Depressive Disorder",
-                description: "Severe depression with suicidal ideation",
-                correct: true,
-                consequences: "Immediate psychiatric evaluation and safety planning",
-                emotionalImpact: "Patient begins treatment, family gets support and education"
-            },
-            {
-                id: "bipolar_disorder",
-                name: "Bipolar Disorder",
-                description: "Mood disorder with episodes of depression and mania",
-                correct: false,
-                consequences: "Wrong medication could worsen symptoms",
-                emotionalImpact: "Patient's condition worsens, family confused and frustrated"
-            },
-            {
-                id: "adjustment_disorder",
-                name: "Adjustment Disorder",
-                description: "Temporary emotional reaction to stress",
-                correct: false,
-                consequences: "Inadequate treatment for serious depression",
-                emotionalImpact: "Patient attempts suicide again, family devastated"
-            },
-            {
-                id: "attention_seeking",
-                name: "Attention-Seeking Behavior",
-                description: "Cry for help without serious intent",
-                correct: false,
-                consequences: "Patient dismissed, attempts suicide successfully",
-                emotionalImpact: "Patient dies, family and medical team devastated"
-            }
-        ]
-    },
-
-    toxicology: {
-        id: "toxicology",
-        title: "Toxicology Emergency - Drug Overdose",
-        specialty: "Emergency Medicine",
-        difficulty: "expert",
-        icon: "fas fa-pills",
-        timeLimit: TIME_PRESSURE.CRITICAL,
-        correctDiagnosis: "opioid_overdose",
-        description: "A 28-year-old male is found unconscious in a public restroom. He has pinpoint pupils, slow breathing, and no response to painful stimuli. Empty pill bottles are found nearby.",
-        patientHistory: {
-            demographics: "28-year-old male",
-            pastMedicalHistory: [
-                "History of substance abuse",
-                "Previous overdose 6 months ago",
-                "Depression and anxiety",
-                "Chronic back pain from work injury"
-            ],
-            socialHistory: [
-                "Lost his job 3 months ago",
-                "Recently divorced",
-                "Living in his car",
-                "No family support",
-                "Former construction worker"
-            ],
-            emotionalContext: "Patient is a father of two young children who he hasn't seen in months. He's been trying to get clean but relapsed after losing his job."
-        },
-        questions: [
-            {
-                id: "consciousness",
-                text: "Is the patient conscious and responsive?",
-                category: "neurological",
-                critical: true
-            },
-            {
-                id: "breathing",
-                text: "Is the patient breathing normally?",
-                category: "respiratory",
-                critical: true
-            },
-            {
-                id: "pupil_size",
-                text: "Are the pupils pinpoint (very small)?",
-                category: "neurological",
-                critical: true
-            },
-            {
-                id: "skin_color",
-                text: "Is the patient's skin blue or pale?",
-                category: "symptoms",
-                critical: true
-            },
-            {
-                id: "needle_marks",
-                text: "Are there needle marks on the arms?",
-                category: "symptoms",
-                critical: false
-            }
-        ],
-        tests: [
-            {
-                id: "drug_screen",
-                name: "Comprehensive Drug Screen",
-                description: "Blood and urine tests for multiple substances",
-                cost: 300,
-                timeRequired: 2,
-                critical: true
-            },
-            {
-                id: "blood_work",
-                name: "Complete Blood Count",
-                description: "Assess organ function and blood chemistry",
-                cost: 150,
-                timeRequired: 1,
-                critical: true
-            },
-            {
-                id: "liver_function",
-                name: "Liver Function Tests",
-                description: "Check for liver damage from overdose",
-                cost: 200,
-                timeRequired: 3,
-                critical: false
-            },
-            {
-                id: "kidney_function",
-                name: "Kidney Function Tests",
-                description: "Assess kidney function",
-                cost: 200,
-                timeRequired: 3,
-                critical: false
-            }
-        ],
-        diagnosisOptions: [
-            {
-                id: "opioid_overdose",
-                name: "Opioid Overdose",
-                description: "Overdose of prescription or illicit opioids",
-                correct: true,
-                consequences: "Immediate administration of naloxone and supportive care",
-                emotionalImpact: "Patient survives and agrees to addiction treatment"
-            },
-            {
-                id: "benzodiazepine_overdose",
-                name: "Benzodiazepine Overdose",
-                description: "Overdose of anti-anxiety medications",
-                correct: false,
-                consequences: "Wrong treatment delays proper care",
-                emotionalImpact: "Patient suffers complications, family angry at medical team"
-            },
-            {
-                id: "alcohol_poisoning",
-                name: "Alcohol Poisoning",
-                description: "Severe alcohol intoxication",
-                correct: false,
-                consequences: "Patient receives wrong treatment",
-                emotionalImpact: "Patient's condition worsens, family loses trust"
-            },
-            {
-                id: "head_injury",
-                name: "Traumatic Brain Injury",
-                description: "Head injury causing unconsciousness",
-                correct: false,
-                consequences: "Delayed treatment for actual overdose",
-                emotionalImpact: "Patient dies, family devastated and blames medical team"
+                consequences: "Missed diagnosis, continued symptoms",
+                emotionalImpact: "Child continues to struggle unnecessarily"
             }
         ]
     }
 };
 
-// Helper functions for case management
+// Utility functions
 function getCase(caseId) {
     return medicalCases[caseId] || null;
 }
@@ -857,32 +608,6 @@ function getCasesBySpecialty(specialty) {
 }
 
 function generateRandomCase() {
-    const caseIds = Object.keys(medicalCases);
-    const randomId = caseIds[Math.floor(Math.random() * caseIds.length)];
-    return medicalCases[randomId];
-}
-
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { medicalCases, getCase, getAllCases, getCasesByDifficulty, getCasesBySpecialty, generateRandomCase };
-}
-
-// Expose to global scope for testing
-if (typeof global !== 'undefined') {
-    global.medicalCases = medicalCases;
-    global.getCase = getCase;
-    global.getAllCases = getAllCases;
-    global.getCasesByDifficulty = getCasesByDifficulty;
-    global.getCasesBySpecialty = getCasesBySpecialty;
-    global.generateRandomCase = generateRandomCase;
-}
-
-// Expose to window scope for browser
-if (typeof window !== 'undefined') {
-    window.medicalCases = medicalCases;
-    window.getCase = getCase;
-    window.getAllCases = getAllCases;
-    window.getCasesByDifficulty = getCasesByDifficulty;
-    window.getCasesBySpecialty = getCasesBySpecialty;
-    window.generateRandomCase = generateRandomCase;
+    const cases = getAllCases();
+    return cases[Math.floor(Math.random() * cases.length)];
 } 
