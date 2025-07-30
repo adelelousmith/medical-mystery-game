@@ -24,6 +24,7 @@ class MedicalMysteryGame {
         this.timer = null;
         this.stats = this.loadStats();
         this.achievements = this.loadAchievements();
+        this.settings = this.loadSettings();
         
         this.initializeGame();
     }
@@ -97,6 +98,22 @@ class MedicalMysteryGame {
         }
     }
 
+    loadSettings() {
+        try {
+            const saved = localStorage.getItem('gameSettings');
+            return saved ? JSON.parse(saved) : {
+                soundEnabled: true,
+                timerEnabled: true
+            };
+        } catch (error) {
+            console.error('Error loading settings:', error);
+            return {
+                soundEnabled: true,
+                timerEnabled: true
+            };
+        }
+    }
+
     showCaseSelection() {
         this.gameState.gamePhase = 'case-selection';
         
@@ -130,8 +147,18 @@ class MedicalMysteryGame {
             gameContainer.innerHTML = `
                 <div class="case-selection">
                     <div class="header">
-                        <h1>Medical Mystery</h1>
-                        <p>Emergency Medicine Simulator</p>
+                        <div class="header-content">
+                            <h1>Medical Mystery</h1>
+                            <p>Emergency Medicine Simulator</p>
+                        </div>
+                        <div class="header-actions">
+                            <button class="action-btn secondary" onclick="game.showGlossary()">
+                                <i class="fas fa-book-medical"></i> Glossary
+                            </button>
+                            <button class="action-btn secondary" onclick="game.showSettings()">
+                                <i class="fas fa-cog"></i> Settings
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="stats-panel">
@@ -354,28 +381,65 @@ class MedicalMysteryGame {
     }
 
     getQuestionAnswer(questionId) {
-        // Generate appropriate answers based on the case and question
+        // Comprehensive, realistic patient responses for each question
         const answers = {
-            'chest_pain': 'Yes, severe crushing chest pain that started 30 minutes ago',
-            'shortness_breath': 'Yes, patient is having difficulty breathing',
-            'sweating': 'Yes, patient is diaphoretic and clammy',
-            'nausea': 'Yes, patient reports feeling nauseous',
-            'radiation_pain': 'Yes, pain radiates to left arm and jaw',
-            'fever': 'Yes, temperature is 102°F (39°C)',
-            'cough': 'Yes, productive cough with yellow sputum',
-            'fatigue': 'Yes, patient reports extreme fatigue',
-            'headache': 'Yes, severe headache for the past 2 hours',
-            'dizziness': 'Yes, patient feels lightheaded and dizzy',
-            'abdominal_pain': 'Yes, severe abdominal pain in right lower quadrant',
-            'nausea_vomiting': 'Yes, patient has been vomiting for 6 hours',
-            'diarrhea': 'Yes, watery diarrhea for the past 24 hours',
-            'back_pain': 'Yes, severe lower back pain',
-            'leg_pain': 'Yes, pain and swelling in right leg',
-            'confusion': 'Yes, patient appears confused and disoriented',
-            'weakness': 'Yes, weakness on left side of body',
-            'vision_problems': 'Yes, blurred vision in right eye',
-            'speech_problems': 'Yes, slurred speech',
-            'balance_problems': 'Yes, difficulty maintaining balance'
+            // Cardiac case questions
+            'chest_pain': 'Yes, severe crushing chest pain that started 30 minutes ago. Patient describes it as "like an elephant sitting on my chest" and rates it 9/10.',
+            'shortness_breath': 'Yes, patient is having significant difficulty breathing. Speaking in short sentences and appears anxious about breathing.',
+            'sweating': 'Yes, patient is diaphoretic and clammy. Sweating profusely despite normal room temperature.',
+            'nausea': 'Yes, patient reports feeling nauseous and has vomited once. Says stomach feels "upset".',
+            'radiation_pain': 'Yes, pain radiates to left arm, jaw, and back. Patient describes it as "shooting down my arm".',
+            
+            // Trauma case questions
+            'consciousness': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions.',
+            'abdominal_pain': 'Yes, severe abdominal pain in right lower quadrant. Patient guards the area and winces with movement.',
+            'bleeding': 'Yes, visible bruising on abdomen and chest. Patient reports internal bleeding sensation.',
+            'breathing': 'Patient is breathing but with difficulty. Respiratory rate is 24/min and shallow.',
+            'extremity_movement': 'Patient can move arms but has difficulty with legs. Reports weakness in lower extremities.',
+            
+            // Pediatric case questions
+            'breathing_difficulty': 'Yes, child is working hard to breathe. Using accessory muscles and has nasal flaring.',
+            'fever': 'Yes, temperature is 102°F (39°C). Child appears flushed and lethargic.',
+            'cough': 'Yes, barking cough that sounds like a seal. Worse at night and with activity.',
+            'stridor': 'Yes, high-pitched sound when breathing in. Child appears anxious about breathing.',
+            'activity_level': 'Child is less active than usual. Prefers to sit quietly and seems tired.',
+            
+            // Obstetric case questions
+            'contractions': 'Yes, regular contractions every 3-4 minutes lasting 45-60 seconds. Increasing in intensity.',
+            'water_broken': 'Yes, clear fluid leaking for the past 2 hours. No foul odor.',
+            'bleeding': 'Yes, light spotting for the past hour. No heavy bleeding.',
+            'fetal_movement': 'Yes, baby is moving normally. Mother reports regular kicks and movements.',
+            'pain_location': 'Pain is in lower abdomen and radiating to back. Describes as "cramping" sensation.',
+            
+            // Psychiatric case questions
+            'suicidal_thoughts': 'Patient admits to having thoughts of self-harm but denies active plan. Says "life doesn\'t seem worth living".',
+            'depression_symptoms': 'Yes, patient reports feeling "empty" and hopeless for the past 3 months. Cries frequently.',
+            'sleep_changes': 'Yes, difficulty falling asleep and staying asleep. Wakes up early and can\'t go back to sleep.',
+            'appetite_changes': 'Yes, significant weight loss due to poor appetite. "Food doesn\'t taste good anymore".',
+            'social_withdrawal': 'Yes, has stopped seeing friends and family. Prefers to stay in bed all day.',
+            
+            // Toxicology case questions
+            'consciousness': 'Patient is drowsy and difficult to arouse. Responds to painful stimuli but not verbal commands.',
+            'breathing': 'Respiratory rate is 8/min and shallow. Patient appears to be struggling to breathe.',
+            'pupil_size': 'Pupils are pinpoint (2mm) and reactive to light. Both eyes affected equally.',
+            'skin_color': 'Patient appears pale and slightly cyanotic around lips and fingertips.',
+            'needle_marks': 'Yes, multiple track marks on both arms. Some appear fresh, others are older scars.',
+            
+            // Additional common symptoms
+            'fever': 'Yes, temperature is 102°F (39°C). Patient appears flushed and reports chills.',
+            'cough': 'Yes, productive cough with yellow-green sputum for the past 3 days.',
+            'fatigue': 'Yes, patient reports extreme fatigue and weakness. "Can barely get out of bed".',
+            'headache': 'Yes, severe headache for the past 2 hours. Describes as "worst headache of my life".',
+            'dizziness': 'Yes, patient feels lightheaded and dizzy. Reports room spinning when moving.',
+            'nausea_vomiting': 'Yes, patient has been vomiting for 6 hours. Can\'t keep anything down.',
+            'diarrhea': 'Yes, watery diarrhea for the past 24 hours. 8-10 episodes per day.',
+            'back_pain': 'Yes, severe lower back pain that radiates down left leg. Worse with movement.',
+            'leg_pain': 'Yes, pain and swelling in right leg. Calf is tender to touch.',
+            'confusion': 'Yes, patient appears confused and disoriented. Can\'t remember recent events.',
+            'weakness': 'Yes, weakness on left side of body. Difficulty with fine motor tasks.',
+            'vision_problems': 'Yes, blurred vision in right eye. Reports "spots" in vision.',
+            'speech_problems': 'Yes, slurred speech and difficulty finding words. Speech is slow and unclear.',
+            'balance_problems': 'Yes, difficulty maintaining balance. Patient reports feeling "unsteady on feet".'
         };
         
         return answers[questionId] || 'Patient responds appropriately to the question.';
@@ -492,10 +556,20 @@ class MedicalMysteryGame {
             
             this.gameState.orderedTests.push(testId);
             this.gameState.score += SCORING.TEST_ORDER;
-            this.render();
+            
+            // Update only the medical tests section instead of full re-render
+            this.updateMedicalTestsSection();
             
         } catch (error) {
             console.error('Error ordering test:', error);
+        }
+    }
+
+    updateMedicalTestsSection() {
+        const testsSection = document.querySelector('.section:has(.test-grid)');
+        if (testsSection) {
+            const newTestsHTML = this.renderMedicalTests();
+            testsSection.outerHTML = newTestsHTML;
         }
     }
 
@@ -582,6 +656,150 @@ class MedicalMysteryGame {
                     </button>
                 </div>
             `;
+        }
+    }
+
+    showGlossary() {
+        const glossaryContent = `
+            <div class="modal-overlay" onclick="game.hideGlossary()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-book-medical"></i> Medical Glossary</h2>
+                        <button class="close-btn" onclick="game.hideGlossary()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="glossary-section">
+                            <h3>Common Medical Terms</h3>
+                            <div class="glossary-item">
+                                <strong>ECG/EKG:</strong> Electrocardiogram - records electrical activity of the heart
+                            </div>
+                            <div class="glossary-item">
+                                <strong>CT Scan:</strong> Computed Tomography - detailed cross-sectional images
+                            </div>
+                            <div class="glossary-item">
+                                <strong>MRI:</strong> Magnetic Resonance Imaging - detailed soft tissue images
+                            </div>
+                            <div class="glossary-item">
+                                <strong>X-Ray:</strong> Radiographic imaging using electromagnetic radiation
+                            </div>
+                            <div class="glossary-item">
+                                <strong>Blood Panel:</strong> Comprehensive blood chemistry analysis
+                            </div>
+                        </div>
+                        <div class="glossary-section">
+                            <h3>Emergency Medicine</h3>
+                            <div class="glossary-item">
+                                <strong>STEMI:</strong> ST-Elevation Myocardial Infarction - heart attack
+                            </div>
+                            <div class="glossary-item">
+                                <strong>Sepsis:</strong> Life-threatening response to infection
+                            </div>
+                            <div class="glossary-item">
+                                <strong>Shock:</strong> Inadequate blood flow to vital organs
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', glossaryContent);
+    }
+
+    hideGlossary() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    showSettings() {
+        const settingsContent = `
+            <div class="modal-overlay" onclick="game.hideSettings()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-cog"></i> Settings</h2>
+                        <button class="close-btn" onclick="game.hideSettings()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="settings-section">
+                            <h3>Game Settings</h3>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="sound-toggle" ${this.settings.soundEnabled ? 'checked' : ''}>
+                                    Enable Sound Effects
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" id="timer-toggle" ${this.settings.timerEnabled ? 'checked' : ''}>
+                                    Enable Timer
+                                </label>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <h3>Statistics</h3>
+                            <div class="stat-display">
+                                <p><strong>Games Played:</strong> ${this.stats.gamesPlayed}</p>
+                                <p><strong>Games Won:</strong> ${this.stats.gamesWon}</p>
+                                <p><strong>Average Score:</strong> ${this.stats.averageScore}</p>
+                            </div>
+                        </div>
+                        <div class="settings-actions">
+                            <button class="action-btn secondary" onclick="game.resetStats()">
+                                <i class="fas fa-trash"></i> Reset Statistics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', settingsContent);
+        
+        // Add event listeners for settings
+        const soundToggle = document.getElementById('sound-toggle');
+        const timerToggle = document.getElementById('timer-toggle');
+        
+        if (soundToggle) {
+            soundToggle.addEventListener('change', (e) => {
+                this.settings.soundEnabled = e.target.checked;
+                localStorage.setItem('gameSettings', JSON.stringify(this.settings));
+            });
+        }
+        
+        if (timerToggle) {
+            timerToggle.addEventListener('change', (e) => {
+                this.settings.timerEnabled = e.target.checked;
+                localStorage.setItem('gameSettings', JSON.stringify(this.settings));
+            });
+        }
+    }
+
+    hideSettings() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    resetStats() {
+        if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+            this.stats = {
+                gamesPlayed: 0,
+                gamesWon: 0,
+                totalScore: 0,
+                averageScore: 0,
+                casesCompleted: {},
+                bestScores: {}
+            };
+            this.saveStats();
+            this.hideSettings();
+            this.showSettings(); // Refresh the settings modal
         }
     }
 }
