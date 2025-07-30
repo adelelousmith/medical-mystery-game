@@ -1139,6 +1139,72 @@ textarea:focus {
     line-height: 1.4;
 }
 
+/* Question Results Styling */
+.asked-questions {
+    margin-bottom: 2rem;
+}
+
+.asked-questions h4 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.asked-questions h4::before {
+    content: '✓';
+    color: var(--success-green);
+    font-weight: bold;
+}
+
+.question-result {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+}
+
+.question-result:hover {
+    border-color: var(--border-blue);
+    box-shadow: var(--shadow-md);
+}
+
+.question-result strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.question-result .answer {
+    color: var(--text-secondary);
+    margin: 0;
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-blue);
+}
+
+.available-questions h4 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.available-questions h4::before {
+    content: '?';
+    color: var(--primary-blue);
+    font-weight: bold;
+}
+
 /* Enhanced History Revealed State */
 .history-section.revealed {
     animation: fadeInUp 0.5s ease;

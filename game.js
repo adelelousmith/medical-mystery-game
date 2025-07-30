@@ -267,30 +267,35 @@ class MedicalMysteryGame {
                 <h3><i class="fas fa-file-medical"></i> Medical History</h3>
                 <div class="history-content">
                     <div class="history-item">
-                        <strong>Demographics:</strong> ${history.demographics}
+                        <strong>Demographics:</strong> ${history.demographics || 'Not specified'}
                     </div>
                     <div class="history-item">
                         <strong>Past Medical History:</strong>
-                        <ul>${history.pastMedicalHistory.map(item => `<li>${item}</li>`).join('')}</ul>
+                        <ul>${(history.pastMedicalHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
                     </div>
                     <div class="history-item">
                         <strong>Social History:</strong>
-                        <ul>${history.socialHistory.map(item => `<li>${item}</li>`).join('')}</ul>
+                        <ul>${(history.socialHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
                     </div>
                     <div class="history-item">
                         <strong>Family History:</strong>
-                        <ul>${history.familyHistory.map(item => `<li>${item}</li>`).join('')}</ul>
+                        <ul>${(history.familyHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
                     </div>
                     <div class="history-item">
                         <strong>Medications:</strong>
-                        <ul>${history.medications.map(item => `<li>${item}</li>`).join('')}</ul>
+                        <ul>${(history.medications || []).map(item => `<li>${item}</li>`).join('')}</ul>
                     </div>
                     <div class="history-item">
-                        <strong>Allergies:</strong> ${history.allergies}
+                        <strong>Allergies:</strong> ${history.allergies || 'None reported'}
                     </div>
                     <div class="history-item">
-                        <strong>Last Physical:</strong> ${history.lastPhysical}
+                        <strong>Last Physical:</strong> ${history.lastPhysical || 'Not specified'}
                     </div>
+                    ${history.emotionalContext ? `
+                    <div class="history-item">
+                        <strong>Emotional Context:</strong> ${history.emotionalContext}
+                    </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -301,29 +306,79 @@ class MedicalMysteryGame {
             !this.gameState.askedQuestions.includes(q.id)
         );
         
-        if (availableQuestions.length === 0) {
-            return `
-                <div class="section">
-                    <h3><i class="fas fa-comments"></i> Patient Interview</h3>
-                    <p>All questions have been asked.</p>
+        const askedQuestions = this.gameState.currentCase.questions.filter(q => 
+            this.gameState.askedQuestions.includes(q.id)
+        );
+        
+        let content = '';
+        
+        // Show asked questions with answers
+        if (askedQuestions.length > 0) {
+            content += `
+                <div class="asked-questions">
+                    <h4>Questions Asked:</h4>
+                    ${askedQuestions.map(q => `
+                        <div class="question-result">
+                            <strong>Q: ${q.text}</strong>
+                            <p class="answer">A: ${this.getQuestionAnswer(q.id)}</p>
+                        </div>
+                    `).join('')}
                 </div>
             `;
         }
         
-        const questionButtons = availableQuestions.map(q => `
-            <button class="action-btn secondary question-btn" data-question="${q.id}" onclick="game.askQuestion('${q.id}')">
-                ${q.text}
-            </button>
-        `).join('');
+        // Show available questions
+        if (availableQuestions.length > 0) {
+            content += `
+                <div class="available-questions">
+                    <h4>Available Questions:</h4>
+                    <div class="question-grid">
+                        ${availableQuestions.map(q => `
+                            <button class="action-btn secondary question-btn" data-question="${q.id}" onclick="game.askQuestion('${q.id}')">
+                                ${q.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } else {
+            content += '<p>All questions have been asked.</p>';
+        }
         
         return `
             <div class="section">
                 <h3><i class="fas fa-comments"></i> Patient Interview</h3>
-                <div class="question-grid">
-                    ${questionButtons}
-                </div>
+                ${content}
             </div>
         `;
+    }
+
+    getQuestionAnswer(questionId) {
+        // Generate appropriate answers based on the case and question
+        const answers = {
+            'chest_pain': 'Yes, severe crushing chest pain that started 30 minutes ago',
+            'shortness_breath': 'Yes, patient is having difficulty breathing',
+            'sweating': 'Yes, patient is diaphoretic and clammy',
+            'nausea': 'Yes, patient reports feeling nauseous',
+            'radiation_pain': 'Yes, pain radiates to left arm and jaw',
+            'fever': 'Yes, temperature is 102°F (39°C)',
+            'cough': 'Yes, productive cough with yellow sputum',
+            'fatigue': 'Yes, patient reports extreme fatigue',
+            'headache': 'Yes, severe headache for the past 2 hours',
+            'dizziness': 'Yes, patient feels lightheaded and dizzy',
+            'abdominal_pain': 'Yes, severe abdominal pain in right lower quadrant',
+            'nausea_vomiting': 'Yes, patient has been vomiting for 6 hours',
+            'diarrhea': 'Yes, watery diarrhea for the past 24 hours',
+            'back_pain': 'Yes, severe lower back pain',
+            'leg_pain': 'Yes, pain and swelling in right leg',
+            'confusion': 'Yes, patient appears confused and disoriented',
+            'weakness': 'Yes, weakness on left side of body',
+            'vision_problems': 'Yes, blurred vision in right eye',
+            'speech_problems': 'Yes, slurred speech',
+            'balance_problems': 'Yes, difficulty maintaining balance'
+        };
+        
+        return answers[questionId] || 'Patient responds appropriately to the question.';
     }
 
     renderMedicalTests() {
