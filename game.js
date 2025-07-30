@@ -26,7 +26,148 @@ class MedicalMysteryGame {
         this.achievements = this.loadAchievements();
         this.settings = this.loadSettings();
         
+        // Initialize audio system
+        this.audioContext = null;
+        this.initAudio();
+        
         this.initializeGame();
+    }
+
+    initAudio() {
+        try {
+            // Create audio context for sound generation
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (error) {
+            console.warn('Audio not supported:', error);
+        }
+    }
+
+    playSound(type) {
+        if (!this.settings.soundEnabled || !this.audioContext) return;
+        
+        try {
+            switch (type) {
+                case 'click':
+                    this.createTone(800, 0.1, 'sine');
+                    break;
+                case 'success':
+                    this.createChord([523, 659, 784], 0.3); // C major chord
+                    break;
+                case 'error':
+                    this.createTone(200, 0.2, 'sawtooth');
+                    break;
+                case 'warning':
+                    this.createTone(400, 0.15, 'square');
+                    break;
+                case 'heartbeat':
+                    this.createHeartbeat();
+                    break;
+                case 'monitor':
+                    this.createMonitorBeep();
+                    break;
+                case 'ambient':
+                    this.createAmbientSound();
+                    break;
+                case 'critical':
+                    this.createCriticalAlert();
+                    break;
+                default:
+                    this.createTone(600, 0.1, 'sine');
+            }
+        } catch (error) {
+            console.warn('Error playing sound:', error);
+        }
+    }
+
+    createTone(frequency, duration, type = 'sine') {
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+        oscillator.type = type;
+        
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + duration);
+    }
+
+    createChord(frequencies, duration) {
+        if (!this.audioContext) return;
+        
+        frequencies.forEach((freq, index) => {
+            setTimeout(() => {
+                this.createTone(freq, duration * 0.8, 'sine');
+            }, index * 50);
+        });
+    }
+
+    createHeartbeat() {
+        if (!this.audioContext) return;
+        
+        // First beat
+        this.createTone(60, 0.1, 'sine');
+        
+        // Second beat after 0.2 seconds
+        setTimeout(() => {
+            this.createTone(60, 0.1, 'sine');
+        }, 200);
+    }
+
+    createMonitorBeep() {
+        if (!this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.05, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 0.1);
+    }
+
+    createAmbientSound() {
+        if (!this.audioContext) return;
+        
+        // Create a subtle ambient hospital sound
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.02, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 2);
+        
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + 2);
+    }
+
+    createCriticalAlert() {
+        if (!this.audioContext) return;
+        
+        // Create an urgent, attention-grabbing sound
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                this.createTone(800 + (i * 100), 0.2, 'sawtooth');
+            }, i * 200);
+        }
     }
 
     initializeGame() {
@@ -200,19 +341,21 @@ class MedicalMysteryGame {
             }
             
             this.gameState.currentCase = case_;
-            this.gameState.gamePhase = 'playing';
-            this.gameState.timeRemaining = case_.timeLimit * 60;
+            this.gameState.timeRemaining = case_.timeLimit * 60; // Convert to seconds
             this.gameState.score = 0;
             this.gameState.askedQuestions = [];
             this.gameState.orderedTests = [];
             this.gameState.historyRevealed = false;
+            this.gameState.gamePhase = 'playing';
             this.gameState.finalDiagnosis = null;
             
+            this.playSound('click');
             this.render();
             this.startTimer();
             
         } catch (error) {
             console.error('Error starting case:', error);
+            this.playSound('error');
             this.showError('Failed to start case. Please try again.');
         }
     }
@@ -251,6 +394,14 @@ class MedicalMysteryGame {
                             <span>STABLE</span>
                         </div>
                     </div>
+                    <div class="game-controls">
+                        <button class="action-btn secondary control-btn" onclick="game.showGlossary()" title="Medical Glossary">
+                            <i class="fas fa-book-medical"></i>
+                        </button>
+                        <button class="action-btn secondary control-btn" onclick="game.showSettings()" title="Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="game-content">
@@ -263,6 +414,12 @@ class MedicalMysteryGame {
                 <div class="game-actions">
                     <button class="action-btn secondary" onclick="game.showCaseSelection()">
                         <i class="fas fa-arrow-left"></i> Back to Cases
+                    </button>
+                    <button class="action-btn secondary" onclick="game.showGlossary()">
+                        <i class="fas fa-book-medical"></i> Glossary
+                    </button>
+                    <button class="action-btn secondary" onclick="game.showSettings()">
+                        <i class="fas fa-cog"></i> Settings
                     </button>
                 </div>
             `;
@@ -450,27 +607,53 @@ class MedicalMysteryGame {
             !this.gameState.orderedTests.includes(t.id)
         );
         
-        if (availableTests.length === 0) {
-            return `
-                <div class="section">
-                    <h3><i class="fas fa-flask"></i> Medical Tests</h3>
-                    <p>All tests have been ordered.</p>
-                </div>
-            `;
+        const orderedTests = this.gameState.orderedTests.map(testId => {
+            const test = this.gameState.currentCase.tests.find(t => t.id === testId);
+            return {
+                id: testId,
+                name: test.name,
+                result: this.generateTestResult(test) // Use the same result generation logic
+            };
+        });
+
+        let content = '';
+
+        if (availableTests.length === 0 && orderedTests.length === 0) {
+            content += '<p>All tests have been ordered and results received.</p>';
+        } else {
+            if (availableTests.length > 0) {
+                content += `
+                    <div class="available-tests">
+                        <h4>Available Tests:</h4>
+                        <div class="test-grid">
+                            ${availableTests.map(t => `
+                                <button class="action-btn secondary test-btn" data-test="${t.id}" onclick="game.orderTest('${t.id}')">
+                                    ${t.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (orderedTests.length > 0) {
+                content += `
+                    <div class="ordered-tests">
+                        <h4>Ordered Tests:</h4>
+                        ${orderedTests.map(test => `
+                            <div class="test-result-item">
+                                <strong>${test.name}:</strong> ${test.result}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
         }
-        
-        const testButtons = availableTests.map(t => `
-            <button class="action-btn secondary test-btn" data-test="${t.id}" onclick="game.orderTest('${t.id}')">
-                ${t.name}
-            </button>
-        `).join('');
         
         return `
             <div class="section">
                 <h3><i class="fas fa-flask"></i> Medical Tests</h3>
-                <div class="test-grid">
-                    ${testButtons}
-                </div>
+                ${content}
             </div>
         `;
     }
@@ -524,6 +707,7 @@ class MedicalMysteryGame {
         
         this.gameState.historyRevealed = true;
         this.gameState.score += SCORING.HISTORY_REVEAL;
+        this.playSound('success');
         this.render();
     }
 
@@ -538,10 +722,12 @@ class MedicalMysteryGame {
             
             this.gameState.askedQuestions.push(questionId);
             this.gameState.score += SCORING.QUESTION_ASK;
+            this.playSound('click');
             this.render();
             
         } catch (error) {
             console.error('Error asking question:', error);
+            this.playSound('error');
         }
     }
 
@@ -556,20 +742,117 @@ class MedicalMysteryGame {
             
             this.gameState.orderedTests.push(testId);
             this.gameState.score += SCORING.TEST_ORDER;
+            this.playSound('monitor');
             
-            // Update only the medical tests section instead of full re-render
+            // Show test result immediately
+            this.showTestResult(test);
+            
+            // Update the medical tests section to show both available and ordered tests
             this.updateMedicalTestsSection();
             
         } catch (error) {
             console.error('Error ordering test:', error);
+            this.playSound('error');
+            this.showError('Failed to order test. Please try again.');
         }
     }
 
+    showTestResult(test) {
+        // Generate realistic test results based on the test type
+        const results = this.generateTestResult(test);
+        
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.className = 'test-result-notification';
+        notification.innerHTML = `
+            <div class="test-result-content">
+                <h4><i class="fas fa-flask"></i> ${test.name} Results</h4>
+                <p>${results}</p>
+                <button class="action-btn secondary" onclick="this.parentElement.parentElement.remove()">Close</button>
+            </div>
+        `;
+        
+        // Add to the game container
+        const gameContainer = document.getElementById('game-container');
+        if (gameContainer) {
+            gameContainer.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+    }
+
+    generateTestResult(test) {
+        // Generate realistic test results based on test type and current case
+        const caseId = this.gameState.currentCase.id;
+        
+        const testResults = {
+            // Cardiac case results
+            ecg: "Sinus rhythm with ST-segment elevation in leads II, III, aVF. Q waves present in inferior leads. Consistent with acute inferior wall myocardial infarction.",
+            troponin: "Elevated troponin I: 15.2 ng/mL (normal <0.04). Confirms myocardial injury.",
+            chest_xray: "Cardiomegaly with pulmonary congestion. No pneumothorax or other acute findings.",
+            cardiac_enzymes: "Elevated CK-MB: 45 ng/mL, LDH: 280 U/L. Consistent with myocardial damage.",
+            
+            // Trauma case results
+            ct_scan: "Large hemoperitoneum with active extravasation from liver laceration. Multiple rib fractures. No intracranial hemorrhage.",
+            ultrasound: "Free fluid in all quadrants. Positive FAST exam for intra-abdominal bleeding.",
+            xray: "Multiple rib fractures (3rd-8th ribs on right). No pneumothorax visible.",
+            blood_work: "Hemoglobin: 8.2 g/dL (normal 13-17). Platelets: 85,000/μL. Elevated lactate: 4.2 mmol/L.",
+            
+            // Pediatric case results
+            pulse_ox: "Oxygen saturation: 88% on room air. Improves to 94% with supplemental oxygen.",
+            chest_xray_ped: "Hyperinflated lungs with flattened diaphragms. No infiltrates. Consistent with asthma exacerbation.",
+            blood_gas: "pH: 7.32, PaCO2: 48 mmHg, PaO2: 65 mmHg. Respiratory acidosis with hypoxemia.",
+            cbc: "White blood cells: 12,500/μL. Neutrophils: 8,200/μL. No significant anemia.",
+            
+            // Obstetric case results
+            ultrasound_ob: "Single viable fetus, vertex presentation. Estimated gestational age: 38 weeks. Amniotic fluid index: 8.5 cm.",
+            fetal_monitor: "Fetal heart rate: 140-150 bpm with good variability. Contractions every 3-4 minutes.",
+            blood_pressure: "BP: 140/90 mmHg. Elevated from baseline of 120/80 mmHg.",
+            urine_test: "Proteinuria: 2+ on dipstick. Glucose: negative. Ketones: trace.",
+            
+            // Psychiatric case results
+            mental_status: "Patient alert and oriented x3. Mood: depressed. Affect: flat. No psychotic symptoms.",
+            drug_screen: "Positive for benzodiazepines. Negative for other substances.",
+            thyroid_test: "TSH: 0.8 mIU/L (normal 0.4-4.0). T4: 1.2 ng/dL (normal 0.8-1.8). Normal thyroid function.",
+            cbc_psych: "Hemoglobin: 13.2 g/dL. White blood cells: 7,800/μL. No significant abnormalities.",
+            
+            // Toxicology case results
+            drug_screen_tox: "Positive for opioids (morphine), benzodiazepines, and cocaine metabolites.",
+            blood_alcohol: "Blood alcohol level: 0.08% (legal limit: 0.08%).",
+            liver_function: "AST: 85 U/L, ALT: 92 U/L. Mildly elevated liver enzymes.",
+            kidney_function: "Creatinine: 1.8 mg/dL (elevated). BUN: 25 mg/dL. Acute kidney injury.",
+            
+            // Default results for other tests
+            default: "Test completed. Results within normal limits."
+        };
+        
+        return testResults[test.id] || testResults.default;
+    }
+
     updateMedicalTestsSection() {
-        const testsSection = document.querySelector('.section:has(.test-grid)');
+        // Find the medical tests section by looking for the section with the test-grid class
+        const sections = document.querySelectorAll('.section');
+        let testsSection = null;
+        
+        for (const section of sections) {
+            if (section.querySelector('.test-grid')) {
+                testsSection = section;
+                break;
+            }
+        }
+        
         if (testsSection) {
             const newTestsHTML = this.renderMedicalTests();
             testsSection.outerHTML = newTestsHTML;
+        } else {
+            // If we can't find the section, do a full re-render as fallback
+            console.warn('Medical tests section not found, doing full re-render');
+            this.render();
         }
     }
 
@@ -587,14 +870,17 @@ class MedicalMysteryGame {
             
             if (diagnosis.correct) {
                 this.gameState.score += SCORING.CORRECT_DIAGNOSIS;
+                this.playSound('success');
                 this.endGame('✅ Correct Diagnosis! Patient saved!', true);
             } else {
                 this.gameState.score += SCORING.INCORRECT_DIAGNOSIS;
+                this.playSound('error');
                 this.endGame('❌ Incorrect Diagnosis!', false);
             }
             
         } catch (error) {
             console.error('Error making diagnosis:', error);
+            this.playSound('error');
         }
     }
 
@@ -660,6 +946,7 @@ class MedicalMysteryGame {
     }
 
     showGlossary() {
+        this.playSound('click');
         const glossaryContent = `
             <div class="modal-overlay" onclick="game.hideGlossary()">
                 <div class="modal-content" onclick="event.stopPropagation()">
@@ -709,6 +996,7 @@ class MedicalMysteryGame {
     }
 
     hideGlossary() {
+        this.playSound('click');
         const modal = document.querySelector('.modal-overlay');
         if (modal) {
             modal.remove();
@@ -716,6 +1004,7 @@ class MedicalMysteryGame {
     }
 
     showSettings() {
+        this.playSound('click');
         const settingsContent = `
             <div class="modal-overlay" onclick="game.hideSettings()">
                 <div class="modal-content" onclick="event.stopPropagation()">
@@ -730,13 +1019,13 @@ class MedicalMysteryGame {
                             <h3>Game Settings</h3>
                             <div class="setting-item">
                                 <label>
-                                    <input type="checkbox" id="sound-toggle" ${this.settings.soundEnabled ? 'checked' : ''}>
+                                    <input type="checkbox" id="sound-toggle" ${this.settings.soundEnabled ? 'checked' : ''} onchange="game.toggleSound(this.checked)">
                                     Enable Sound Effects
                                 </label>
                             </div>
                             <div class="setting-item">
                                 <label>
-                                    <input type="checkbox" id="timer-toggle" ${this.settings.timerEnabled ? 'checked' : ''}>
+                                    <input type="checkbox" id="timer-toggle" ${this.settings.timerEnabled ? 'checked' : ''} onchange="game.toggleTimer(this.checked)">
                                     Enable Timer
                                 </label>
                             </div>
@@ -747,6 +1036,7 @@ class MedicalMysteryGame {
                                 <p><strong>Games Played:</strong> ${this.stats.gamesPlayed}</p>
                                 <p><strong>Games Won:</strong> ${this.stats.gamesWon}</p>
                                 <p><strong>Average Score:</strong> ${this.stats.averageScore}</p>
+                                <p><strong>Best Score:</strong> ${Math.max(...Object.values(this.stats.bestScores), 0)}</p>
                             </div>
                         </div>
                         <div class="settings-actions">
@@ -760,24 +1050,18 @@ class MedicalMysteryGame {
         `;
         
         document.body.insertAdjacentHTML('beforeend', settingsContent);
-        
-        // Add event listeners for settings
-        const soundToggle = document.getElementById('sound-toggle');
-        const timerToggle = document.getElementById('timer-toggle');
-        
-        if (soundToggle) {
-            soundToggle.addEventListener('change', (e) => {
-                this.settings.soundEnabled = e.target.checked;
-                localStorage.setItem('gameSettings', JSON.stringify(this.settings));
-            });
-        }
-        
-        if (timerToggle) {
-            timerToggle.addEventListener('change', (e) => {
-                this.settings.timerEnabled = e.target.checked;
-                localStorage.setItem('gameSettings', JSON.stringify(this.settings));
-            });
-        }
+    }
+
+    toggleSound(enabled) {
+        this.settings.soundEnabled = enabled;
+        this.playSound('click');
+        localStorage.setItem('gameSettings', JSON.stringify(this.settings));
+    }
+
+    toggleTimer(enabled) {
+        this.settings.timerEnabled = enabled;
+        this.playSound('click');
+        localStorage.setItem('gameSettings', JSON.stringify(this.settings));
     }
 
     hideSettings() {
