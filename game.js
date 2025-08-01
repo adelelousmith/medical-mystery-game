@@ -1,4 +1,6 @@
-// Medical Mystery Game - Emergency Medicine Simulator
+// Medical Mystery Game - Steam-Ready Emergency Medicine Simulator
+// Enhanced with Steam integration, achievements, and professional features
+
 // Constants
 const SCORING = {
     HISTORY_REVEAL: 50,
@@ -8,7 +10,10 @@ const SCORING = {
     INCORRECT_DIAGNOSIS: -100,
     SPECIALIST_CONSULT: 40,
     APPROPRIATE_REFERRAL: 50,
-    INAPPROPRIATE_REFERRAL: -30
+    INAPPROPRIATE_REFERRAL: -30,
+    PERFECT_SCORE_BONUS: 100,
+    TIME_BONUS: 50,
+    CRITICAL_SAVE: 75
 };
 
 // Game Phases
@@ -33,6 +38,52 @@ const DETERIORATION_FACTORS = {
     INCORRECT_ACTIONS: 0.2, // Deterioration per wrong action
     MISSED_CRITICAL: 0.5, // Deterioration for missing critical tests
     IMPROVEMENT: -0.3 // Improvement for correct actions
+};
+
+// Steam Achievement System
+const STEAM_ACHIEVEMENTS = {
+    FIRST_CASE: {
+        id: 'first_case_completed',
+        title: 'First Steps',
+        description: 'Complete your first medical case',
+        steamId: 'FIRST_CASE_COMPLETED',
+        icon: 'fas fa-stethoscope'
+    },
+    PERFECT_DIAGNOSIS: {
+        id: 'perfect_diagnosis',
+        title: 'Perfect Diagnosis',
+        description: 'Achieve a perfect score with stable patient',
+        steamId: 'PERFECT_DIAGNOSIS',
+        icon: 'fas fa-star'
+    },
+    SPEED_RUNNER: {
+        id: 'speed_runner',
+        title: 'Speed Runner',
+        description: 'Complete a case in under 2 minutes',
+        steamId: 'SPEED_RUNNER',
+        icon: 'fas fa-bolt'
+    },
+    CRITICAL_CARE: {
+        id: 'critical_care_specialist',
+        title: 'Critical Care Specialist',
+        description: 'Successfully manage 5 critical patients',
+        steamId: 'CRITICAL_CARE_SPECIALIST',
+        icon: 'fas fa-heartbeat'
+    },
+    MASTER_DIAGNOSTICIAN: {
+        id: 'master_diagnostician',
+        title: 'Master Diagnostician',
+        description: 'Complete all cases with perfect scores',
+        steamId: 'MASTER_DIAGNOSTICIAN',
+        icon: 'fas fa-trophy'
+    },
+    EMERGENCY_EXPERT: {
+        id: 'emergency_expert',
+        title: 'Emergency Expert',
+        description: 'Complete 10 emergency cases',
+        steamId: 'EMERGENCY_EXPERT',
+        icon: 'fas fa-ambulance'
+    }
 };
 
 // Specialist Types
@@ -455,58 +506,93 @@ class MedicalMysteryGame {
         }
     }
 
-    // Achievement System
+    // Enhanced Steam Achievement System
     checkAchievements() {
         const newAchievements = [];
+        const caseCompletionTime = this.gameState.currentCase.timeLimit * 60 - this.gameState.timeRemaining;
         
-        // Speed achievements
-        if (this.gameState.timeRemaining > 0 && this.gameState.score >= 300) {
-            const timeEfficiency = this.gameState.score / (this.gameState.currentCase.timeLimit * 60 - this.gameState.timeRemaining);
-            if (timeEfficiency > 2) {
-                newAchievements.push({
-                    id: 'speed_demon',
-                    title: 'Speed Demon',
-                    description: 'Completed case with high efficiency',
-                    icon: 'fas fa-bolt',
-                    unlocked: true,
-                    timestamp: Date.now()
-                });
-            }
+        // First case completion
+        if (this.stats.gamesPlayed === 1) {
+            newAchievements.push({
+                ...STEAM_ACHIEVEMENTS.FIRST_CASE,
+                unlocked: true,
+                timestamp: Date.now()
+            });
         }
         
-        // Perfect diagnosis
+        // Perfect diagnosis with high score and stable patient
         if (this.gameState.score >= 400 && this.gameState.patientStability >= 80) {
             newAchievements.push({
-                id: 'perfect_diagnosis',
-                title: 'Perfect Diagnosis',
-                description: 'Achieved perfect score with stable patient',
-                icon: 'fas fa-star',
+                ...STEAM_ACHIEVEMENTS.PERFECT_DIAGNOSIS,
                 unlocked: true,
                 timestamp: Date.now()
             });
         }
         
-        // Critical care
+        // Speed runner - complete case in under 2 minutes
+        if (caseCompletionTime < 120 && this.gameState.score >= 200) {
+            newAchievements.push({
+                ...STEAM_ACHIEVEMENTS.SPEED_RUNNER,
+                unlocked: true,
+                timestamp: Date.now()
+            });
+        }
+        
+        // Critical care specialist - manage critical patient successfully
         if (this.gameState.patientStability <= 30 && this.gameState.score >= 200) {
             newAchievements.push({
-                id: 'critical_care',
-                title: 'Critical Care Specialist',
-                description: 'Successfully managed critical patient',
-                icon: 'fas fa-heartbeat',
+                ...STEAM_ACHIEVEMENTS.CRITICAL_CARE,
                 unlocked: true,
                 timestamp: Date.now()
             });
         }
         
-        // Add new achievements to existing ones
+        // Emergency expert - complete multiple emergency cases
+        const emergencyCases = this.stats.casesCompleted.emergency || 0;
+        if (emergencyCases >= 10) {
+            newAchievements.push({
+                ...STEAM_ACHIEVEMENTS.EMERGENCY_EXPERT,
+                unlocked: true,
+                timestamp: Date.now()
+            });
+        }
+        
+        // Master diagnostician - perfect scores on all cases
+        const totalCases = Object.keys(this.stats.casesCompleted).length;
+        const perfectCases = Object.values(this.stats.bestScores).filter(score => score >= 400).length;
+        if (totalCases >= 5 && perfectCases === totalCases) {
+            newAchievements.push({
+                ...STEAM_ACHIEVEMENTS.MASTER_DIAGNOSTICIAN,
+                unlocked: true,
+                timestamp: Date.now()
+            });
+        }
+        
+        // Add new achievements and trigger Steam integration
         newAchievements.forEach(achievement => {
             if (!this.achievements.find(a => a.id === achievement.id)) {
                 this.achievements.push(achievement);
                 this.showAchievementNotification(achievement);
+                this.triggerSteamAchievement(achievement);
             }
         });
         
         this.saveAchievements();
+    }
+    
+    triggerSteamAchievement(achievement) {
+        // Steam API integration
+        if (typeof Steam !== 'undefined' && Steam.setAchievement) {
+            try {
+                Steam.setAchievement(achievement.steamId);
+                console.log(`Steam achievement unlocked: ${achievement.steamId}`);
+            } catch (error) {
+                console.warn('Steam achievement error:', error);
+            }
+        }
+        
+        // Show Steam-style notification
+        this.showSteamAchievementNotification(achievement);
     }
 
     showAchievementNotification(achievement) {
@@ -526,8 +612,25 @@ class MedicalMysteryGame {
         
         // Remove after 3 seconds
         setTimeout(() => {
-            notification.remove();
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
         }, 3000);
+    }
+    
+    showSteamAchievementNotification(achievement) {
+        const steamNotification = document.getElementById('steam-achievement');
+        const descriptionElement = document.getElementById('achievement-description');
+        
+        if (steamNotification && descriptionElement) {
+            descriptionElement.textContent = `${achievement.title}: ${achievement.description}`;
+            steamNotification.classList.remove('hidden');
+            
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                steamNotification.classList.add('hidden');
+            }, 4000);
+        }
     }
 
     saveAchievements() {
@@ -557,7 +660,31 @@ class MedicalMysteryGame {
     }
 
     showCaseSelection() {
-        this.gameState.gamePhase = 'case-selection';
+        // Reset game state when returning to case selection
+        this.gameState.gamePhase = GAME_PHASES.CASE_SELECTION;
+        this.gameState.currentCase = null;
+        this.gameState.timeRemaining = 0;
+        this.gameState.score = 0;
+        this.gameState.askedQuestions = [];
+        this.gameState.orderedTests = [];
+        this.gameState.historyRevealed = false;
+        this.gameState.finalDiagnosis = null;
+        this.gameState.patientState = PATIENT_STATES.STABLE;
+        this.gameState.patientStability = 100;
+        this.gameState.criticalActionsMissed = 0;
+        this.gameState.incorrectActions = 0;
+        this.gameState.specialistConsultations = [];
+        this.gameState.consultationSlotsRemaining = 3;
+        this.gameState.questionsRemaining = 5;
+        
+        // Stop any running timers
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        
+        // Stop background music
+        this.toggleBackgroundMusic(false);
         
         try {
             const cases = getAllCases();
@@ -641,14 +768,25 @@ class MedicalMysteryGame {
                 throw new Error(`Case ${caseId} not found`);
             }
             
+            // Reset game state completely for new case
             this.gameState.currentCase = case_;
             this.gameState.timeRemaining = case_.timeLimit * 60; // Convert to seconds
             this.gameState.score = 0;
             this.gameState.askedQuestions = [];
             this.gameState.orderedTests = [];
             this.gameState.historyRevealed = false;
-            this.gameState.gamePhase = 'playing';
+            this.gameState.gamePhase = GAME_PHASES.PLAYING;
             this.gameState.finalDiagnosis = null;
+            this.gameState.patientState = PATIENT_STATES.STABLE;
+            this.gameState.patientStability = 100;
+            this.gameState.criticalActionsMissed = 0;
+            this.gameState.incorrectActions = 0;
+            this.gameState.specialistConsultations = [];
+            this.gameState.consultationSlotsRemaining = 3; // Reset consultation slots
+            this.gameState.questionsRemaining = 5; // Reset question limit
+            
+            // Reset case start time for performance tracking
+            this.caseStartTime = Date.now();
             
             // Start background music if enabled
             if (this.settings.backgroundMusicEnabled) {
@@ -755,11 +893,11 @@ class MedicalMysteryGame {
                         <i class="fas fa-heartbeat"></i>
                         <span>${this.gameState.patientState.charAt(0).toUpperCase() + this.gameState.patientState.slice(1)} (${Math.round(this.gameState.patientStability)}%)</span>
                     </div>
-                    <div class="status-item">
+                    <div class="status-item ${this.gameState.questionsRemaining <= 1 ? 'limited' : ''}">
                         <i class="fas fa-question-circle"></i>
                         <span>Q: ${this.gameState.questionsRemaining}</span>
                     </div>
-                    <div class="status-item">
+                    <div class="status-item ${this.gameState.consultationSlotsRemaining <= 1 ? 'limited' : ''}">
                         <i class="fas fa-user-md"></i>
                         <span>C: ${this.gameState.consultationSlotsRemaining}</span>
                     </div>
@@ -778,9 +916,9 @@ class MedicalMysteryGame {
                 ${this.renderPatientImage()}
                 ${this.renderHistorySection()}
                 ${this.renderPatientInterview()}
+                ${this.renderSpecialistConsultations()}
                 ${this.renderMedicalTests()}
                 ${this.renderDiagnosisOptions()}
-                ${this.renderSpecialistConsultations()}
             </div>
 
             <div class="game-actions">
@@ -983,7 +1121,15 @@ class MedicalMysteryGame {
             'weakness': 'Yes, weakness on left side of body. Difficulty with fine motor tasks.',
             'vision_problems': 'Yes, blurred vision in right eye. Reports "spots" in vision.',
             'speech_problems': 'Yes, slurred speech and difficulty finding words. Speech is slow and unclear.',
-            'balance_problems': 'Yes, difficulty maintaining balance. Patient reports feeling "unsteady on feet".'
+            'balance_problems': 'Yes, difficulty maintaining balance. Patient reports feeling "unsteady on feet".',
+            
+            // Stroke case questions
+            'symptom_onset': 'Symptoms began 45 minutes ago. Patient was watching TV when he suddenly noticed left arm weakness and slurred speech.',
+            'consciousness_level': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions but speech is slurred.',
+            'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
+            'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
+            'headache': 'No headache reported. Patient denies any head or neck pain.',
+            'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.'
         };
         
         return answers[questionId] || 'Patient responds appropriately to the question.';
@@ -1438,7 +1584,7 @@ class MedicalMysteryGame {
                         </div>
                     </div>
                     <div class="game-actions">
-                        <button class="action-btn primary" onclick="game.showCaseSelection()">
+                        <button class="action-btn primary" onclick="game.resetAndPlayAgain()">
                             <i class="fas fa-play"></i> Play Again
                         </button>
                         <button class="action-btn secondary" onclick="game.showAchievements()">
@@ -1923,6 +2069,39 @@ class MedicalMysteryGame {
             const test = this.gameState.currentCase.tests.find(t => t.id === testId);
             return test ? test.result : null;
         }).filter(result => result);
+    }
+
+    resetAndPlayAgain() {
+        // Reset all game state for a fresh start
+        this.gameState = {
+            currentCase: null,
+            timeRemaining: 0,
+            score: 0,
+            askedQuestions: [],
+            orderedTests: [],
+            historyRevealed: false,
+            gamePhase: GAME_PHASES.CASE_SELECTION,
+            finalDiagnosis: null,
+            patientState: PATIENT_STATES.STABLE,
+            patientStability: 100,
+            criticalActionsMissed: 0,
+            incorrectActions: 0,
+            specialistConsultations: [],
+            consultationSlotsRemaining: 3,
+            questionsRemaining: 5
+        };
+        
+        // Stop any running timers
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+        
+        // Stop background music
+        this.toggleBackgroundMusic(false);
+        
+        // Show case selection
+        this.showCaseSelection();
     }
 }
 

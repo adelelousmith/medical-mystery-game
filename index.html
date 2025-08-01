@@ -3,29 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Medical Mystery - Interactive Emergency Medicine Simulator for learning diagnostic skills">
-    <meta name="keywords" content="medical, emergency, simulation, education, diagnosis, healthcare">
-    <meta name="author" content="Medical Mystery Team">
+    
+    <!-- Steam-Ready Meta Tags -->
+    <meta name="description" content="Medical Mystery - Professional Emergency Medicine Simulator. Master diagnostic skills with realistic cases, time pressure, and authentic medical scenarios. Perfect for medical students and healthcare professionals.">
+    <meta name="keywords" content="medical simulation, emergency medicine, diagnostic game, healthcare education, medical training, emergency room simulator">
+    <meta name="author" content="Medical Mystery Development Team">
     <meta name="theme-color" content="#2563eb">
+    <meta name="robots" content="index, follow">
     
-    <title>Medical Mystery - Emergency Medicine Simulator</title>
+    <!-- Open Graph Tags for Steam -->
+    <meta property="og:title" content="Medical Mystery - Emergency Medicine Simulator">
+    <meta property="og:description" content="Master diagnostic skills with realistic emergency medicine cases. Time pressure, authentic scenarios, and comprehensive learning.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://medical-mystery-game.com">
+    <meta property="og:image" content="https://medical-mystery-game.com/assets/steam-banner.jpg">
     
-    <!-- Favicon -->
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Medical Mystery - Emergency Medicine Simulator">
+    <meta name="twitter:description" content="Professional medical simulation game for diagnostic training">
+    
+    <title>Medical Mystery - Professional Emergency Medicine Simulator</title>
+    
+    <!-- Enhanced Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="game.js" as="script">
+    <link rel="preload" href="cases.js" as="script">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="game.js" as="script">
-    <link rel="preload" href="cases.js" as="script">
+    <!-- Steam Integration Script -->
+    <script>
+        // Steam API Integration
+        if (typeof Steam !== 'undefined') {
+            // Initialize Steam achievements
+            window.steamAchievements = {
+                firstCase: 'FIRST_CASE_COMPLETED',
+                perfectDiagnosis: 'PERFECT_DIAGNOSIS',
+                speedRunner: 'SPEED_RUNNER',
+                criticalCare: 'CRITICAL_CARE_SPECIALIST',
+                masterDiagnostician: 'MASTER_DIAGNOSTICIAN'
+            };
+        }
+    </script>
 </head>
 <body>
     <div id="app">
-        <!-- Loading Screen -->
+        <!-- Enhanced Loading Screen -->
         <div id="loading-screen" class="loading-screen">
             <div class="loading-content">
                 <div class="loading-icon">
@@ -35,6 +69,7 @@
                 <div class="loading-bar">
                     <div class="loading-progress"></div>
                 </div>
+                <p class="loading-tip">Tip: Use the medical glossary to learn new terms</p>
             </div>
         </div>
 
@@ -42,11 +77,36 @@
         <div id="game-container">
             <!-- Will be populated by JavaScript -->
         </div>
+        
+        <!-- Steam Achievement Notification -->
+        <div id="steam-achievement" class="steam-achievement hidden">
+            <div class="achievement-content">
+                <i class="fas fa-trophy"></i>
+                <div class="achievement-text">
+                    <h3>Achievement Unlocked!</h3>
+                    <p id="achievement-description"></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
-                        <script src="images.js"></script>
-                    <script src="cases.js"></script>
-                    <script src="game.js"></script>
+    <script src="images.js"></script>
+    <script src="cases.js"></script>
+    <script src="game.js"></script>
+    
+    <!-- Steam Integration -->
+    <script>
+        // Initialize game after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Steam integration if available
+            if (typeof Steam !== 'undefined') {
+                console.log('Steam integration available');
+            }
+            
+            // Initialize game
+            window.game = new MedicalMysteryGame();
+        });
+    </script>
 </body>
 </html> 

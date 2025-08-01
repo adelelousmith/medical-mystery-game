@@ -28,8 +28,9 @@ const DIFFICULTY_LEVELS = {
 };
 
 // Enhanced medical cases inspired by TOMY Medical Mysteries Investigation Game
+// Steam-Ready Professional Medical Cases
 const medicalCases = {
-    // EASY CASES - Good for beginners
+    // EASY CASES - Good for beginners and Steam onboarding
     pediatric_fever: {
         id: "pediatric_fever",
         title: "Pediatric Fever - 3-Year-Old",
@@ -604,6 +605,175 @@ const medicalCases = {
                 correct: false,
                 consequences: "Missed diagnosis, continued symptoms",
                 emotionalImpact: "Child continues to struggle unnecessarily"
+            }
+        ]
+    },
+
+    // NEW CASE - Neurological Emergency
+    neurological_stroke: {
+        id: "neurological_stroke",
+        title: "Acute Neurological Deficit - 72-Year-Old Male",
+        specialty: "Neurology",
+        difficulty: "hard",
+        category: "neurological",
+        correctDiagnosis: "Ischemic Stroke",
+        icon: "fas fa-brain",
+        timeLimit: TIME_PRESSURE.CRITICAL, // 3 minutes - time is brain!
+        description: "A 72-year-old man presents with sudden onset of left-sided weakness and slurred speech. Symptoms began 45 minutes ago.",
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CjxwYXRoIGQ9Ik0xODAgMTIwIEwyMjAgMTIwIEwyMDAgMTgwIEwxODAgMTIwIiBmaWxsPSIjRkYwMDAwIiBzdHJva2U9IiNGRjAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij43Mi15ZWFyLW9sZCBtYWxlPC90ZXh0Pgo8L3N2Zz4K",
+        patientHistory: {
+            demographics: "72-year-old male",
+            pastMedicalHistory: [
+                "Hypertension (20 years)",
+                "Type 2 Diabetes (15 years)",
+                "Atrial Fibrillation (5 years)",
+                "Previous TIA 2 years ago",
+                "Hyperlipidemia"
+            ],
+            socialHistory: [
+                "Lives alone in retirement community",
+                "Former accountant, retired 5 years ago",
+                "Minimal alcohol use",
+                "No tobacco use"
+            ],
+            familyHistory: [
+                "Father died of stroke at age 68",
+                "Mother has diabetes and hypertension",
+                "Sister has atrial fibrillation"
+            ],
+            medications: [
+                "Metformin 500mg twice daily",
+                "Lisinopril 10mg daily",
+                "Atorvastatin 20mg daily",
+                "Apixaban 5mg twice daily",
+                "Metoprolol 25mg twice daily"
+            ],
+            allergies: "None known",
+            lastPhysical: "3 months ago - BP 140/85, otherwise stable",
+            emotionalContext: "Patient is alert but anxious about his symptoms. Family is very concerned and wants immediate action."
+        },
+        questions: [
+            {
+                id: "symptom_onset",
+                text: "When did the symptoms first begin?",
+                category: "timing",
+                critical: true
+            },
+            {
+                id: "consciousness_level",
+                text: "Is the patient alert and oriented?",
+                category: "neurological",
+                critical: true
+            },
+            {
+                id: "speech_problems",
+                text: "Are there any speech or language difficulties?",
+                category: "neurological",
+                critical: true
+            },
+            {
+                id: "vision_problems",
+                text: "Any visual disturbances or field cuts?",
+                category: "neurological",
+                critical: false
+            },
+            {
+                id: "headache",
+                text: "Is there any headache or neck pain?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "recent_trauma",
+                text: "Any recent head trauma or falls?",
+                category: "history",
+                critical: false
+            }
+        ],
+        tests: [
+            {
+                id: "neurological_exam",
+                name: "Neurological Examination",
+                description: "Comprehensive neurological assessment",
+                cost: 50,
+                timeRequired: 2,
+                critical: true,
+                category: "neurological",
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPk5ldXJvbG9naWNhbCBFeGFtaW5hdGlvbjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNGRjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+QUJOT1JNQUw8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPkxlZnQgc2lkZSB3ZWFrbmVzcywgc2x1cnJlZCBzcGVlY2g8L3RleHQ+Cjwvc3ZnPgo="
+            },
+            {
+                id: "ct_head",
+                name: "CT Head (Non-contrast)",
+                description: "Emergency brain imaging for stroke evaluation",
+                cost: 200,
+                timeRequired: 3,
+                critical: true,
+                category: "neurological",
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNUIEhlYWQ8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkYwMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPk5FR0FUSVZFPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij5ObyBibGVlZGluZywgbm8gbWFzcyBsZXNpb248L3RleHQ+Cjwvc3ZnPgo="
+            },
+            {
+                id: "glucose",
+                name: "Blood Glucose",
+                description: "Check for hypoglycemia as stroke mimic",
+                cost: 30,
+                timeRequired: 1,
+                critical: false,
+                category: "laboratory",
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkdsdWNvc2U8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBGRjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPjE0MCBtZy9kTDwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+Tm9ybWFsPC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "coagulation_studies",
+                name: "Coagulation Studies",
+                description: "INR and PTT for anticoagulation status",
+                cost: 80,
+                timeRequired: 2,
+                critical: false,
+                category: "laboratory",
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNvYWd1bGF0aW9uIFN0dWRpZXM8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDBGRjAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiPklOUjogMi4xPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij5UaGVyYXBldXRpYyByYW5nZTwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+UFRUOiAzNSBzZWNvbmRzPC90ZXh0Pgo8L3N2Zz4K"
+            },
+            {
+                id: "cardiac_monitor",
+                name: "Cardiac Monitoring",
+                description: "Continuous ECG monitoring for arrhythmias",
+                cost: 60,
+                timeRequired: 1,
+                critical: false,
+                category: "cardiac",
+                resultImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiPkNhcmRpYWMgTW9uaXRvcmluZzwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIxODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiNGRjAwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCI+QVRSSUFMIEZJQlJJTExBVElPTjwvdGV4dD4KPHRleHQgeD0iMjAwIiB5PSIyMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+SW5lZ3VsYXIgcml0aG0sIG5vIFAtd2F2ZXM8L3RleHQ+Cjwvc3ZnPgo="
+            }
+        ],
+        diagnosisOptions: [
+            {
+                id: "ischemic_stroke",
+                name: "Ischemic Stroke",
+                description: "Blocked blood vessel in the brain causing tissue damage",
+                correct: true,
+                consequences: "Immediate thrombolytic therapy if within 4.5 hours of onset",
+                emotionalImpact: "Patient and family understand the urgency of treatment"
+            },
+            {
+                id: "hemorrhagic_stroke",
+                name: "Hemorrhagic Stroke",
+                description: "Bleeding in the brain causing neurological deficits",
+                correct: false,
+                consequences: "Inappropriate thrombolytics could worsen bleeding",
+                emotionalImpact: "Family concerned about brain bleeding"
+            },
+            {
+                id: "tia",
+                name: "Transient Ischemic Attack (TIA)",
+                description: "Temporary neurological symptoms that resolve completely",
+                correct: false,
+                consequences: "Missed opportunity for stroke prevention",
+                emotionalImpact: "Patient relieved but may not seek follow-up care"
+            },
+            {
+                id: "seizure",
+                name: "Post-Ictal State",
+                description: "Neurological deficits following a seizure",
+                correct: false,
+                consequences: "Inappropriate treatment, missed stroke diagnosis",
+                emotionalImpact: "Patient confused about actual diagnosis"
             }
         ]
     }

@@ -1,6 +1,6 @@
-/* Medical Mystery Game - Professional UI */
+/* Medical Mystery Game - Steam-Ready Professional UI */
 :root {
-    /* Color Palette */
+    /* Enhanced Color Palette for Steam */
     --primary-blue: #2563eb;
     --secondary-blue: #1d4ed8;
     --accent-blue: #3b82f6;
@@ -19,6 +19,13 @@
     --surface-white: #ffffff;
     --surface-light: #f9fafb;
     --surface-dark: #f3f4f6;
+    
+    /* Steam Achievement Colors */
+    --achievement-gold: #ffd700;
+    --achievement-silver: #c0c0c0;
+    --achievement-bronze: #cd7f32;
+    --steam-green: #5c7e10;
+    --steam-blue: #1b2838;
     
     /* Gradients */
     --header-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
@@ -1130,6 +1137,63 @@ body::before {
     font-weight: 700;
     color: var(--primary-blue);
     margin: 0;
+}
+
+/* Steam Achievement Notification */
+.steam-achievement {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--steam-blue) 0%, var(--steam-green) 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    z-index: 10000;
+    max-width: 400px;
+    animation: slideInRight 0.5s ease-out;
+    border: 2px solid var(--achievement-gold);
+}
+
+.steam-achievement.hidden {
+    display: none;
+}
+
+.achievement-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.achievement-content i {
+    font-size: 2rem;
+    color: var(--achievement-gold);
+    animation: achievementGlow 2s ease-in-out infinite;
+}
+
+.achievement-text h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.achievement-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+@keyframes achievementGlow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Loading Tip */
+.loading-tip {
+    margin-top: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-style: italic;
 }
 
 /* Responsive Design */
