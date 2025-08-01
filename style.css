@@ -44,6 +44,17 @@
     
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    
+    /* Additional Variables for Consistency */
+    --surface-card: #ffffff;
+    --surface-overlay: rgba(0, 0, 0, 0.5);
+    --accent-color: #3b82f6;
+    --shadow-emergency: 0 0 20px rgba(220, 38, 38, 0.3);
+    --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.2);
+    --button-hover-gradient: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+    --border-radius: 0.75rem;
+    --border-radius-lg: 1rem;
+    --border-radius-xl: 1.5rem;
 }
 
 * {
@@ -573,7 +584,7 @@ body::before {
     }
 }
 
-.modal-content {
+.modal .modal-content {
     background: var(--surface-gradient);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
@@ -907,7 +918,7 @@ body::before {
     animation: fadeIn 0.3s ease-out;
 }
 
-.modal-content {
+.modal-overlay .modal-content {
     background: var(--surface-white);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-xl);
@@ -1210,6 +1221,12 @@ textarea:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--secondary-blue);
+}
+
+/* Firefox scrollbar styles */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-blue) var(--surface-dark);
 }
 
 /* Critical Flash Animation */
@@ -1618,4 +1635,453 @@ textarea:focus {
     border-radius: var(--radius);
     border: 2px solid var(--border-blue);
     box-shadow: var(--shadow-md);
+}
+
+/* Achievement Notification */
+.achievement-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--surface-gradient);
+    border: 2px solid var(--success-green);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 10000;
+    animation: slideInRight 0.5s ease-out;
+    max-width: 300px;
+}
+
+.achievement-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.achievement-content i {
+    font-size: 2rem;
+    color: var(--success-green);
+}
+
+.achievement-content h4 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.achievement-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Patient State Indicators */
+.status-item.critical {
+    color: var(--emergency-red);
+    animation: criticalPulse 2s ease-in-out infinite;
+}
+
+.status-item.deteriorating {
+    color: var(--warning-orange);
+}
+
+.status-item.improving {
+    color: var(--success-green);
+}
+
+.status-item.stable {
+    color: var(--text-primary);
+}
+
+/* Enhanced End Game */
+.patient-outcome {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin: 1rem 0;
+    font-weight: 600;
+}
+
+.patient-outcome.success {
+    background: var(--success-green);
+    color: white;
+}
+
+.patient-outcome.warning {
+    background: var(--warning-orange);
+    color: white;
+}
+
+.patient-outcome.danger {
+    background: var(--emergency-red);
+    color: white;
+}
+
+.performance-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.performance-stats .stat-item {
+    background: var(--surface-light);
+    padding: 1rem;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.performance-stats .stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.performance-stats .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Achievement Modal */
+.achievement-modal {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.achievement-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--surface-light);
+    border-radius: var(--radius);
+}
+
+.achievement-stats .stat {
+    text-align: center;
+}
+
+.achievement-stats .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.achievement-stats .stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.achievement-item.unlocked {
+    background: var(--surface-light);
+    border-color: var(--success-green);
+}
+
+.achievement-item.locked {
+    background: var(--surface-dark);
+    opacity: 0.6;
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-blue);
+    color: white;
+    font-size: 1.5rem;
+}
+
+.achievement-item.locked .achievement-icon {
+    background: var(--text-secondary);
+}
+
+.achievement-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.achievement-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.unlock-date {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--success-green);
+    margin-top: 0.5rem;
+}
+
+/* Welcome Screen */
+.welcome-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+}
+
+.welcome-content h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+}
+
+.welcome-content p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+/* Critical Pulse Animation */
+@keyframes criticalPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Slide In Animation */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Specialist Consultation System */
+.specialist-section {
+    background: var(--surface-gradient);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.specialist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.specialist-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    background: var(--surface-light);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.specialist-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.specialist-btn i {
+    font-size: 1.25rem;
+    width: 1.5rem;
+    text-align: center;
+}
+
+.consultation-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--surface-dark);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+}
+
+.consultation-info p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.no-consultations {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+/* Specialist Opinion Modal */
+.specialist-opinion {
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.specialist-info {
+    background: var(--surface-light);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+}
+
+.specialist-info p {
+    margin: 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.specialist-info .success {
+    color: var(--success-green);
+    font-weight: 600;
+}
+
+.specialist-info .danger {
+    color: var(--emergency-red);
+    font-weight: 600;
+}
+
+.specialist-opinion h3 {
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.specialist-opinion p {
+    line-height: 1.6;
+    color: var(--text-primary);
+    font-style: italic;
+    background: var(--surface-light);
+    padding: 1rem;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--primary-blue);
+}
+
+.consultation-remaining {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--surface-dark);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.consultation-remaining p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Question and Consultation Limits */
+.question-info,
+.consultation-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--surface-dark);
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+}
+
+.question-info p,
+.consultation-info p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+/* Status Bar Enhancements */
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--surface-light);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-item i {
+    font-size: 1rem;
+    width: 1rem;
+    text-align: center;
+}
+
+/* Limited Resource Indicators */
+.status-item.limited {
+    background: var(--warning-orange);
+    color: white;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-item.critical {
+    background: var(--emergency-red);
+    color: white;
+    animation: criticalPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Specialist Button States */
+.specialist-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--surface-dark);
+}
+
+.specialist-btn.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--surface-dark);
+    color: var(--text-secondary);
+}
+
+/* Question Button States */
+.question-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.question-btn.disabled:hover {
+    transform: none;
+    box-shadow: none;
 }

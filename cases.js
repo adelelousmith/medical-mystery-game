@@ -9,6 +9,24 @@ const TIME_PRESSURE = {
     ROUTINE: 12  // 12 minutes for routine cases
 };
 
+// Case Categories
+const CASE_CATEGORIES = {
+    CARDIAC: 'cardiac',
+    RESPIRATORY: 'respiratory',
+    NEUROLOGICAL: 'neurological',
+    TRAUMA: 'trauma',
+    PEDIATRIC: 'pediatric',
+    EMERGENCY: 'emergency'
+};
+
+// Difficulty Levels
+const DIFFICULTY_LEVELS = {
+    EASY: 'easy',
+    MEDIUM: 'medium',
+    HARD: 'hard',
+    EXPERT: 'expert'
+};
+
 // Enhanced medical cases inspired by TOMY Medical Mysteries Investigation Game
 const medicalCases = {
     // EASY CASES - Good for beginners
@@ -17,9 +35,10 @@ const medicalCases = {
         title: "Pediatric Fever - 3-Year-Old",
         specialty: "Pediatrics",
         difficulty: "easy",
+        category: "pediatric",
+        correctDiagnosis: "Viral Upper Respiratory Infection",
         icon: "fas fa-thermometer-half",
         timeLimit: TIME_PRESSURE.ROUTINE,
-        correctDiagnosis: "viral_upper_respiratory",
         description: "A 3-year-old girl presents with fever of 102°F, runny nose, and mild cough. Parents are concerned about the fever.",
         patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPjMteWVhci1vbGQgZmVtYWxlPC90ZXh0Pgo8L3N2Zz4K",
         patientHistory: {
@@ -125,7 +144,7 @@ const medicalCases = {
         title: "Acute Abdominal Pain - 45-Year-Old",
         specialty: "Emergency Medicine",
         difficulty: "medium",
-        icon: "fas fa-stomach",
+        icon: "fas fa-user-injured",
         timeLimit: TIME_PRESSURE.MODERATE,
         correctDiagnosis: "appendicitis",
         description: "A 45-year-old woman presents with severe right lower abdominal pain that started 6 hours ago. Pain is constant and worsening.",
@@ -243,7 +262,7 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "myocardial_infarction",
         description: "A 58-year-old male collapses in the waiting room. Bystanders report he was complaining of chest pain and shortness of breath before losing consciousness. The patient is unresponsive with no pulse.",
-        patientImage: getPatientImage("cardiac"),
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CjxwYXRoIGQ9Ik0xODAgMTIwIEwyMjAgMTIwIEwyMDAgMTgwIEwxODAgMTIwIiBmaWxsPSIjRkYwMDAwIiBzdHJva2U9IiNGRjAwMDAiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij41OC15ZWFyLW9sZCBtYWxlPC90ZXh0Pgo8L3N2Zz4K",
         patientHistory: {
             demographics: "58-year-old male",
             pastMedicalHistory: [
@@ -368,7 +387,7 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "multiple_trauma",
         description: "A 32-year-old male is brought in by ambulance after a high-speed motor vehicle accident. Patient is unconscious with multiple injuries.",
-        patientImage: getPatientImage("trauma_multiple"),
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CjxyZWN0IHg9IjE3MCIgeT0iMTEwIiB3aWR0aD0iNjAiIGhlaWdodD0iNDAiIGZpbGw9IiNGRkYwMDAiIHN0cm9rZT0iI0ZGMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMDAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiPjMyLXllYXItb2xkIG1hbGU8L3RleHQ+Cjwvc3ZnPgo=",
         patientHistory: {
             demographics: "32-year-old male",
             pastMedicalHistory: [
@@ -491,7 +510,7 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.URGENT,
         correctDiagnosis: "asthma_exacerbation",
         description: "An 8-year-old boy presents with severe difficulty breathing, wheezing, and chest tightness. Parents report he has a history of asthma.",
-        patientImage: getPatientImage("pediatric_asthma"),
+        patientImage: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRkZGRkZGIi8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjE1MCIgcj0iODAiIGZpbGw9IiNGRkM0QzQiLz4KPGNpcmNsZSBjeD0iMTgwIiBjeT0iMTMwIiByPSIxMCIgZmlsbD0iIzAwMCIvPgo8Y2lyY2xlIGN4PSIyMjAiIGN5PSIxMzAiIHI9IjEwIiBmaWxsPSIjMDAwIi8+CjxwYXRoIGQ9Ik0xNzAgMTgwIFEyMDAgMjAwIDIzMCAxODAiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+CjxwYXRoIGQ9Ik0xNzAgMTYwIEwyMzAgMTYwIiBzdHJva2U9IiMwMDBGRkYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgo8dGV4dCB4PSIyMDAiIHk9IjI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0Ij44LXllYXItb2xkIG1hbGU8L3RleHQ+Cjwvc3ZnPgo=",
         patientHistory: {
             demographics: "8-year-old male",
             pastMedicalHistory: [
