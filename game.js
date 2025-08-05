@@ -1129,6 +1129,40 @@ class MedicalMysteryGame {
             'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
             'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
             'headache': 'No headache reported. Patient denies any head or neck pain.',
+            'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.',
+            
+            // Pediatric fever case questions
+            'fever_duration': 'Fever has been present for 2 days. Started with runny nose and mild cough.',
+            'other_symptoms': 'Yes, runny nose, mild cough, and slight decrease in appetite. No vomiting or diarrhea.',
+            'appetite': 'Child is eating and drinking normally, though slightly less than usual. No signs of dehydration.',
+            'activity_level': 'Child is active and playful when fever is controlled with medication. Sleeps normally.',
+            
+            // Abdominal pain case questions
+            'pain_location': 'Pain is located in the right lower abdomen. Patient points to McBurney\'s point specifically.',
+            'pain_character': 'Pain is sharp and constant, rated 8/10. Worse with movement and coughing.',
+            'nausea_vomiting': 'Yes, patient has been nauseous for 6 hours and vomited twice. Can\'t keep food down.',
+            'fever': 'Yes, low-grade fever of 100.4°F (38°C). Patient feels warm to touch.',
+            'appetite': 'No appetite for the past 12 hours. Patient reports feeling "sick to my stomach".',
+            
+            // Trauma case questions
+            'consciousness': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions.',
+            'breathing': 'Patient is breathing but with difficulty. Respiratory rate is 24/min and shallow.',
+            'circulation': 'Pulse is 110/min and regular. Skin is warm and dry with good capillary refill.',
+            'bleeding': 'Yes, visible bruising on abdomen and chest. Patient reports internal bleeding sensation.',
+            'deformities': 'No obvious deformities. Patient reports pain with movement but no visible abnormalities.',
+            
+            // Pediatric asthma case questions
+            'breathing_difficulty': 'Yes, child is working hard to breathe. Using accessory muscles and has nasal flaring.',
+            'wheezing': 'Yes, audible wheezing heard throughout chest. Worse with activity and at night.',
+            'triggers': 'Yes, symptoms started after playing outside in cold weather. Has history of asthma.',
+            'medication': 'Yes, child has albuterol inhaler but it\'s not helping much. Used it 3 times today.',
+            
+            // Neurological stroke case questions
+            'symptom_onset': 'Symptoms began 45 minutes ago. Patient was watching TV when he suddenly noticed left arm weakness and slurred speech.',
+            'consciousness_level': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions but speech is slurred.',
+            'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
+            'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
+            'headache': 'No headache reported. Patient denies any head or neck pain.',
             'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.'
         };
         
