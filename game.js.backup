@@ -2156,8 +2156,243 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         
+        document.body.insertAdjacentHTML('beforeend', glossaryContent);
     }
-});
+
+    hideGlossary() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    showSettings() {
+        this.playSound('click');
+        const settingsContent = `
+            <div class="modal-overlay" onclick="game.hideSettings()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-cog"></i> Settings</h2>
+                        <button class="close-btn" onclick="game.hideSettings()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="settings-section">
+                            <h3>Audio Settings</h3>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" ${this.settings.soundEnabled ? 'checked' : ''} 
+                                           onchange="game.toggleSound(this.checked)">
+                                    Enable Sound Effects
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Game Settings</h3>
+                            <div class="setting-item">
+                                <label>
+                                    <input type="checkbox" ${this.settings.timerEnabled ? 'checked' : ''} 
+                                           onchange="game.toggleTimer(this.checked)">
+                                    Enable Timer
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Statistics</h3>
+                            <div class="stat-display">
+                                <p>Games Played: ${this.stats.gamesPlayed}</p>
+                                <p>Games Won: ${this.stats.gamesWon}</p>
+                                <p>Win Rate: ${this.stats.gamesPlayed > 0 ? Math.round((this.stats.gamesWon / this.stats.gamesPlayed) * 100) : 0}%</p>
+                                <p>Average Score: ${this.stats.averageScore}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-actions">
+                            <button class="action-btn danger" onclick="game.resetStats()">
+                                <i class="fas fa-trash"></i> Reset Statistics
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', settingsContent);
+    }
+
+    hideSettings() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+
+    toggleSound(enabled) {
+        this.settings.soundEnabled = enabled;
+        this.saveSettings();
+        this.playSound('click');
+    }
+
+    toggleTimer(enabled) {
+        this.settings.timerEnabled = enabled;
+        this.saveSettings();
+        
+        if (this.gameState.gamePhase === 'playing') {
+            if (enabled && !this.timer) {
+                this.startTimer();
+            } else if (!enabled && this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+        }
+    }
+
+    saveSettings() {
+        try {
+            localStorage.setItem('gameSettings', JSON.stringify(this.settings));
+        } catch (error) {
+            console.error('Error saving settings:', error);
+        }
+    }
+
+    resetStats() {
+        if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+            this.stats = {
+                gamesPlayed: 0,
+                gamesWon: 0,
+                totalScore: 0,
+                averageScore: 0,
+                bestScores: {},
+                casesCompleted: {}
+            };
+            this.saveStats();
+            this.hideSettings();
+            this.showNotification('Statistics Reset', 'All statistics have been reset.', 'success');
+        }
+    }
+
+    showNotification(title, message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <h4>${title}</h4>
+                <p>${message}</p>
+                <button class="action-btn secondary" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    checkAchievements() {
+        // Check for various achievements
+        const newAchievements = [];
+        
+        // Perfect Score Achievement
+        if (this.gameState.score >= 500 && !this.achievements.includes('perfect_score')) {
+            newAchievements.push({
+                id: 'perfect_score',
+                name: 'Perfect Diagnosis',
+                description: 'Achieved a score of 500 or higher'
+            });
+        }
+        
+        // Speed Demon Achievement
+        if (this.gameState.timeRemaining >= 300 && !this.achievements.includes('speed_demon')) {
+            newAchievements.push({
+                id: 'speed_demon',
+                name: 'Speed Demon',
+                description: 'Completed a case with 5+ minutes remaining'
+            });
+        }
+        
+        // First Win Achievement
+        if (this.stats.gamesWon === 1 && !this.achievements.includes('first_win')) {
+            newAchievements.push({
+                id: 'first_win',
+                name: 'First Save',
+                description: 'Won your first case'
+            });
+        }
+        
+        // Add new achievements
+        newAchievements.forEach(achievement => {
+            this.achievements.push(achievement.id);
+            this.showNotification('Achievement Unlocked!', `${achievement.name}: ${achievement.description}`, 'success');
+        });
+        
+        if (newAchievements.length > 0) {
+            this.saveAchievements();
+        }
+    }
+
+    saveAchievements() {
+        try {
+            localStorage.setItem('medicalMysteryAchievements', JSON.stringify(this.achievements));
+        } catch (error) {
+            console.error('Error saving achievements:', error);
+        }
+    }
+
+    showAchievements() {
+        const achievementsList = this.achievements.map(id => {
+            const achievementData = {
+                'perfect_score': { name: 'Perfect Diagnosis', description: 'Achieved a score of 500 or higher' },
+                'speed_demon': { name: 'Speed Demon', description: 'Completed a case with 5+ minutes remaining' },
+                'first_win': { name: 'First Save', description: 'Won your first case' }
+            };
+            
+            const achievement = achievementData[id];
+            return achievement ? `
+                <div class="achievement-item">
+                    <h4>${achievement.name}</h4>
+                    <p>${achievement.description}</p>
+                </div>
+            ` : '';
+        }).join('');
+        
+        const achievementsContent = `
+            <div class="modal-overlay" onclick="game.hideAchievements()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-trophy"></i> Achievements</h2>
+                        <button class="close-btn" onclick="game.hideAchievements()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="achievements-list">
+                            ${achievementsList || '<p>No achievements unlocked yet. Keep playing to earn them!</p>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', achievementsContent);
+    }
+
+    hideAchievements() {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+}
+
 // Helper functions for cases
 function getAllCases() {
     if (typeof medicalCases === 'undefined') {
