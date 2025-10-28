@@ -937,14 +937,33 @@ class MedicalMysteryGame {
         this.attachEventHandlers();
     }
 
+    getPatientImageForAge(demographics) {
+        // Extract age from demographics string (e.g., "58-year-old male" -> 58)
+        const ageMatch = demographics.match(/(\d+)-year-old/);
+        if (!ageMatch) return null;
+        
+        const age = parseInt(ageMatch[1]);
+        
+        // Map age to available patient images
+        // Available images: 3.png, 8.png, 32.png, 45.png, 58.png, 72.png
+        if (age <= 5) return 'paitentImages/3.png';
+        if (age <= 12) return 'paitentImages/8.png';
+        if (age <= 38) return 'paitentImages/32.png';
+        if (age <= 51) return 'paitentImages/45.png';
+        if (age <= 65) return 'paitentImages/58.png';
+        return 'paitentImages/72.png';
+    }
+
     renderPatientImage() {
-        if (!this.gameState.currentCase.patientImage) return '';
+        const patientImageSrc = this.getPatientImageForAge(this.gameState.currentCase.patientHistory.demographics);
+        
+        if (!patientImageSrc) return '';
         
         return `
             <div class="section patient-image-section">
                 <h3><i class="fas fa-user-injured"></i> Patient</h3>
                 <div class="patient-image-container">
-                    <img src="${this.gameState.currentCase.patientImage}" alt="Patient" class="patient-image" />
+                    <img src="${patientImageSrc}" alt="Patient" class="patient-image" />
                     <div class="patient-info">
                         <strong>${this.gameState.currentCase.patientHistory.demographics}</strong>
                         <p>${this.gameState.currentCase.description}</p>
