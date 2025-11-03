@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .patient-image { width: 120px; height: 120px; border: 2px solid #333; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Patient Image Test</h1>
+    <div id="test-results"></div>
+
+    <script src="cases.js"></script>
+    <script>
+        // Test function to get patient image for age
+        function getPatientImageForAge(demographics) {
+            const ageMatch = demographics.match(/(\d+)-year-old/);
+            if (!ageMatch) return null;
+            
+            const age = parseInt(ageMatch[1]);
+            
+            if (age <= 5) return 'paitentImages/3.png';
+            if (age <= 12) return 'paitentImages/8.png';
+            if (age <= 38) return 'paitentImages/32.png';
+            if (age <= 51) return 'paitentImages/45.png';
+            if (age <= 65) return 'paitentImages/58.png';
+            return 'paitentImages/72.png';
+        }
+
+        // Test all cases
+        function testPatientImages() {
+            const cases = getAllCases();
+            const resultsDiv = document.getElementById('test-results');
+            
+            cases.forEach(case_ => {
+                const demographics = case_.patientHistory.demographics;
+                const expectedImage = getPatientImageForAge(demographics);
+                
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-case';
+                
+                testDiv.innerHTML = `
+                    <h3>Case: ${case_.title}</h3>
+                    <p><strong>Demographics:</strong> ${demographics}</p>
+                    <p><strong>Expected Image:</strong> ${expectedImage}</p>
+                    <div>
+                        <img src="${expectedImage}" alt="Patient" class="patient-image" 
+                             onload="this.nextSibling.innerHTML='<span class=success>✓ Image loaded successfully</span>'"
+                             onerror="this.nextSibling.innerHTML='<span class=error>✗ Image failed to load</span>'">
+                        <div>Loading...</div>
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(testDiv);
+            });
+        }
+
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', testPatientImages);
+    </script>
+</body>
+</html>

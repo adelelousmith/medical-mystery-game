@@ -100,9 +100,9 @@ const SPECIALISTS = {
         id: 'pulmonologist',
         name: 'Pulmonologist',
         icon: 'fas fa-lungs',
-        expertise: ['respiratory', 'shortness_of_breath', 'asthma'],
+        expertise: ['respiratory', 'shortness_of_breath', 'asthma', 'pediatric'],
         consultationLimit: 2,
-        description: 'Lung and respiratory system specialist'
+        description: 'Lung and respiratory system specialist (including pediatric cases)'
     },
     NEUROLOGIST: {
         id: 'neurologist',
@@ -2010,6 +2010,32 @@ class MedicalMysteryGame {
         const caseType = caseData.category || 'general';
         const hasRelevantTests = this.hasRelevantTestResults(specialist.expertise);
         
+        // Special logic for pediatric respiratory cases
+        if (caseData.id === 'pediatric' && specialist.id === 'pulmonologist') {
+            return true; // Pulmonologist is always appropriate for pediatric respiratory distress
+        }
+        
+        // Special logic for cardiac cases
+        if (caseData.id === 'cardiac' && specialist.id === 'cardiologist') {
+            return true; // Cardiologist is always appropriate for cardiac emergencies
+        }
+        
+        // Special logic for trauma cases
+        if (caseData.id === 'trauma' && specialist.id === 'surgeon') {
+            return true; // Surgeon is always appropriate for trauma with internal bleeding
+        }
+        
+        // Special logic for appendicitis case
+        if (caseData.id === 'abdominal_pain' && specialist.id === 'surgeon') {
+            return true; // Surgeon is always appropriate for acute abdomen/appendicitis
+        }
+        
+        // Special logic for stroke case
+        if (caseData.id === 'stroke' && specialist.id === 'neurologist') {
+            return true; // Neurologist is always appropriate for stroke
+        }
+        
+        // General logic based on expertise matching
         return specialist.expertise.includes(caseType) || hasRelevantTests;
     }
 
@@ -2079,14 +2105,22 @@ class MedicalMysteryGame {
                 
             case 'pulmonologist':
                 if (caseData.category === 'respiratory') {
-                    return `"The respiratory findings are consistent with ${caseData.correctDiagnosis}. Pulmonary function tests support this diagnosis."`;
+                    if (caseData.id === 'pediatric') {
+                        return `"The stridor and respiratory distress in this age group is consistent with croup. Humidified air and corticosteroids should help."`;
+                    } else {
+                        return `"The respiratory findings are consistent with ${caseData.correctDiagnosis}. Pulmonary function tests support this diagnosis."`;
+                    }
                 } else {
                     return `"No significant pulmonary pathology detected. Consider other organ systems."`;
                 }
                 
             case 'neurologist':
                 if (caseData.category === 'neurological') {
-                    return `"The neurological examination and imaging findings are concerning for ${caseData.correctDiagnosis}. Immediate intervention is warranted."`;
+                    if (caseData.id === 'stroke') {
+                        return `"This is an acute ischemic stroke. The CT shows no hemorrhage, and we're within the tPA window. We need to start thrombolytic therapy immediately to restore blood flow."`;
+                    } else {
+                        return `"The neurological examination and imaging findings are concerning for ${caseData.correctDiagnosis}. Immediate intervention is warranted."`;
+                    }
                 } else {
                     return `"No acute neurological findings. The symptoms may be secondary to other conditions."`;
                 }
@@ -2099,15 +2133,25 @@ class MedicalMysteryGame {
                 }
                 
             case 'pediatrician':
-                if (caseData.category === 'pediatric') {
-                    return `"In pediatric patients, this presentation is most consistent with ${caseData.correctDiagnosis}. Age-appropriate management is crucial."`;
+                if (caseData.category === 'pediatric' || caseData.category === 'respiratory') {
+                    if (caseData.id === 'pediatric') {
+                        return `"This 3-year-old has classic croup symptoms. The barking cough and stridor are characteristic. Supportive care with steroids is appropriate."`;
+                    } else {
+                        return `"In pediatric patients, this presentation is most consistent with ${caseData.correctDiagnosis}. Age-appropriate management is crucial."`;
+                    }
                 } else {
                     return `"This case involves an adult patient. Consider consulting an adult medicine specialist."`;
                 }
                 
             case 'surgeon':
                 if (caseData.category === 'surgical') {
-                    return `"This requires immediate surgical intervention. The findings are consistent with ${caseData.correctDiagnosis}."`;
+                    if (caseData.id === 'abdominal_pain') {
+                        return `"The clinical presentation and imaging are consistent with acute appendicitis. This requires emergency appendectomy to prevent rupture and peritonitis."`;
+                    } else {
+                        return `"This requires immediate surgical intervention. The findings are consistent with ${caseData.correctDiagnosis}."`;
+                    }
+                } else if (caseData.category === 'trauma') {
+                    return `"The trauma pattern suggests internal bleeding requiring surgical exploration. We need to get to the OR immediately."`;
                 } else {
                     return `"No surgical intervention required at this time. Continue with medical management."`;
                 }
@@ -2198,3 +2242,8 @@ function getCase(caseId) {
 document.addEventListener('DOMContentLoaded', () => {
     window.game = new MedicalMysteryGame();
 });
+
+// Export for Node.js testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { MedicalMysteryGame };
+}

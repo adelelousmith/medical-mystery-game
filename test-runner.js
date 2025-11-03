@@ -74,8 +74,9 @@ console.log('\n🧪 Testing Core Systems...');
 // Test 1: Diagnosis Logic - Symptoms → Tests → Diagnosis Path
 runTest('Diagnosis Logic Flow', () => {
     // Access medicalCases from the global scope after eval
-    const medicalCases = global.medicalCases || window.medicalCases;
-    if (!medicalCases) throw new Error('medicalCases not available');
+    if (typeof medicalCases === 'undefined') {
+        throw new Error('medicalCases not available - check cases.js loading');
+    }
     
     const cardiacCase = medicalCases.cardiac;
     if (!cardiacCase) throw new Error('Cardiac case not found');
@@ -98,8 +99,9 @@ runTest('Diagnosis Logic Flow', () => {
 
 // Test 2: Decision-Making - Branching Choices
 runTest('Decision-Making System', () => {
-    const medicalCases = global.medicalCases || window.medicalCases;
-    if (!medicalCases) throw new Error('medicalCases not available');
+    if (typeof medicalCases === 'undefined') {
+        throw new Error('medicalCases not available - check cases.js loading');
+    }
     
     // Test that cases have multiple diagnosis options (branching)
     Object.values(medicalCases).forEach(case_ => {

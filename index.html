@@ -96,10 +96,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="performance-monitor.js"></script>
-    <script src="glossary.js"></script>
-    <script src="cases.js"></script>
-    <script src="game.js"></script>
+    <script src="performance-monitor.js?v=2.2"></script>
+    <script src="glossary.js?v=2.2"></script>
+    <script src="cases.js?v=2.2"></script>
+    <script src="debug-cases.js?v=2.2"></script>
+    <script src="game.js?v=2.2"></script>
     
     <!-- Steam Integration -->
     <script>
@@ -109,6 +110,10 @@
             if (typeof Steam !== 'undefined') {
                 console.log('Steam integration available');
             }
+            
+            // Debug: Check if all cases are loaded
+            console.log('Available cases:', Object.keys(medicalCases));
+            console.log('Total cases:', Object.keys(medicalCases).length);
             
             // Initialize game
             window.game = new MedicalMysteryGame();

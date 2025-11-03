@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cases Loading</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .case { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Medical Mystery Game - Cases Loading Test</h1>
+    <div id="results"></div>
+
+    <script src="cases.js?v=2.0"></script>
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        try {
+            // Check if medicalCases is defined
+            if (typeof medicalCases === 'undefined') {
+                resultsDiv.innerHTML = '<p class="error">❌ medicalCases is not defined</p>';
+            } else {
+                const cases = Object.keys(medicalCases);
+                resultsDiv.innerHTML = `
+                    <p class="success">✅ medicalCases loaded successfully</p>
+                    <p><strong>Total cases:</strong> ${cases.length}</p>
+                    <p><strong>Case IDs:</strong> ${cases.join(', ')}</p>
+                    <h3>Case Details:</h3>
+                `;
+                
+                Object.values(medicalCases).forEach(case_ => {
+                    resultsDiv.innerHTML += `
+                        <div class="case">
+                            <h4>${case_.title}</h4>
+                            <p><strong>ID:</strong> ${case_.id}</p>
+                            <p><strong>Difficulty:</strong> ${case_.difficulty}</p>
+                            <p><strong>Demographics:</strong> ${case_.patientHistory.demographics}</p>
+                        </div>
+                    `;
+                });
+            }
+        } catch (error) {
+            resultsDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html>

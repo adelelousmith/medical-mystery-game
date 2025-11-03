@@ -214,3 +214,21 @@ function searchTerms(query) {
 function getAllTerms() {
     return Object.values(medicalTerms);
 }
+
+// Export for Node.js testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { 
+        medicalTerms, 
+        categories, 
+        getTermsByCategory, 
+        searchTerms, 
+        getAllTerms 
+    };
+} else if (typeof window !== 'undefined') {
+    // Browser environment
+    window.medicalTerms = medicalTerms;
+    window.categories = categories;
+    window.getTermsByCategory = getTermsByCategory;
+    window.searchTerms = searchTerms;
+    window.getAllTerms = getAllTerms;
+}

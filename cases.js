@@ -15,6 +15,7 @@ const medicalCases = {
         id: "cardiac",
         title: "Code Blue - Cardiac Arrest",
         specialty: "Cardiology",
+        category: "cardiac",
         difficulty: "expert",
         icon: "fas fa-heartbeat",
         timeLimit: TIME_PRESSURE.CRITICAL,
@@ -154,6 +155,7 @@ const medicalCases = {
         id: "trauma",
         title: "Trauma Alert - Multi-System Injury",
         specialty: "Emergency Medicine",
+        category: "trauma",
         difficulty: "expert",
         icon: "fas fa-ambulance",
         timeLimit: TIME_PRESSURE.CRITICAL,
@@ -288,6 +290,7 @@ const medicalCases = {
         id: "pediatric",
         title: "Pediatric Emergency - Respiratory Distress",
         specialty: "Pediatrics",
+        category: "respiratory",
         difficulty: "hard",
         icon: "fas fa-baby",
         timeLimit: TIME_PRESSURE.URGENT,
@@ -422,6 +425,7 @@ const medicalCases = {
         id: "toxicology",
         title: "Toxicology Emergency - Drug Overdose",
         specialty: "Emergency Medicine",
+        category: "toxicology",
         difficulty: "expert",
         icon: "fas fa-pills",
         timeLimit: TIME_PRESSURE.CRITICAL,
@@ -551,6 +555,287 @@ const medicalCases = {
                 correct: false,
                 consequences: "Focus on head injury misses overdose",
                 emotionalImpact: "Patient dies from untreated overdose"
+            }
+        ]
+    },
+
+    stroke: {
+        id: "stroke",
+        title: "Acute Stroke - Neurological Emergency",
+        specialty: "Neurology",
+        category: "neurological",
+        difficulty: "medium",
+        icon: "fas fa-brain",
+        timeLimit: TIME_PRESSURE.URGENT,
+        correctDiagnosis: "ischemic_stroke",
+        description: "A 72-year-old man is brought to the ER by his daughter after suddenly developing weakness on his right side and difficulty speaking. The symptoms started about 2 hours ago while he was watching TV.",
+        patientHistory: {
+            demographics: "72-year-old male",
+            pastMedicalHistory: [
+                "Hypertension for 15 years",
+                "Atrial fibrillation diagnosed 3 years ago",
+                "Type 2 diabetes for 10 years",
+                "High cholesterol",
+                "Previous TIA (mini-stroke) 1 year ago"
+            ],
+            socialHistory: [
+                "Retired school principal",
+                "Lives independently with occasional help from daughter",
+                "Non-smoker, quit 20 years ago",
+                "Occasional glass of wine with dinner"
+            ],
+            familyHistory: [
+                "Father died of stroke at age 78",
+                "Mother had dementia",
+                "Sister has heart disease"
+            ],
+            medications: [
+                "Warfarin 5mg daily (blood thinner)",
+                "Metoprolol 50mg twice daily",
+                "Metformin 1000mg twice daily",
+                "Atorvastatin 40mg daily"
+            ],
+            allergies: "Penicillin (rash)",
+            lastPhysical: "2 months ago - blood pressure well controlled",
+            emotionalContext: "Daughter is terrified and blames herself for not visiting more often. Patient is confused and frustrated by his inability to speak clearly."
+        },
+        questions: [
+            {
+                id: "weakness",
+                text: "Does the patient have weakness on one side of the body?",
+                category: "neurological",
+                critical: true
+            },
+            {
+                id: "speech_difficulty",
+                text: "Is the patient having difficulty speaking or understanding?",
+                category: "neurological",
+                critical: true
+            },
+            {
+                id: "facial_droop",
+                text: "Does the patient have facial drooping?",
+                category: "neurological",
+                critical: true
+            },
+            {
+                id: "time_onset",
+                text: "When did the symptoms start?",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "consciousness",
+                text: "Is the patient alert and responsive?",
+                category: "neurological",
+                critical: false
+            }
+        ],
+        tests: [
+            {
+                id: "ct_head",
+                name: "CT Head (Non-contrast)",
+                description: "Emergency brain imaging to rule out hemorrhage",
+                cost: 600,
+                timeRequired: 2,
+                critical: true
+            },
+            {
+                id: "blood_work",
+                name: "Complete Blood Count & Coagulation",
+                description: "Check blood counts and clotting function",
+                cost: 200,
+                timeRequired: 2,
+                critical: true
+            },
+            {
+                id: "ecg",
+                name: "12-Lead ECG",
+                description: "Check for atrial fibrillation or other heart rhythm problems",
+                cost: 150,
+                timeRequired: 1,
+                critical: false
+            },
+            {
+                id: "glucose",
+                name: "Blood Glucose",
+                description: "Rule out hypoglycemia mimicking stroke",
+                cost: 25,
+                timeRequired: 1,
+                critical: true
+            }
+        ],
+        diagnosisOptions: [
+            {
+                id: "ischemic_stroke",
+                name: "Acute Ischemic Stroke",
+                description: "Blood clot blocking brain artery causing brain tissue death",
+                correct: true,
+                consequences: "Immediate tPA (clot-buster) treatment restores blood flow. Patient recovers most function.",
+                emotionalImpact: "Daughter relieved by quick treatment. Patient grateful for regaining speech and movement."
+            },
+            {
+                id: "hemorrhagic_stroke",
+                name: "Hemorrhagic Stroke",
+                description: "Bleeding in the brain causing neurological symptoms",
+                correct: false,
+                consequences: "tPA given inappropriately, causing dangerous bleeding. Patient's condition worsens.",
+                emotionalImpact: "Patient suffers severe complications, family devastated by medical error"
+            },
+            {
+                id: "hypoglycemia",
+                name: "Severe Hypoglycemia",
+                description: "Low blood sugar causing stroke-like symptoms",
+                correct: false,
+                consequences: "Stroke treatment delayed while treating blood sugar. Window for tPA closes.",
+                emotionalImpact: "Patient has permanent disability, daughter blames herself and medical team"
+            },
+            {
+                id: "seizure",
+                name: "Post-ictal State (After Seizure)",
+                description: "Confusion and weakness following an unwitnessed seizure",
+                correct: false,
+                consequences: "Anti-seizure medication given, stroke goes untreated. Permanent brain damage.",
+                emotionalImpact: "Patient never recovers speech, family struggles with long-term care needs"
+            }
+        ]
+    },
+
+    abdominal_pain: {
+        id: "abdominal_pain",
+        title: "Acute Abdomen - Surgical Emergency",
+        specialty: "General Surgery",
+        category: "surgical",
+        difficulty: "medium",
+        icon: "fas fa-procedures",
+        timeLimit: TIME_PRESSURE.URGENT,
+        correctDiagnosis: "appendicitis",
+        description: "A 45-year-old woman presents to the ER with severe abdominal pain that started this morning. The pain began around her belly button and has now moved to the right lower abdomen. She feels nauseous and has vomited twice.",
+        patientHistory: {
+            demographics: "45-year-old female",
+            pastMedicalHistory: [
+                "No significant medical history",
+                "Two previous pregnancies, normal deliveries",
+                "Cholecystectomy (gallbladder removal) 5 years ago",
+                "No known allergies"
+            ],
+            socialHistory: [
+                "Works as a high school teacher",
+                "Married with two teenage children",
+                "Non-smoker, occasional social drinking",
+                "Regular exercise, healthy diet"
+            ],
+            familyHistory: [
+                "Mother had breast cancer",
+                "Father has diabetes",
+                "No family history of appendicitis"
+            ],
+            medications: [
+                "Multivitamin daily",
+                "Ibuprofen occasionally for headaches"
+            ],
+            allergies: "No known drug allergies",
+            lastPhysical: "1 year ago - normal",
+            emotionalContext: "Patient is in significant pain and worried about missing work. Husband is concerned and drove her to the ER. She's never had pain like this before."
+        },
+        questions: [
+            {
+                id: "pain_location",
+                text: "Where exactly is the pain located?",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "pain_migration",
+                text: "Has the pain moved from one area to another?",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "nausea_vomiting",
+                text: "Is the patient experiencing nausea or vomiting?",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "fever",
+                text: "Does the patient have a fever?",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "appetite",
+                text: "Has the patient lost their appetite?",
+                category: "symptoms",
+                critical: false
+            }
+        ],
+        tests: [
+            {
+                id: "ct_abdomen",
+                name: "CT Scan Abdomen/Pelvis",
+                description: "Detailed imaging to visualize appendix and rule out other causes",
+                cost: 800,
+                timeRequired: 2,
+                critical: true
+            },
+            {
+                id: "blood_work",
+                name: "Complete Blood Count",
+                description: "Check white blood cell count for signs of infection",
+                cost: 150,
+                timeRequired: 2,
+                critical: true
+            },
+            {
+                id: "urinalysis",
+                name: "Urinalysis",
+                description: "Rule out urinary tract infection or kidney stones",
+                cost: 75,
+                timeRequired: 1,
+                critical: false
+            },
+            {
+                id: "pregnancy_test",
+                name: "Pregnancy Test",
+                description: "Rule out ectopic pregnancy in women of childbearing age",
+                cost: 50,
+                timeRequired: 1,
+                critical: true
+            }
+        ],
+        diagnosisOptions: [
+            {
+                id: "appendicitis",
+                name: "Acute Appendicitis",
+                description: "Inflammation of the appendix requiring surgical removal",
+                correct: true,
+                consequences: "Emergency appendectomy performed successfully. Patient recovers well.",
+                emotionalImpact: "Patient relieved to have diagnosis. Family grateful for quick treatment."
+            },
+            {
+                id: "kidney_stones",
+                name: "Kidney Stones",
+                description: "Stones in urinary tract causing severe pain",
+                correct: false,
+                consequences: "Appendix ruptures while treating for kidney stones, causing peritonitis",
+                emotionalImpact: "Patient becomes critically ill, family devastated by complications"
+            },
+            {
+                id: "gastroenteritis",
+                name: "Gastroenteritis",
+                description: "Stomach flu causing abdominal pain and vomiting",
+                correct: false,
+                consequences: "Patient sent home, returns with ruptured appendix and sepsis",
+                emotionalImpact: "Patient nearly dies, family sues hospital for misdiagnosis"
+            },
+            {
+                id: "ovarian_cyst",
+                name: "Ovarian Cyst Rupture",
+                description: "Ruptured ovarian cyst causing abdominal pain",
+                correct: false,
+                consequences: "Gynecology consulted, appendicitis missed until rupture occurs",
+                emotionalImpact: "Patient requires emergency surgery, prolonged recovery"
             }
         ]
     }
