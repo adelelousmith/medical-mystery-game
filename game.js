@@ -1158,7 +1158,7 @@ class MedicalMysteryGame {
             
             // Abdominal pain case questions
             'pain_location': 'Pain is located in the right lower abdomen. Patient points to McBurney\'s point specifically.',
-            'pain_character': 'Pain is sharp and constant, rated 8/10. Worse with movement and coughing.',
+            'pain_migration': 'Yes, pain started around the belly button this morning and moved to the right lower abdomen over 4-6 hours.',
             'nausea_vomiting': 'Yes, patient has been nauseous for 6 hours and vomited twice. Can\'t keep food down.',
             'fever': 'Yes, low-grade fever of 100.4°F (38°C). Patient feels warm to touch.',
             'appetite': 'No appetite for the past 12 hours. Patient reports feeling "sick to my stomach".',
@@ -1177,7 +1177,12 @@ class MedicalMysteryGame {
             'medication': 'Yes, child has albuterol inhaler but it\'s not helping much. Used it 3 times today.',
             
             // Neurological stroke case questions
-            'symptom_onset': 'Symptoms began 45 minutes ago. Patient was watching TV when he suddenly noticed left arm weakness and slurred speech.',
+            'weakness': 'Yes, obvious weakness on the right side of the body. Patient cannot lift right arm and right leg is weak.',
+            'speech_difficulty': 'Yes, patient has slurred speech and difficulty finding words. Speech is slow and unclear.',
+            'facial_droop': 'Yes, right side of face is drooping. Right corner of mouth sags and patient cannot smile symmetrically.',
+            'time_onset': 'Symptoms started approximately 2 hours ago while watching TV. Sudden onset, no gradual progression.',
+            'consciousness': 'Patient is alert and oriented to person, place, and time. Responds to questions but speech is impaired.',
+            'symptom_onset': 'Symptoms began 2 hours ago. Patient was watching TV when he suddenly noticed right arm weakness and slurred speech.',
             'consciousness_level': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions but speech is slurred.',
             'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
             'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
@@ -1185,7 +1190,7 @@ class MedicalMysteryGame {
             'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.'
         };
         
-        return answers[questionId] || 'Patient responds appropriately to the question.';
+        return answers[questionId] || 'Patient provides a clear response. No significant findings for this question.';
     }
 
     renderMedicalTests() {
