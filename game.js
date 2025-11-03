@@ -944,14 +944,14 @@ class MedicalMysteryGame {
         
         const age = parseInt(ageMatch[1]);
         
-        // Map age to available patient images
-        // Available images: 3.png, 8.png, 32.png, 45.png, 58.png, 72.png
-        if (age <= 5) return 'paitentImages/3.png';
-        if (age <= 12) return 'paitentImages/8.png';
-        if (age <= 38) return 'paitentImages/32.png';
-        if (age <= 51) return 'paitentImages/45.png';
-        if (age <= 65) return 'paitentImages/58.png';
-        return 'paitentImages/72.png';
+        // Map age to available patient images with descriptive names
+        // Available images: child-3yo, child-8yo, adult-32yo, adult-45yo, adult-58yo, elderly-72yo
+        if (age <= 5) return 'assets/images/patients/child-3yo.png';
+        if (age <= 12) return 'assets/images/patients/child-8yo.png';
+        if (age <= 38) return 'assets/images/patients/adult-32yo.png';
+        if (age <= 51) return 'assets/images/patients/adult-45yo.png';
+        if (age <= 65) return 'assets/images/patients/adult-58yo.png';
+        return 'assets/images/patients/elderly-72yo.png';
     }
 
     renderPatientImage() {
@@ -1517,6 +1517,9 @@ class MedicalMysteryGame {
             blood_alcohol: "Blood alcohol level: 0.08% (legal limit: 0.08%).",
             liver_function: "AST: 85 U/L, ALT: 92 U/L. Mildly elevated liver enzymes.",
             kidney_function: "Creatinine: 1.8 mg/dL (elevated). BUN: 25 mg/dL. Acute kidney injury.",
+            
+            // Pregnancy test results
+            pregnancy_test: "Pregnancy test: NEGATIVE. No hCG detected in urine. Rules out pregnancy and ectopic pregnancy.",
             
             // Default results for other tests
             default: "Test completed. Results within normal limits."

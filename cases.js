@@ -717,6 +717,8 @@ const medicalCases = {
                 "No significant medical history",
                 "Two previous pregnancies, normal deliveries",
                 "Cholecystectomy (gallbladder removal) 5 years ago",
+                "Last menstrual period: 2 weeks ago, regular cycles",
+                "Sexually active, uses barrier contraception",
                 "No known allergies"
             ],
             socialHistory: [

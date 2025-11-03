@@ -55,7 +55,7 @@ console.log('\n📁 Loading Game Modules...');
 let casesModule, medicalTerms, MedicalMysteryGame;
 
 try {
-    casesModule = require('./cases.js');
+    casesModule = require('../cases.js');
     console.log('✅ cases.js loaded successfully');
     console.log(`✅ Found ${Object.keys(casesModule.medicalCases).length} medical cases`);
 } catch (error) {
@@ -63,7 +63,7 @@ try {
 }
 
 try {
-    const glossaryModule = require('./glossary.js');
+    const glossaryModule = require('../glossary.js');
     medicalTerms = glossaryModule.medicalTerms;
     console.log('✅ glossary.js loaded successfully');
     console.log(`✅ Found ${Object.keys(medicalTerms).length} medical terms`);
@@ -72,14 +72,14 @@ try {
 }
 
 try {
-    const gameModule = require('./game.js');
+    const gameModule = require('../game.js');
     MedicalMysteryGame = gameModule.MedicalMysteryGame;
     console.log('✅ game.js loaded successfully');
 } catch (error) {
     console.log('❌ Error loading game.js:', error.message);
     // Fallback to eval method
     try {
-        const gameCode = fs.readFileSync('./game.js', 'utf8');
+        const gameCode = fs.readFileSync('../game.js', 'utf8');
         eval(gameCode);
         console.log('✅ game.js loaded via eval');
     } catch (evalError) {
@@ -206,7 +206,7 @@ runTest('Time Pressure System', () => {
 
 // Test 7: File Integrity
 runTest('File Integrity', () => {
-    const files = ['index.html', 'style.css', 'game.js', 'cases.js', 'glossary.js'];
+    const files = ['index.html', 'assets/styles/main.css', 'game.js', 'cases.js', 'glossary.js'];
     
     files.forEach(file => {
         if (!fs.existsSync(file)) {
@@ -222,7 +222,7 @@ runTest('File Integrity', () => {
 
 // Test 8: Performance
 runTest('Performance Check', () => {
-    const files = ['cases.js', 'game.js', 'glossary.js', 'style.css'];
+    const files = ['cases.js', 'game.js', 'glossary.js', 'assets/styles/main.css'];
     let totalSize = 0;
     
     files.forEach(file => {
