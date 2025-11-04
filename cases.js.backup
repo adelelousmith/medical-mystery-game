@@ -21,7 +21,99 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "myocardial_infarction",
         description: "A 58-year-old male collapses in the waiting room. Bystanders report he was complaining of chest pain and shortness of breath before losing consciousness. The patient is unresponsive with no pulse.",
-
+        
+        // NEW: Clue system for logical reasoning
+        clues: {
+            initial: [
+                "Patient collapsed suddenly in waiting room",
+                "Complained of chest pain before collapse",
+                "Currently unresponsive with no pulse"
+            ],
+            revealed: {
+                "chest_pain": ["Described as 'crushing' chest pain", "Pain rated 9/10 severity"],
+                "radiation_pain": ["Pain radiates to left arm and jaw", "Classic pattern for cardiac event"],
+                "ecg": ["ST elevation in inferior leads (II, III, aVF)", "Q waves suggest tissue death"],
+                "troponin": ["Troponin I: 15.2 ng/mL (severely elevated)", "Confirms myocardial damage"],
+                "sweating": ["Profuse diaphoresis noted", "Sympathetic response to cardiac stress"]
+            }
+        },
+        
+        // NEW: Dynamic events add tension
+        events: [
+            {
+                trigger: "time_elapsed_90s",
+                description: "Wife arrives at bedside, asks 'Is he going to be okay?'",
+                impact: "emotional_pressure",
+                narrativeText: "The patient's wife clutches your arm, her eyes filled with terror."
+            },
+            {
+                trigger: "test_ecg_ordered",
+                description: "ECG machine shows alarming rhythm",
+                impact: "clinical_urgency",
+                narrativeText: "The ECG trace shows unmistakable signs of acute cardiac injury."
+            },
+            {
+                trigger: "confidence_above_80",
+                description: "Team prepares for emergency intervention",
+                impact: "treatment_readiness",
+                narrativeText: "The cardiac team is standing by for your diagnosis."
+            }
+        ],
+        
+        // NEW: Confidence factors for scoring
+        confidenceFactors: {
+            "ecg": { weight: 0.35, category: "diagnostic", reasoning: "Essential for identifying STEMI pattern" },
+            "troponin": { weight: 0.25, category: "confirmatory", reasoning: "Confirms myocardial damage" },
+            "chest_pain": { weight: 0.15, category: "clinical", reasoning: "Key symptom for cardiac events" },
+            "radiation_pain": { weight: 0.15, category: "clinical", reasoning: "Classic presentation pattern" },
+            "sweating": { weight: 0.10, category: "supportive", reasoning: "Supports sympathetic response" }
+        },
+        
+        // NEW: Glossary terms for auto-linking
+        glossaryTerms: ["STEMI", "troponin", "myocardial infarction", "ECG", "ST elevation", "diaphoresis"],
+        
+        // NEW: Hint system
+        hints: [
+            {
+                trigger: "confidence_below_40_after_2_minutes",
+                text: "For collapsed patients with chest pain, consider immediate cardiac investigations",
+                cost: 45,
+                source: "Consultant Cardiologist",
+                unlocks: ["priority_ecg_hint"]
+            },
+            {
+                trigger: "ecg_not_ordered_after_3_minutes",
+                text: "ECG is the first-line investigation for suspected cardiac events",
+                cost: 30,
+                source: "Senior Sister",
+                unlocks: ["ecg_interpretation_guide"]
+            }
+        ],
+        
+        // NEW: Enhanced narrative outcomes
+        narrativeBranches: {
+            "excellent_performance": {
+                description: "Rapid diagnosis enables immediate PCI intervention",
+                familyReaction: "Wife sobs with relief as husband's pulse returns",
+                clinicalOutcome: "Patient makes full recovery with minimal heart damage",
+                followUp: "Returns to work in 8 weeks, starts cardiac rehabilitation",
+                teamFeedback: "Exemplary emergency medicine - textbook case management"
+            },
+            "good_performance": {
+                description: "Timely diagnosis allows effective treatment",
+                familyReaction: "Wife anxiously waits as treatment begins",
+                clinicalOutcome: "Patient survives with moderate heart damage",
+                followUp: "Requires lifestyle changes and ongoing cardiac monitoring",
+                teamFeedback: "Solid clinical reasoning led to positive outcome"
+            },
+            "delayed_diagnosis": {
+                description: "Delayed recognition complicates treatment options",
+                familyReaction: "Wife becomes increasingly distressed at delays",
+                clinicalOutcome: "Patient survives but with significant heart damage",
+                followUp: "Long recovery period, may not return to previous activity level",
+                teamFeedback: "Earlier recognition could have improved outcomes"
+            }
+        }
         patientHistory: {
             demographics: "58-year-old male",
             pastMedicalHistory: [

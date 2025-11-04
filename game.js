@@ -1,4 +1,4 @@
-// Medical Mystery Game - Steam-Ready Emergency Medicine Simulator
+// Medical Mystery Game - A&E Simulator for Healthcare Training
 // Enhanced with Steam integration, achievements, and professional features
 
 // Constants
@@ -100,9 +100,9 @@ const SPECIALISTS = {
         id: 'pulmonologist',
         name: 'Pulmonologist',
         icon: 'fas fa-lungs',
-        expertise: ['respiratory', 'shortness_of_breath', 'asthma', 'pediatric'],
+        expertise: ['respiratory', 'shortness_of_breath', 'asthma', 'paediatric'],
         consultationLimit: 2,
-        description: 'Lung and respiratory system specialist (including pediatric cases)'
+        description: 'Lung and respiratory system specialist (including paediatric cases)'
     },
     NEUROLOGIST: {
         id: 'neurologist',
@@ -121,10 +121,10 @@ const SPECIALISTS = {
         description: 'Bones, joints, and musculoskeletal specialist'
     },
     PEDIATRICIAN: {
-        id: 'pediatrician',
-        name: 'Pediatrician',
+        id: 'paediatrician',
+        name: 'Paediatrician',
         icon: 'fas fa-baby',
-        expertise: ['pediatric', 'child_emergency'],
+        expertise: ['paediatric', 'child_emergency'],
         consultationLimit: 2,
         description: 'Child and adolescent medicine specialist'
     },
@@ -155,13 +155,50 @@ class MedicalMysteryGame {
             incorrectActions: 0,
             specialistConsultations: [],
             consultationSlotsRemaining: 3, // Limited consultation slots
-            questionsRemaining: 5 // Limited questions
+            questionsRemaining: 5, // Limited questions
+            
+            // NEW: Three-phase investigative structure
+            investigationPhase: 'examine', // examine → diagnose → treat
+            phaseProgress: {
+                examine: { completed: false, confidence: 0, actions: [] },
+                diagnose: { completed: false, confidence: 0, selectedDiagnosis: null },
+                treat: { completed: false, interventions: [], outcome: null }
+            },
+            
+            // NEW: Enhanced patient tracking
+            patientCondition: {
+                consciousness: 'alert', // alert, drowsy, unconscious
+                breathing: 'normal', // normal, laboured, critical
+                circulation: 'stable', // stable, compromised, critical
+                temperature: 'normal', // normal, fever, hypothermia
+                pain: 'moderate', // none, mild, moderate, severe
+                mobility: 'normal' // normal, limited, immobile
+            },
+            
+            // NEW: Time-based deterioration tracking
+            deteriorationFactors: {
+                timeWithoutTreatment: 0,
+                missedCriticalActions: 0,
+                inappropriateActions: 0,
+                delayedDiagnosis: false
+            },
+            
+            // NEW: Clinical reasoning tracking
+            clinicalReasoning: {
+                hypotheses: [], // Working diagnoses being considered
+                supportingEvidence: [], // Evidence supporting current thinking
+                contradictoryEvidence: [], // Evidence against current thinking
+                confidenceLevel: 0 // Overall diagnostic confidence
+            }
         };
         
         this.timer = null;
         this.stats = this.loadStats();
         this.achievements = this.loadAchievements();
         this.settings = this.loadSettings();
+        
+        // Initialize phase manager
+        this.phaseManager = null;
         
         // Initialize audio system
         this.audioContext = null;
@@ -718,7 +755,7 @@ class MedicalMysteryGame {
                     <div class="header">
                         <div class="header-content">
                             <h1>Medical Mystery</h1>
-                            <p>Emergency Medicine Simulator</p>
+                            <p>A&E Department Simulator</p>
                         </div>
                         <div class="header-actions">
                             <button class="action-btn secondary" onclick="game.showGlossary()" aria-label="Open medical glossary">
@@ -784,6 +821,29 @@ class MedicalMysteryGame {
             this.gameState.specialistConsultations = [];
             this.gameState.consultationSlotsRemaining = 3; // Reset consultation slots
             this.gameState.questionsRemaining = 5; // Reset question limit
+            
+            // Reset investigation phase
+            this.gameState.investigationPhase = 'examine';
+            this.gameState.phaseProgress = {
+                examine: { completed: false, confidence: 0, actions: [] },
+                diagnose: { completed: false, confidence: 0, selectedDiagnosis: null },
+                treat: { completed: false, interventions: [], outcome: null }
+            };
+            
+            // Reset patient condition
+            this.gameState.patientCondition = {
+                consciousness: 'alert',
+                breathing: 'normal', 
+                circulation: 'stable',
+                temperature: 'normal',
+                pain: 'moderate',
+                mobility: 'normal'
+            };
+            
+            // Initialize phase manager
+            if (typeof InvestigationPhaseManager !== 'undefined') {
+                this.phaseManager = new InvestigationPhaseManager(this);
+            }
             
             // Reset case start time for performance tracking
             this.caseStartTime = Date.now();
@@ -859,7 +919,7 @@ class MedicalMysteryGame {
             <div class="welcome-screen">
                 <div class="welcome-content">
                     <h1><i class="fas fa-stethoscope"></i> Medical Mystery</h1>
-                    <p>Emergency Medicine Simulator</p>
+                    <p>A&E Department Simulator</p>
                     <button class="action-btn primary" onclick="game.showCaseSelection()">
                         <i class="fas fa-play"></i> Start Game
                     </button>
@@ -880,6 +940,9 @@ class MedicalMysteryGame {
                     <h1><i class="${this.gameState.currentCase.icon}"></i> ${this.gameState.currentCase.title}</h1>
                     <p>${this.gameState.currentCase.description}</p>
                 </div>
+                
+                ${this.shouldShowPhases() ? this.renderInvestigationPhases() : ''}
+                
                 <div class="status-bar">
                     <div class="status-item">
                         <i class="fas fa-clock"></i>
@@ -914,11 +977,8 @@ class MedicalMysteryGame {
 
             <div class="game-content">
                 ${this.renderPatientImage()}
-                ${this.renderHistorySection()}
-                ${this.renderPatientInterview()}
-                ${this.renderSpecialistConsultations()}
-                ${this.renderMedicalTests()}
-                ${this.renderDiagnosisOptions()}
+                ${this.renderPatientCondition()}
+                ${this.renderPhaseContent()}
             </div>
 
             <div class="game-actions">
@@ -935,6 +995,423 @@ class MedicalMysteryGame {
         `;
         
         this.attachEventHandlers();
+    }
+
+    renderInvestigationPhases() {
+        const currentPhase = this.gameState.investigationPhase;
+        const phases = ['examine', 'diagnose', 'treat'];
+        
+        const phaseIcons = {
+            examine: 'fas fa-search',
+            diagnose: 'fas fa-stethoscope', 
+            treat: 'fas fa-pills'
+        };
+        
+        const phaseNames = {
+            examine: 'Examine',
+            diagnose: 'Diagnose',
+            treat: 'Treat'
+        };
+
+        return `
+            <div class="investigation-phases">
+                ${phases.map((phase, index) => {
+                    const isActive = phase === currentPhase;
+                    const isCompleted = this.gameState.phaseProgress[phase].completed;
+                    const confidence = this.phaseManager ? 
+                        this.phaseManager.calculatePhaseConfidence(phase) : 0;
+                    
+                    let phaseClass = 'phase-item';
+                    if (isActive) phaseClass += ' active';
+                    if (isCompleted) phaseClass += ' completed';
+                    
+                    return `
+                        <div class="${phaseClass}">
+                            <div class="phase-icon">
+                                <i class="${phaseIcons[phase]}"></i>
+                            </div>
+                            <div class="phase-info">
+                                <h3>${phaseNames[phase]}</h3>
+                                <div class="phase-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${confidence}%"></div>
+                                    </div>
+                                    <span class="progress-text">${confidence}%</span>
+                                </div>
+                            </div>
+                            ${index < phases.length - 1 ? '<div class="phase-arrow"><i class="fas fa-chevron-right"></i></div>' : ''}
+                        </div>
+                    `;
+                }).join('')}
+                
+                ${this.renderPhaseAdvanceButton()}
+            </div>
+        `;
+    }
+
+    renderPhaseAdvanceButton() {
+        if (!this.phaseManager || !this.phaseManager.canAdvancePhase()) {
+            return '';
+        }
+
+        const nextPhaseNames = {
+            examine: 'Begin Diagnosis',
+            diagnose: 'Start Treatment'
+        };
+
+        const currentPhase = this.gameState.investigationPhase;
+        const buttonText = nextPhaseNames[currentPhase] || 'Continue';
+
+        return `
+            <button class="action-btn primary phase-advance-btn" onclick="game.advancePhase()">
+                <i class="fas fa-arrow-right"></i> ${buttonText}
+            </button>
+        `;
+    }
+
+    renderPatientCondition() {
+        const condition = this.gameState.patientCondition;
+        const stability = this.gameState.patientStability;
+        
+        const conditionIcons = {
+            consciousness: 'fas fa-eye',
+            breathing: 'fas fa-lungs',
+            circulation: 'fas fa-heartbeat',
+            temperature: 'fas fa-thermometer-half',
+            pain: 'fas fa-exclamation-circle',
+            mobility: 'fas fa-walking'
+        };
+
+        const conditionLabels = {
+            consciousness: 'Consciousness',
+            breathing: 'Breathing',
+            circulation: 'Circulation', 
+            temperature: 'Temperature',
+            pain: 'Pain Level',
+            mobility: 'Mobility'
+        };
+
+        return `
+            <div class="section patient-condition">
+                <h3><i class="fas fa-user-injured"></i> Patient Condition</h3>
+                <div class="condition-grid">
+                    ${Object.entries(condition).map(([key, value]) => `
+                        <div class="condition-item ${value}">
+                            <i class="${conditionIcons[key]}"></i>
+                            <div class="condition-info">
+                                <span class="condition-label">${conditionLabels[key]}</span>
+                                <span class="condition-value">${value.charAt(0).toUpperCase() + value.slice(1)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="stability-meter">
+                    <div class="stability-label">Overall Stability: ${Math.round(stability)}%</div>
+                    <div class="stability-bar">
+                        <div class="stability-fill ${this.getStabilityClass(stability)}" 
+                             style="width: ${stability}%"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderPhaseContent() {
+        const currentPhase = this.gameState.investigationPhase;
+        
+        switch (currentPhase) {
+            case 'examine':
+                return this.renderExaminePhase();
+            case 'diagnose':
+                return this.renderDiagnosePhase();
+            case 'treat':
+                return this.renderTreatPhase();
+            default:
+                return '';
+        }
+    }
+
+    renderExaminePhase() {
+        return `
+            ${this.renderHistorySection()}
+            ${this.renderPatientInterview()}
+            ${this.renderMedicalTests()}
+            ${this.renderSpecialistConsultations()}
+            ${this.renderDiagnosisReadyButton()}
+        `;
+    }
+
+    renderDiagnosePhase() {
+        return `
+            ${this.renderCollapsibleHistory()}
+            ${this.renderCollapsibleFindings()}
+            ${this.renderDiagnosisOptions()}
+        `;
+    }
+
+    renderTreatPhase() {
+        const selectedDiagnosis = this.gameState.phaseProgress.diagnose.selectedDiagnosis;
+        
+        return `
+            <div class="section treatment-planning">
+                <h3><i class="fas fa-pills"></i> Treatment Planning</h3>
+                <div class="diagnosis-confirmation">
+                    <p><strong>Working Diagnosis:</strong> ${selectedDiagnosis || 'None selected'}</p>
+                </div>
+                ${this.renderTreatmentOptions()}
+                ${this.renderMonitoringPlan()}
+            </div>
+        `;
+    }
+
+    renderClinicalSummary() {
+        const askedQuestions = this.gameState.askedQuestions;
+        const orderedTests = this.gameState.orderedTests;
+        
+        return `
+            <div class="clinical-summary">
+                <h4>Your Clinical Findings</h4>
+                <div class="findings-grid">
+                    <div class="findings-section">
+                        <h5>History & Examination</h5>
+                        ${askedQuestions.length > 0 ? `
+                            <div class="findings-list">
+                                ${askedQuestions.map(qId => {
+                                    const question = this.gameState.currentCase.questions.find(q => q.id === qId);
+                                    const answer = this.getQuestionAnswer(qId);
+                                    return question ? `
+                                        <div class="finding-item">
+                                            <strong>Q:</strong> ${question.text}<br>
+                                            <strong>A:</strong> ${answer}
+                                        </div>
+                                    ` : '';
+                                }).join('')}
+                            </div>
+                        ` : '<p>No questions asked yet.</p>'}
+                    </div>
+                    <div class="findings-section">
+                        <h5>Test Results</h5>
+                        ${orderedTests.length > 0 ? `
+                            <div class="findings-list">
+                                ${orderedTests.map(tId => {
+                                    const test = this.gameState.currentCase.tests.find(t => t.id === tId);
+                                    const result = this.generateTestResult(test);
+                                    return test ? `
+                                        <div class="finding-item">
+                                            <strong>${test.name}:</strong><br>
+                                            ${result}
+                                        </div>
+                                    ` : '';
+                                }).join('')}
+                            </div>
+                        ` : '<p>No tests ordered yet.</p>'}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderDifferentialDiagnosis() {
+        // Removed to reduce confusion - let players make their own differential
+        return '';
+    }
+
+    renderTreatmentOptions() {
+        // This would be populated based on the selected diagnosis
+        return `
+            <div class="treatment-options">
+                <h4>Treatment Options</h4>
+                <p>Treatment planning will be implemented based on diagnosis selection.</p>
+            </div>
+        `;
+    }
+
+    renderMonitoringPlan() {
+        return `
+            <div class="monitoring-plan">
+                <h4>Monitoring Plan</h4>
+                <p>Patient monitoring protocols will be displayed here.</p>
+            </div>
+        `;
+    }
+
+    getStabilityClass(stability) {
+        if (stability >= 80) return 'stable';
+        if (stability >= 60) return 'concerning';
+        if (stability >= 40) return 'unstable';
+        return 'critical';
+    }
+
+    advancePhase() {
+        if (this.phaseManager) {
+            this.phaseManager.advancePhase();
+        }
+    }
+
+    shouldShowPhases() {
+        // Only show phases in examine phase, hide during diagnosis to reduce clutter
+        return this.gameState.investigationPhase === 'examine';
+    }
+
+    renderDiagnosisReadyButton() {
+        if (this.gameState.investigationPhase !== 'examine') return '';
+        
+        const totalActions = this.gameState.askedQuestions.length + this.gameState.orderedTests.length;
+        const hasMinActions = totalActions >= 3;
+        const hasCriticalFindings = this.phaseManager ? this.phaseManager.hasCriticalFindings() : false;
+        
+        if (hasMinActions || hasCriticalFindings) {
+            return `
+                <div class="section diagnosis-ready">
+                    <div class="ready-content">
+                        <h3><i class="fas fa-stethoscope"></i> Ready to Make Diagnosis?</h3>
+                        <p>You've gathered clinical information. Review your findings and select your diagnosis.</p>
+                        <button class="action-btn primary" onclick="game.proceedToDiagnosis()">
+                            <i class="fas fa-arrow-right"></i> Proceed to Diagnosis
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="section diagnosis-ready disabled">
+                <div class="ready-content">
+                    <h3><i class="fas fa-search"></i> Continue Investigation</h3>
+                    <p>Ask more questions or order tests before making your diagnosis.</p>
+                    <p><small>Actions taken: ${totalActions}/3 minimum</small></p>
+                </div>
+            </div>
+        `;
+    }
+
+    proceedToDiagnosis() {
+        this.gameState.investigationPhase = 'diagnose';
+        this.render();
+        
+        // Scroll to top to show diagnosis options clearly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderCollapsibleHistory() {
+        if (!this.gameState.historyRevealed) return '';
+        
+        const history = this.gameState.currentCase.patientHistory;
+        return `
+            <div class="section collapsible-section">
+                <div class="collapsible-header" onclick="game.toggleSection('history')">
+                    <h3><i class="fas fa-file-medical"></i> Medical History</h3>
+                    <i class="fas fa-chevron-down toggle-icon" id="history-toggle"></i>
+                </div>
+                <div class="collapsible-content" id="history-content" style="display: none;">
+                    <div class="history-grid">
+                        <div class="history-item">
+                            <strong>Demographics:</strong> ${history.demographics || 'Not specified'}
+                        </div>
+                        <div class="history-item">
+                            <strong>Past Medical History:</strong>
+                            <ul>${(history.pastMedicalHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
+                        </div>
+                        <div class="history-item">
+                            <strong>Social History:</strong>
+                            <ul>${(history.socialHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
+                        </div>
+                        <div class="history-item">
+                            <strong>Family History:</strong>
+                            <ul>${(history.familyHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
+                        </div>
+                        <div class="history-item">
+                            <strong>Medications:</strong>
+                            <ul>${(history.medications || []).map(item => `<li>${item}</li>`).join('')}</ul>
+                        </div>
+                        <div class="history-item">
+                            <strong>Allergies:</strong> ${history.allergies || 'None reported'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderCollapsibleFindings() {
+        const askedQuestions = this.gameState.askedQuestions;
+        const orderedTests = this.gameState.orderedTests;
+        
+        return `
+            <div class="section collapsible-section">
+                <div class="collapsible-header" onclick="game.toggleSection('findings')">
+                    <h3><i class="fas fa-search"></i> Clinical Findings</h3>
+                    <i class="fas fa-chevron-down toggle-icon" id="findings-toggle"></i>
+                </div>
+                <div class="collapsible-content" id="findings-content" style="display: block;">
+                    <script>
+                        // Set the toggle icon to up since content is visible
+                        setTimeout(() => {
+                            const toggle = document.getElementById('findings-toggle');
+                            if (toggle) {
+                                toggle.classList.remove('fa-chevron-down');
+                                toggle.classList.add('fa-chevron-up');
+                            }
+                        }, 100);
+                    </script>
+                    <div class="findings-grid">
+                        <div class="findings-section">
+                            <h5>History & Examination (${askedQuestions.length})</h5>
+                            ${askedQuestions.length > 0 ? `
+                                <div class="findings-list">
+                                    ${askedQuestions.map(qId => {
+                                        const question = this.gameState.currentCase.questions.find(q => q.id === qId);
+                                        const answer = this.getQuestionAnswer(qId);
+                                        return question ? `
+                                            <div class="finding-item">
+                                                <strong>Q:</strong> ${question.text}<br>
+                                                <strong>A:</strong> ${answer}
+                                            </div>
+                                        ` : '';
+                                    }).join('')}
+                                </div>
+                            ` : '<p>No questions asked.</p>'}
+                        </div>
+                        <div class="findings-section">
+                            <h5>Test Results (${orderedTests.length})</h5>
+                            ${orderedTests.length > 0 ? `
+                                <div class="findings-list">
+                                    ${orderedTests.map(tId => {
+                                        const test = this.gameState.currentCase.tests.find(t => t.id === tId);
+                                        const result = this.generateTestResult(test);
+                                        return test ? `
+                                            <div class="finding-item">
+                                                <strong>${test.name}:</strong><br>
+                                                ${result}
+                                            </div>
+                                        ` : '';
+                                    }).join('')}
+                                </div>
+                            ` : '<p>No tests ordered.</p>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    toggleSection(sectionId) {
+        const content = document.getElementById(`${sectionId}-content`);
+        const toggle = document.getElementById(`${sectionId}-toggle`);
+        
+        if (content && toggle) {
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.classList.remove('fa-chevron-down');
+                toggle.classList.add('fa-chevron-up');
+            } else {
+                content.style.display = 'none';
+                toggle.classList.remove('fa-chevron-up');
+                toggle.classList.add('fa-chevron-down');
+            }
+        }
+        
+        this.playSound('click');
     }
 
     getPatientImageForAge(demographics) {
@@ -1100,7 +1577,7 @@ class MedicalMysteryGame {
             
             // Pediatric case questions
             'breathing_difficulty': 'Yes, child is working hard to breathe. Using accessory muscles and has nasal flaring.',
-            'fever': 'Yes, temperature is 102°F (39°C). Child appears flushed and lethargic.',
+            'fever': 'Yes, temperature is 39°C. Child appears flushed and lethargic.',
             'cough': 'Yes, barking cough that sounds like a seal. Worse at night and with activity.',
             'stridor': 'Yes, high-pitched sound when breathing in. Child appears anxious about breathing.',
             'activity_level': 'Child is less active than usual. Prefers to sit quietly and seems tired.',
@@ -1109,7 +1586,7 @@ class MedicalMysteryGame {
             'contractions': 'Yes, regular contractions every 3-4 minutes lasting 45-60 seconds. Increasing in intensity.',
             'water_broken': 'Yes, clear fluid leaking for the past 2 hours. No foul odor.',
             'bleeding': 'Yes, light spotting for the past hour. No heavy bleeding.',
-            'fetal_movement': 'Yes, baby is moving normally. Mother reports regular kicks and movements.',
+            'fetal_movement': 'Yes, baby is moving normally. Mum reports regular kicks and movements.',
             'pain_location': 'Pain is in lower abdomen and radiating to back. Describes as "cramping" sensation.',
             
             // Psychiatric case questions
@@ -1127,7 +1604,7 @@ class MedicalMysteryGame {
             'needle_marks': 'Yes, multiple track marks on both arms. Some appear fresh, others are older scars.',
             
             // Additional common symptoms
-            'fever': 'Yes, temperature is 102°F (39°C). Patient appears flushed and reports chills.',
+            'fever': 'Yes, temperature is 39°C. Patient appears flushed and reports chills.',
             'cough': 'Yes, productive cough with yellow-green sputum for the past 3 days.',
             'fatigue': 'Yes, patient reports extreme fatigue and weakness. "Can barely get out of bed".',
             'headache': 'Yes, severe headache for the past 2 hours. Describes as "worst headache of my life".',
@@ -1157,10 +1634,10 @@ class MedicalMysteryGame {
             'activity_level': 'Child is active and playful when fever is controlled with medication. Sleeps normally.',
             
             // Abdominal pain case questions
-            'pain_location': 'Pain is located in the right lower abdomen. Patient points to McBurney\'s point specifically.',
+            'pain_location': 'Pain is located in the right iliac fossa. Patient has localised tenderness in this area.',
             'pain_migration': 'Yes, pain started around the belly button this morning and moved to the right lower abdomen over 4-6 hours.',
             'nausea_vomiting': 'Yes, patient has been nauseous for 6 hours and vomited twice. Can\'t keep food down.',
-            'fever': 'Yes, low-grade fever of 100.4°F (38°C). Patient feels warm to touch.',
+            'fever': 'Yes, low-grade fever of 38°C. Patient feels warm to touch.',
             'appetite': 'No appetite for the past 12 hours. Patient reports feeling "sick to my stomach".',
             
             // Trauma case questions
@@ -1174,7 +1651,7 @@ class MedicalMysteryGame {
             'breathing_difficulty': 'Yes, child is working hard to breathe. Using accessory muscles and has nasal flaring.',
             'wheezing': 'Yes, audible wheezing heard throughout chest. Worse with activity and at night.',
             'triggers': 'Yes, symptoms started after playing outside in cold weather. Has history of asthma.',
-            'medication': 'Yes, child has albuterol inhaler but it\'s not helping much. Used it 3 times today.',
+            'medication': 'Yes, child has salbutamol inhaler but it\'s not helping much. Used it 3 times today.',
             
             // Neurological stroke case questions
             'weakness': 'Yes, obvious weakness on the right side of the body. Patient cannot lift right arm and right leg is weak.',
@@ -1253,17 +1730,25 @@ class MedicalMysteryGame {
         // Shuffle the diagnosis options to ensure correct answer isn't always first
         const shuffledOptions = [...this.gameState.currentCase.diagnosisOptions].sort(() => Math.random() - 0.5);
         
-        const diagnosisButtons = shuffledOptions.map(d => `
-            <button class="action-btn primary diagnosis-btn" data-diagnosis="${d.id}" onclick="game.makeDiagnosis('${d.id}')">
-                ${d.name}
-            </button>
+        const diagnosisCards = shuffledOptions.map(d => `
+            <div class="diagnosis-card" onclick="game.makeDiagnosis('${d.id}')">
+                <h4>${d.name}</h4>
+                <p>${d.description}</p>
+                <div class="diagnosis-action">
+                    <i class="fas fa-arrow-right"></i>
+                    Select Diagnosis
+                </div>
+            </div>
         `).join('');
         
         return `
-            <div class="section">
-                <h3><i class="fas fa-stethoscope"></i> Make Diagnosis</h3>
-                <div class="diagnosis-grid">
-                    ${diagnosisButtons}
+            <div class="section diagnosis-selection">
+                <div class="diagnosis-header">
+                    <h2><i class="fas fa-stethoscope"></i> Select Your Diagnosis</h2>
+                    <p>Based on your clinical findings, choose the most likely diagnosis:</p>
+                </div>
+                <div class="diagnosis-options">
+                    ${diagnosisCards}
                 </div>
             </div>
         `;
@@ -1347,22 +1832,27 @@ class MedicalMysteryGame {
     }
 
     updatePatientStability() {
-        // Time pressure causes gradual deterioration
-        this.gameState.patientStability -= DETERIORATION_FACTORS.TIME_PRESSURE;
-        
-        // Update patient state based on stability
-        if (this.gameState.patientStability <= 20) {
-            this.gameState.patientState = PATIENT_STATES.CRITICAL;
-        } else if (this.gameState.patientStability <= 50) {
-            this.gameState.patientState = PATIENT_STATES.DETERIORATING;
-        } else if (this.gameState.patientStability >= 80) {
-            this.gameState.patientState = PATIENT_STATES.IMPROVING;
+        // Enhanced deterioration system with phase manager integration
+        if (this.phaseManager) {
+            this.phaseManager.updatePatientCondition();
         } else {
-            this.gameState.patientState = PATIENT_STATES.STABLE;
+            // Fallback to original system
+            this.gameState.patientStability -= DETERIORATION_FACTORS.TIME_PRESSURE;
+            
+            // Update patient state based on stability
+            if (this.gameState.patientStability <= 20) {
+                this.gameState.patientState = PATIENT_STATES.CRITICAL;
+            } else if (this.gameState.patientStability <= 50) {
+                this.gameState.patientState = PATIENT_STATES.DETERIORATING;
+            } else if (this.gameState.patientStability >= 80) {
+                this.gameState.patientState = PATIENT_STATES.IMPROVING;
+            } else {
+                this.gameState.patientState = PATIENT_STATES.STABLE;
+            }
+            
+            // Clamp stability between 0 and 100
+            this.gameState.patientStability = Math.max(0, Math.min(100, this.gameState.patientStability));
         }
-        
-        // Clamp stability between 0 and 100
-        this.gameState.patientStability = Math.max(0, Math.min(100, this.gameState.patientStability));
     }
 
     updatePatientStateDisplay() {
@@ -1564,15 +2054,34 @@ class MedicalMysteryGame {
                 throw new Error(`Diagnosis ${diagnosisId} not found`);
             }
             
+            // Handle diagnosis based on current investigation phase
+            if (this.gameState.investigationPhase === 'diagnose') {
+                // Store diagnosis selection and go straight to final result
+                this.gameState.phaseProgress.diagnose.selectedDiagnosis = diagnosis.name;
+                this.gameState.phaseProgress.diagnose.confidence = 85;
+                // Skip treatment phase for now - go straight to results
+            }
+            
+            // Original diagnosis flow for final submission
             this.gameState.finalDiagnosis = diagnosisId;
+            this.gameState.selectedDiagnosis = diagnosis;
             this.gameState.gamePhase = 'ended';
             
             if (diagnosis.correct) {
                 this.gameState.score += SCORING.CORRECT_DIAGNOSIS;
+                // Bonus points for time remaining and patient stability
+                const timeBonus = Math.floor(this.gameState.timeRemaining / 60) * SCORING.TIME_BONUS;
+                const stabilityBonus = this.gameState.patientStability > 80 ? SCORING.PERFECT_SCORE_BONUS : 0;
+                this.gameState.score += timeBonus + stabilityBonus;
+                
                 this.playSound('success');
                 this.endGame('✅ Correct Diagnosis! Patient saved!', true);
             } else {
                 this.gameState.score += SCORING.INCORRECT_DIAGNOSIS;
+                // Additional penalties for incorrect diagnosis
+                this.gameState.patientStability = Math.max(0, this.gameState.patientStability - 30);
+                this.gameState.incorrectActions++;
+                
                 this.playSound('error');
                 this.endGame('❌ Incorrect Diagnosis!', false);
             }
@@ -1620,6 +2129,8 @@ class MedicalMysteryGame {
         const gameContainer = document.getElementById('game-container');
         if (gameContainer) {
             const patientOutcome = this.getPatientOutcome();
+            const diagnosisResult = this.getDiagnosisResult();
+            
             gameContainer.innerHTML = `
                 <div class="end-game">
                     <h1>${message}</h1>
@@ -1630,6 +2141,9 @@ class MedicalMysteryGame {
                             <span>${patientOutcome.text}</span>
                         </div>
                     </div>
+                    
+                    ${diagnosisResult}
+                    
                     <div class="performance-stats">
                         <div class="stat-item">
                             <span class="stat-label">Patient Stability</span>
@@ -1644,9 +2158,13 @@ class MedicalMysteryGame {
                             <span class="stat-value">${this.gameState.askedQuestions.length + this.gameState.orderedTests.length}</span>
                         </div>
                     </div>
+                    
                     <div class="game-actions">
                         <button class="action-btn primary" onclick="game.resetAndPlayAgain()">
                             <i class="fas fa-play"></i> Play Again
+                        </button>
+                        <button class="action-btn secondary" onclick="game.showCaseReview()">
+                            <i class="fas fa-book-medical"></i> Review Case
                         </button>
                         <button class="action-btn secondary" onclick="game.showAchievements()">
                             <i class="fas fa-trophy"></i> View Achievements
@@ -1679,10 +2197,197 @@ class MedicalMysteryGame {
         }
     }
 
+    getDiagnosisResult() {
+        if (!this.gameState.selectedDiagnosis) return '';
+        
+        const diagnosis = this.gameState.selectedDiagnosis;
+        const correctDiagnosis = this.gameState.currentCase.diagnosisOptions.find(d => d.correct);
+        
+        if (diagnosis.correct) {
+            return `
+                <div class="diagnosis-result success">
+                    <h3><i class="fas fa-check-circle"></i> Excellent Diagnosis!</h3>
+                    <div class="diagnosis-details">
+                        <p><strong>Your Diagnosis:</strong> ${diagnosis.name}</p>
+                        <p><strong>Medical Outcome:</strong> ${diagnosis.consequences}</p>
+                        <p><strong>Family Response:</strong> ${diagnosis.emotionalImpact}</p>
+                    </div>
+                    <div class="learning-points">
+                        <h4>Key Learning Points:</h4>
+                        <ul>
+                            <li>Rapid recognition of ${correctDiagnosis.name} symptoms</li>
+                            <li>Appropriate diagnostic workup and test ordering</li>
+                            <li>Time-critical decision making under pressure</li>
+                            <li>Effective patient communication and care</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="diagnosis-result error">
+                    <h3><i class="fas fa-times-circle"></i> Incorrect Diagnosis - Learning Opportunity</h3>
+                    <div class="diagnosis-comparison">
+                        <div class="your-diagnosis">
+                            <h4>Your Diagnosis: ${diagnosis.name}</h4>
+                            <p><strong>Consequences:</strong> ${diagnosis.consequences}</p>
+                            <p><strong>Family Impact:</strong> ${diagnosis.emotionalImpact}</p>
+                        </div>
+                        <div class="correct-diagnosis">
+                            <h4>Correct Diagnosis: ${correctDiagnosis.name}</h4>
+                            <p><strong>Why This Was Correct:</strong> ${correctDiagnosis.description}</p>
+                            <p><strong>Proper Treatment:</strong> ${correctDiagnosis.consequences}</p>
+                        </div>
+                    </div>
+                    <div class="learning-points">
+                        <h4>What You Can Learn:</h4>
+                        <ul>
+                            <li><strong>Key Symptoms Missed:</strong> Review the critical signs of ${correctDiagnosis.name}</li>
+                            <li><strong>Diagnostic Tests:</strong> Consider which tests would have confirmed the diagnosis</li>
+                            <li><strong>Time Pressure:</strong> Practice rapid assessment and decision-making</li>
+                            <li><strong>Pattern Recognition:</strong> Study classic presentations of emergency conditions</li>
+                        </ul>
+                    </div>
+                    <div class="improvement-tips">
+                        <h4>Improvement Tips:</h4>
+                        <ul>
+                            <li>Focus on critical symptoms and their significance</li>
+                            <li>Order appropriate diagnostic tests early</li>
+                            <li>Consider differential diagnoses systematically</li>
+                            <li>Practice with similar cases to improve pattern recognition</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
     formatTime(decimalHours) {
         const hours = Math.floor(decimalHours);
         const minutes = Math.floor((decimalHours - hours) * 60);
         return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    }
+
+    showCaseReview() {
+        const gameContainer = document.getElementById('game-container');
+        if (!gameContainer) return;
+        
+        const correctDiagnosis = this.gameState.currentCase.diagnosisOptions.find(d => d.correct);
+        const criticalQuestions = this.gameState.currentCase.questions.filter(q => q.critical);
+        const criticalTests = this.gameState.currentCase.tests.filter(t => t.critical);
+        
+        const missedCriticalQuestions = criticalQuestions.filter(q => 
+            !this.gameState.askedQuestions.includes(q.id)
+        );
+        const missedCriticalTests = criticalTests.filter(t => 
+            !this.gameState.orderedTests.includes(t.id)
+        );
+        
+        gameContainer.innerHTML = `
+            <div class="case-review">
+                <h1><i class="fas fa-book-medical"></i> Case Review</h1>
+                
+                <div class="case-summary">
+                    <h2>${this.gameState.currentCase.title}</h2>
+                    <p><strong>Patient:</strong> ${this.gameState.currentCase.patientHistory.demographics}</p>
+                    <p><strong>Correct Diagnosis:</strong> ${correctDiagnosis.name}</p>
+                    <p><strong>Your Diagnosis:</strong> ${this.gameState.selectedDiagnosis.name}</p>
+                </div>
+                
+                <div class="performance-analysis">
+                    <div class="analysis-section">
+                        <h3><i class="fas fa-comments"></i> Questions Asked (${this.gameState.askedQuestions.length}/${this.gameState.currentCase.questions.length})</h3>
+                        <div class="questions-review">
+                            ${this.gameState.currentCase.questions.map(q => `
+                                <div class="question-item ${this.gameState.askedQuestions.includes(q.id) ? 'asked' : 'missed'} ${q.critical ? 'critical' : ''}">
+                                    <span class="question-text">${q.text}</span>
+                                    <span class="question-status">
+                                        ${this.gameState.askedQuestions.includes(q.id) ? 
+                                            '<i class="fas fa-check"></i> Asked' : 
+                                            '<i class="fas fa-times"></i> Missed'
+                                        }
+                                        ${q.critical ? '<span class="critical-badge">Critical</span>' : ''}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <h3><i class="fas fa-flask"></i> Tests Ordered (${this.gameState.orderedTests.length}/${this.gameState.currentCase.tests.length})</h3>
+                        <div class="tests-review">
+                            ${this.gameState.currentCase.tests.map(t => `
+                                <div class="test-item ${this.gameState.orderedTests.includes(t.id) ? 'ordered' : 'missed'} ${t.critical ? 'critical' : ''}">
+                                    <span class="test-text">${t.name}</span>
+                                    <span class="test-status">
+                                        ${this.gameState.orderedTests.includes(t.id) ? 
+                                            '<i class="fas fa-check"></i> Ordered' : 
+                                            '<i class="fas fa-times"></i> Missed'
+                                        }
+                                        ${t.critical ? '<span class="critical-badge">Critical</span>' : ''}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                ${missedCriticalQuestions.length > 0 || missedCriticalTests.length > 0 ? `
+                    <div class="missed-critical">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Critical Items Missed</h3>
+                        ${missedCriticalQuestions.length > 0 ? `
+                            <div class="missed-questions">
+                                <h4>Critical Questions:</h4>
+                                <ul>
+                                    ${missedCriticalQuestions.map(q => `<li>${q.text}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        ${missedCriticalTests.length > 0 ? `
+                            <div class="missed-tests">
+                                <h4>Critical Tests:</h4>
+                                <ul>
+                                    ${missedCriticalTests.map(t => `<li>${t.name} - ${t.description}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                
+                <div class="learning-recommendations">
+                    <h3><i class="fas fa-lightbulb"></i> Learning Recommendations</h3>
+                    <ul>
+                        <li>Review the pathophysiology of ${correctDiagnosis.name}</li>
+                        <li>Study the classic presentation and key diagnostic criteria</li>
+                        <li>Practice systematic approach to ${this.gameState.currentCase.specialty.toLowerCase()} emergencies</li>
+                        <li>Focus on time-critical decision making in emergency scenarios</li>
+                        ${missedCriticalQuestions.length > 0 ? '<li>Improve history-taking skills for emergency presentations</li>' : ''}
+                        ${missedCriticalTests.length > 0 ? '<li>Learn appropriate diagnostic test selection and interpretation</li>' : ''}
+                    </ul>
+                </div>
+                
+                <div class="review-actions">
+                    <button class="action-btn primary" onclick="game.resetAndPlayAgain()">
+                        <i class="fas fa-redo"></i> Try This Case Again
+                    </button>
+                    <button class="action-btn secondary" onclick="game.showCaseSelection()">
+                        <i class="fas fa-list"></i> Choose Different Case
+                    </button>
+                    <button class="action-btn secondary" onclick="game.showGlossary()">
+                        <i class="fas fa-book"></i> Medical Glossary
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    resetAndPlayAgain() {
+        if (this.gameState.currentCase) {
+            const caseId = this.gameState.currentCase.id;
+            this.startCase(caseId);
+        } else {
+            this.showCaseSelection();
+        }
     }
 
     showError(message) {
@@ -1739,7 +2444,7 @@ class MedicalMysteryGame {
                             </div>
                         </div>
                         <div class="glossary-section">
-                            <h3>Emergency Medicine</h3>
+                            <h3>A&E Medicine</h3>
                             <div class="glossary-item">
                                 <strong>STEMI:</strong> ST-Elevation Myocardial Infarction - heart attack
                             </div>
@@ -2018,9 +2723,9 @@ class MedicalMysteryGame {
         const caseType = caseData.category || 'general';
         const hasRelevantTests = this.hasRelevantTestResults(specialist.expertise);
         
-        // Special logic for pediatric respiratory cases
+        // Special logic for paediatric respiratory cases
         if (caseData.id === 'pediatric' && specialist.id === 'pulmonologist') {
-            return true; // Pulmonologist is always appropriate for pediatric respiratory distress
+            return true; // Pulmonologist is always appropriate for paediatric respiratory distress
         }
         
         // Special logic for cardiac cases
@@ -2140,12 +2845,12 @@ class MedicalMysteryGame {
                     return `"No significant orthopedic findings. Consider medical causes for the symptoms."`;
                 }
                 
-            case 'pediatrician':
-                if (caseData.category === 'pediatric' || caseData.category === 'respiratory') {
+            case 'paediatrician':
+                if (caseData.category === 'paediatric' || caseData.category === 'respiratory') {
                     if (caseData.id === 'pediatric') {
                         return `"This 3-year-old has classic croup symptoms. The barking cough and stridor are characteristic. Supportive care with steroids is appropriate."`;
                     } else {
-                        return `"In pediatric patients, this presentation is most consistent with ${caseData.correctDiagnosis}. Age-appropriate management is crucial."`;
+                        return `"In paediatric patients, this presentation is most consistent with ${caseData.correctDiagnosis}. Age-appropriate management is crucial."`;
                     }
                 } else {
                     return `"This case involves an adult patient. Consider consulting an adult medicine specialist."`;

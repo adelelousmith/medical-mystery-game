@@ -1,0 +1,995 @@
+/* Enhancement Styles - Additive CSS for new gameplay features */
+
+/* Confidence Meter */
+.confidence-meter {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.confidence-bar {
+    width: 100%;
+    height: 20px;
+    background: var(--surface-light);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+    transition: width 0.5s ease;
+    border-radius: 10px;
+}
+
+.confidence-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Clue System */
+.clues-section {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.clue-item {
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 4px solid var(--primary-blue);
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    animation: clueReveal 0.5s ease-out;
+}
+
+@keyframes clueReveal {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.clue-category {
+    font-size: 0.75rem;
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Event Notifications */
+.event-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--surface-white);
+    border: 2px solid var(--warning-orange);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    max-width: 350px;
+    animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.event-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.event-content i {
+    color: var(--warning-orange);
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+}
+
+.event-text h4 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.event-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+/* Clue Notifications */
+.clue-notification {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--surface-white);
+    border: 2px solid var(--success-green);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    max-width: 300px;
+    animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.clue-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.clue-content i {
+    color: var(--success-green);
+    font-size: 1.25rem;
+    margin-top: 0.25rem;
+}
+
+/* Hint System */
+.hint-modal .modal-content {
+    border: 3px solid var(--primary-blue);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--surface-white) 100%);
+}
+
+.hint-cost {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--error-red);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+    color: var(--error-red);
+    font-weight: 600;
+}
+
+.active-hint {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 2px solid var(--primary-blue);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin: 1rem 0;
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+}
+
+.hint-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hint-content i {
+    color: var(--primary-blue);
+    font-size: 1.25rem;
+}
+
+/* Glossary Auto-linking */
+.glossary-term {
+    color: var(--primary-blue);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    cursor: help;
+    position: relative;
+}
+
+.glossary-term:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 3px;
+}
+
+.glossary-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: white;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    max-width: 250px;
+    white-space: normal;
+}
+
+.glossary-term:hover .glossary-tooltip {
+    opacity: 1;
+}
+
+/* Enhanced Performance Display */
+.performance-summary {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.performance-metric {
+    text-align: center;
+    padding: 1rem;
+    background: var(--surface-white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-light);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    display: block;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+/* Narrative Branches */
+.narrative-outcome {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--surface-white) 100%);
+    border: 2px solid var(--success-green);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.narrative-outcome.delayed {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, var(--surface-white) 100%);
+    border-color: var(--warning-orange);
+}
+
+.narrative-outcome.poor {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--surface-white) 100%);
+    border-color: var(--error-red);
+}
+
+.outcome-section {
+    margin: 1rem 0;
+}
+
+.outcome-section h4 {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.outcome-section p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Investigation Phases */
+.investigation-phases {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.phase-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius);
+    min-width: 200px;
+    transition: all 0.3s ease;
+}
+
+.phase-item.active {
+    border-color: var(--primary-blue);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, var(--surface-white) 100%);
+    transform: scale(1.02);
+}
+
+.phase-item.completed {
+    border-color: var(--success-green);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, var(--surface-white) 100%);
+}
+
+.phase-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--border-light);
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+}
+
+.phase-item.active .phase-icon {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.phase-item.completed .phase-icon {
+    background: var(--success-green);
+    color: white;
+}
+
+.phase-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.phase-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progress-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-blue);
+    transition: width 0.5s ease;
+    border-radius: 3px;
+}
+
+.phase-item.completed .progress-fill {
+    background: var(--success-green);
+}
+
+.progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.phase-arrow {
+    color: var(--border-color);
+    font-size: 1.2rem;
+    margin: 0 0.5rem;
+}
+
+.phase-advance-btn {
+    margin-top: 1rem;
+    align-self: flex-end;
+}
+
+/* Patient Condition Display */
+.patient-condition {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.condition-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.condition-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+}
+
+.condition-item.normal {
+    border-color: var(--success-green);
+}
+
+.condition-item.concerning,
+.condition-item.laboured,
+.condition-item.compromised,
+.condition-item.fever,
+.condition-item.severe {
+    border-color: var(--warning-orange);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, var(--surface-white) 100%);
+}
+
+.condition-item.critical,
+.condition-item.unconscious {
+    border-color: var(--error-red);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, var(--surface-white) 100%);
+    animation: criticalPulse 2s ease-in-out infinite;
+}
+
+.condition-item i {
+    font-size: 1.2rem;
+    color: var(--primary-blue);
+}
+
+.condition-item.concerning i,
+.condition-item.laboured i,
+.condition-item.compromised i {
+    color: var(--warning-orange);
+}
+
+.condition-item.critical i,
+.condition-item.unconscious i {
+    color: var(--error-red);
+}
+
+.condition-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.condition-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.condition-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stability-meter {
+    border-top: 1px solid var(--border-light);
+    padding-top: 1rem;
+}
+
+.stability-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stability-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--border-light);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.stability-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    border-radius: 6px;
+}
+
+.stability-fill.stable {
+    background: var(--success-green);
+}
+
+.stability-fill.concerning {
+    background: var(--warning-orange);
+}
+
+.stability-fill.unstable {
+    background: #f97316;
+}
+
+.stability-fill.critical {
+    background: var(--error-red);
+    animation: criticalPulse 1s ease-in-out infinite;
+}
+
+/* Phase Transition Notifications */
+.phase-transition-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface-white);
+    border: 3px solid var(--primary-blue);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    max-width: 400px;
+    animation: phaseTransition 0.8s ease-out;
+}
+
+@keyframes phaseTransition {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.phase-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.phase-content i {
+    color: var(--primary-blue);
+    font-size: 2rem;
+}
+
+.phase-text h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.phase-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Condition Change Notifications */
+.condition-change-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--surface-white);
+    border: 2px solid var(--warning-orange);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    box-shadow: var(--shadow-xl);
+    z-index: 1000;
+    max-width: 300px;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.condition-change-notification.warning {
+    border-color: var(--warning-orange);
+}
+
+.condition-change-notification.critical {
+    border-color: var(--error-red);
+    animation: criticalAlert 0.5s ease-out;
+}
+
+.condition-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.condition-content i {
+    color: var(--warning-orange);
+    font-size: 1.5rem;
+}
+
+.condition-change-notification.critical .condition-content i {
+    color: var(--error-red);
+}
+
+/* Clinical Reasoning Section */
+.clinical-reasoning {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+.clinical-summary {
+    margin-bottom: 2rem;
+}
+
+.findings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.findings-section {
+    background: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
+.findings-section h5 {
+    margin: 0 0 0.75rem 0;
+    color: var(--primary-blue);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.findings-section ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.findings-section li {
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.findings-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.finding-item {
+    background: rgba(59, 130, 246, 0.05);
+    border-left: 3px solid var(--primary-blue);
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.finding-item strong {
+    color: var(--text-primary);
+}
+
+.differential-diagnosis {
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.5rem;
+}
+
+.diagnosis-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.diagnosis-consideration {
+    background: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.diagnosis-consideration:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.diagnosis-consideration h5 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.diagnosis-consideration p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Collapsible Sections */
+.collapsible-section {
+    background: var(--surface-gradient);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.collapsible-header {
+    padding: 1rem 1.5rem;
+    background: var(--surface-white);
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.collapsible-header:hover {
+    background: var(--surface-light);
+}
+
+.collapsible-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggle-icon {
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+}
+
+.collapsible-content {
+    padding: 1.5rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.history-item {
+    background: var(--surface-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 1rem;
+}
+
+.history-item strong {
+    color: var(--primary-blue);
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.history-item ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.2rem;
+}
+
+.history-item li {
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Enhanced Diagnosis Selection */
+.diagnosis-selection {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--surface-white) 100%);
+    border: 2px solid var(--primary-blue);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.diagnosis-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.diagnosis-header h2 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.diagnosis-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.diagnosis-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.diagnosis-card {
+    background: var(--surface-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.diagnosis-card:hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.diagnosis-card h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.diagnosis-card p {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.diagnosis-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.diagnosis-card:hover .diagnosis-action {
+    opacity: 1;
+}
+
+.diagnosis-action i {
+    font-size: 0.8rem;
+}
+
+/* Diagnosis Ready Section */
+.diagnosis-ready {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, var(--surface-white) 100%);
+    border: 2px solid var(--primary-blue);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.diagnosis-ready.disabled {
+    background: var(--surface-light);
+    border-color: var(--border-color);
+}
+
+.diagnosis-ready.disabled h3 {
+    color: var(--text-secondary);
+}
+
+.ready-content h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-blue);
+}
+
+.ready-content p {
+    margin: 0.5rem 0 1rem 0;
+    color: var(--text-secondary);
+}
+
+.ready-content small {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .investigation-phases {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .phase-item {
+        min-width: auto;
+    }
+    
+    .condition-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .findings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .diagnosis-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .event-notification,
+    .clue-notification,
+    .condition-change-notification {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+    
+    .phase-transition-notification {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        transform: translateY(-50%);
+    }
+    
+    .performance-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .confidence-meter {
+        margin: 0.5rem 0;
+        padding: 0.75rem;
+    }
+}

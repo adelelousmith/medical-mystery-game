@@ -8,7 +8,7 @@ A professional emergency medicine simulation game designed for medical education
 - **6 Realistic Cases**: Cardiac, Trauma, Pediatric, Toxicology, Stroke, and Surgical emergencies
 - **Age-Appropriate Patients**: From 3-year-old pediatric to 72-year-old elderly cases
 - **Difficulty Progression**: Easy → Medium → Hard → Expert levels
-- **Time-Critical Decisions**: Realistic emergency department time pressures
+- **Time-Critical Decisions**: Realistic A&E department time pressures
 
 ### **Educational Excellence**
 - **Evidence-Based Content**: Medically accurate presentations and treatments
@@ -221,7 +221,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🤝 **Acknowledgments**
 
 - Medical content reviewed by emergency medicine professionals
-- Educational framework based on medical school curricula
+- Educational framework based on medical degree curricula
 - Performance optimization following web development best practices
 - Accessibility features designed for inclusive learning
 
