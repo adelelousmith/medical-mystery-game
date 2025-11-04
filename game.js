@@ -237,43 +237,58 @@ class MedicalMysteryGame {
             malePain: new Audio('sounds/male-pain.mp3'),
             elderlyDistress: new Audio('sounds/elderly-distress.mp3'),
             vomiting: new Audio('sounds/vomiting.mp3'),
-            ultrasound: new Audio('sounds/ultrasound.mp3')
+            ultrasound: new Audio('sounds/ultrasound.mp3'),
+            click: new Audio('sounds/click.mp3'),
+            ambulance: new Audio('sounds/ambulance-passing.mp3'),
+            pageTurn: new Audio('sounds/book-turn-page-2-92381.mp3'),
+            bpMonitor: new Audio('sounds/bp-monitor-realistic-medical-sound-effects-319068.mp3'),
+            defibrillator: new Audio('sounds/defibrillatorResusitation.mp3'),
+            printer: new Audio('sounds/printer-sound-effect-no-copyright-394246.mp3')
         };
         
-        // Set volume levels for sound effects
-        Object.values(this.soundEffects).forEach(audio => {
+        // Set volume levels for sound effects and check durations
+        Object.entries(this.soundEffects).forEach(([key, audio]) => {
             audio.volume = 0.4; // 40% volume for sound effects
             audio.preload = 'auto';
+            audio.loop = false; // Ensure no looping
+            
+            // Log duration when metadata loads
+            audio.addEventListener('loadedmetadata', () => {
+                if (audio.duration > 5) {
+                    console.warn(`⚠️ ${key}: ${audio.duration.toFixed(2)}s (will be auto-trimmed to 5s)`);
+                } else {
+                    console.log(`✅ ${key}: ${audio.duration.toFixed(2)}s (OK)`);
+                }
+            });
         });
         
         console.log('✅ Real sound effects loaded');
     }
 
     initBackgroundMusic() {
-        // Load custom background music file
-        try {
-            this.backgroundMusic = new Audio('backgroundMusic.mp3');
-            this.backgroundMusic.loop = true;
-            this.backgroundMusic.volume = 0.08; // Set to 8% volume (much quieter)
-            this.backgroundMusic.preload = 'auto';
-            
-            // Handle loading errors gracefully
-            this.backgroundMusic.addEventListener('error', (e) => {
-                console.warn('Background music file could not be loaded:', e);
-                this.backgroundMusic = null;
-            });
-            
-            console.log('✅ Custom background music loaded');
-        } catch (error) {
-            console.warn('Background music not supported:', error);
-            this.backgroundMusic = null;
-        }
+        // Background music temporarily disabled to fix looping issue
+        console.log('🔇 Background music disabled');
+        this.backgroundMusic = null;
+        
+        // Original code commented out:
+        // try {
+        //     this.backgroundMusic = new Audio('sounds/loading-music.mp3');
+        //     this.backgroundMusic.loop = true;
+        //     this.backgroundMusic.volume = 0.08;
+        //     this.backgroundMusic.preload = 'auto';
+        // } catch (error) {
+        //     this.backgroundMusic = null;
+        // }
     }
 
     // Background music now uses MP3 file instead of generated tones
 
     toggleBackgroundMusic(enabled) {
-        if (!this.backgroundMusic) return;
+        // Background music disabled - do nothing
+        if (!this.backgroundMusic) {
+            console.log('🔇 Background music is disabled');
+            return;
+        }
         
         if (enabled) {
             this.backgroundMusic.play().catch(e => {
@@ -284,8 +299,34 @@ class MedicalMysteryGame {
         }
     }
 
+    stopAllSounds() {
+        // Stop background music
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
+        }
+        
+        // Stop all sound effects
+        if (this.soundEffects) {
+            Object.values(this.soundEffects).forEach(audio => {
+                if (audio && typeof audio.pause === 'function') {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            });
+        }
+        
+        // Clear any sound intervals
+        if (this.modulationInterval) {
+            clearInterval(this.modulationInterval);
+            this.modulationInterval = null;
+        }
+        
+        console.log('🔇 All sounds stopped');
+    }
+
     playSound(type) {
-        if (!this.settings.soundEnabled || !this.audioContext) return;
+        if (!this.settings.soundEnabled) return;
         
         // Throttle rapid sound effects
         const now = Date.now();
@@ -295,12 +336,13 @@ class MedicalMysteryGame {
         this.lastSoundTime = now;
         
         try {
+            // Use appropriate sounds - keep most as synthetic, only use real audio for specific cases
             switch (type) {
                 case 'click':
-                    this.createTone(800, 0.1, 'sine');
+                    this.playAudioFile('click') || this.createTone(800, 0.1, 'sine');
                     break;
                 case 'success':
-                    this.createChord([523, 659, 784], 0.3); // C major chord
+                    this.createChord([523, 659, 784], 0.3); // Keep original success sound
                     break;
                 case 'error':
                     this.createTone(200, 0.2, 'sawtooth');
@@ -309,67 +351,106 @@ class MedicalMysteryGame {
                     this.createTone(400, 0.15, 'square');
                     break;
                 case 'heartbeat':
-                    this.createHeartbeat();
+                    this.playAudioFile('heartbeat') || this.createHeartbeat();
                     break;
                 case 'monitor':
-                    this.createMonitorBeep();
+                    this.createMonitorBeep(); // Keep synthetic
                     break;
                 case 'ambient':
-                    this.createAmbientSound();
+                    this.playAudioFile('hospitalAmbience') || this.createAmbientSound();
                     break;
                 case 'critical':
-                    this.createCriticalAlert();
+                    this.createCriticalAlert(); // Keep synthetic for now
                     break;
                 case 'notification':
-                    this.createNotificationSound();
+                    this.createNotificationSound(); // Keep synthetic
                     break;
                 case 'page_turn':
-                    this.createPageTurnSound();
+                    this.playAudioFile('pageTurn') || this.createPageTurnSound();
                     break;
                 case 'test_result':
-                    this.createTestResultSound();
+                    this.playAudioFile('printer') || this.createTestResultSound();
                     break;
                 case 'timer_tick':
                     this.createTimerTick();
                     break;
                 case 'diagnosis_correct':
-                    this.createDiagnosisCorrectSound();
+                    this.playAudioFile('bpMonitor') || this.createDiagnosisCorrectSound();
                     break;
                 case 'consultation':
-                    this.createConsultationSound();
+                    this.createConsultationSound(); // Keep synthetic
                     break;
                 case 'patient_stable':
-                    this.createPatientStableSound();
+                    this.createPatientStableSound(); // Keep synthetic
                     break;
                 case 'patient_critical':
-                    this.createPatientCriticalSound();
+                    this.playAudioFile('defibrillator') || this.createPatientCriticalSound();
                     break;
                 case 'cough':
-                    this.createCoughSound();
+                    this.playAudioFile('childCough') || this.createCoughSound();
                     break;
                 case 'child_cry':
-                    this.createChildCrySound();
+                    this.playAudioFile('childCough') || this.createChildCrySound();
                     break;
                 case 'male_pain':
-                    this.createMalePainSound();
+                    this.playAudioFile('malePain') || this.createMalePainSound();
                     break;
                 case 'elderly_distress':
-                    this.createElderlyDistressSound();
+                    this.playAudioFile('elderlyDistress') || this.createElderlyDistressSound();
                     break;
                 case 'vomiting':
-                    this.createVomitingSound();
+                    this.playAudioFile('vomiting') || this.createVomitingSound();
                     break;
                 case 'ultrasound':
-                    this.createUltrasoundSound();
+                    this.playAudioFile('ultrasound') || this.createUltrasoundSound();
                     break;
                 case 'hospital_ambience':
-                    this.createHospitalAmbienceSound();
+                    this.playAudioFile('hospitalAmbience') || this.createHospitalAmbienceSound();
+                    break;
+                case 'ambulance':
+                    this.playAudioFile('ambulance');
                     break;
                 default:
                     this.createTone(600, 0.1, 'sine');
             }
         } catch (error) {
             console.warn('Error playing sound:', error);
+        }
+    }
+
+    playAudioFile(soundKey) {
+        try {
+            const audio = this.soundEffects[soundKey];
+            if (audio) {
+                // Reset to beginning and play once only
+                audio.currentTime = 0;
+                audio.volume = 0.3; // Set reasonable volume
+                audio.loop = false; // Ensure no looping
+                
+                // Auto-stop after 5 seconds maximum (except loading-music)
+                if (soundKey !== 'loadingMusic') {
+                    setTimeout(() => {
+                        if (!audio.paused && !audio.ended) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                            console.log(`🔇 Auto-stopped ${soundKey} after 5 seconds`);
+                        }
+                    }, 5000);
+                }
+                
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn(`Error playing ${soundKey}:`, error);
+                    });
+                }
+                return true; // Successfully initiated playback
+            }
+            return false; // Audio file not available
+        } catch (error) {
+            console.warn(`Error playing audio file ${soundKey}:`, error);
+            return false;
         }
     }
 
@@ -421,6 +502,17 @@ class MedicalMysteryGame {
         try {
             const audio = this.soundEffects[soundName];
             audio.currentTime = 0; // Reset to beginning
+            audio.loop = false; // Ensure no looping
+            
+            // Auto-stop after 5 seconds maximum
+            setTimeout(() => {
+                if (!audio.paused && !audio.ended) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    console.log(`🔇 Auto-stopped ${soundName} after 5 seconds`);
+                }
+            }, 5000);
+            
             audio.play().catch(e => {
                 console.warn(`Could not play ${soundName}:`, e);
             });
@@ -624,43 +716,28 @@ class MedicalMysteryGame {
     }
 
     playContextualCaseSound(case_) {
-        // Play ambient sounds based on case category and patient demographics
+        // Play subtle ambient sounds based on case category - much more selective
         setTimeout(() => {
             switch (case_.category) {
-                case 'cardiac':
-                    this.playSound('hospital_ambience');
+                case 'trauma':
+                    // Only ambulance sound for trauma - no additional sounds
+                    this.playAudioFile('ambulance');
                     break;
                 case 'respiratory':
                 case 'paediatric':
+                    // Only for pediatric cases, and only child cough
                     if (case_.id === 'pediatric' || case_.patientHistory?.demographics?.includes('3-year-old')) {
-                        this.playSound('child_cry');
-                        setTimeout(() => this.playSound('cough'), 1500);
-                    } else {
-                        this.playSound('cough');
+                        this.playAudioFile('childCough');
                     }
                     break;
+                case 'cardiac':
                 case 'neurological':
-                    this.playSound('hospital_ambience');
-                    break;
-                case 'trauma':
-                    // Check patient demographics for appropriate pain sound
-                    if (case_.patientHistory?.demographics?.includes('male') || 
-                        case_.patientHistory?.demographics?.includes('Male')) {
-                        this.playSound('male_pain');
-                    } else if (case_.patientHistory?.demographics?.includes('elderly') ||
-                               case_.patientHistory?.demographics?.includes('old')) {
-                        this.playSound('elderly_distress');
-                    } else {
-                        this.playSound('critical');
-                    }
-                    break;
                 case 'gastrointestinal':
-                    this.playSound('vomiting');
-                    break;
                 default:
-                    this.playSound('hospital_ambience');
+                    // No automatic sounds for other cases - let the user interact first
+                    break;
             }
-        }, 500); // Delay to let the case load first
+        }, 800); // Slight delay to let the case load first
     }
 
     playContextualTestSound(test) {
@@ -954,8 +1031,14 @@ class MedicalMysteryGame {
             this.timer = null;
         }
         
-        // Stop background music
-        this.toggleBackgroundMusic(false);
+        // Stop all sound effects first
+        this.stopAllSounds();
+        
+        // Restart background music if enabled
+        if (this.settings.backgroundMusicEnabled) {
+            this.toggleBackgroundMusic(true);
+        }
+        this.stopAllSounds();
         
         try {
             const cases = getAllCases();
@@ -1045,6 +1128,9 @@ class MedicalMysteryGame {
             if (!case_) {
                 throw new Error(`Case ${caseId} not found`);
             }
+            
+            // Stop background music when starting a case
+            this.toggleBackgroundMusic(false);
             
             // Reset game state completely for new case
             this.gameState.currentCase = case_;
@@ -2333,7 +2419,7 @@ class MedicalMysteryGame {
         
         this.gameState.historyRevealed = true;
         this.gameState.score += SCORING.HISTORY_REVEAL;
-        this.playSound('success');
+        this.playSound('page_turn');
         this.render();
     }
 
@@ -2405,8 +2491,8 @@ class MedicalMysteryGame {
     }
 
     showTestResult(test) {
-        // Play contextual sound based on test type
-        this.playContextualTestSound(test);
+        // Play printer sound for test results
+        this.playSound('test_result');
         
         // Check for narrative results first
         if (test.resultNarrative && test.resultNarrative.length > 0) {
@@ -2515,52 +2601,159 @@ class MedicalMysteryGame {
     generateTestResult(test) {
         // Generate realistic test results based on test type and current case
         const caseId = this.gameState.currentCase.id;
+        const caseCategory = this.gameState.currentCase.category;
+        const patientAge = this.gameState.currentCase.patientHistory?.demographics || "";
+        const isPediatric = caseId === 'pediatric' || patientAge.includes('3-year-old') || caseCategory === 'paediatric';
         
+        // Case-specific test results
         const testResults = {
-            // Cardiac case results
-            ecg: "12-Lead ECG: Abnormal electrical patterns in leads II, III, and aVF. ST-segment elevation noted (abnormal heart rhythm changes). Clinical correlation required.",
-            troponin: "Cardiac Troponin I: Significantly elevated at 15.2 ng/mL (normal <0.04). Suggests possible heart muscle injury.",
-            chest_xray: "Chest X-ray: Cardiomegaly (enlarged heart) with pulmonary vascular congestion (fluid backing up into lungs). No pneumothorax.",
-            cardiac_enzymes: "Cardiac Enzymes Panel: Elevated CK-MB and LDH levels. Findings consistent with myocardial tissue damage (heart muscle injury).",
+            // ECG - varies by case
+            ecg: caseCategory === 'cardiac' ? 
+                "Shows irregular electrical changes in several leads. (May indicate strain on the heart.)" :
+                "Heart rhythm appears normal with no significant abnormalities detected.",
             
-            // Trauma case results
-            ct_scan: "CT Scan (Head and Abdomen): Hemoperitoneum (blood in abdominal cavity) with active bleeding from liver injury. Multiple rib fractures noted. No brain bleeding detected.",
-            ultrasound: "Abdominal Ultrasound: Free fluid visible in all abdominal quadrants. FAST exam positive, indicating internal bleeding.",
-            xray: "Chest X-ray: Multiple rib fractures (ribs 3-8 on right side). No pneumothorax (collapsed lung) visible.",
-            blood_work: "Complete Blood Count (CBC): Low hemoglobin at 8.2 g/dL (normal 13-17), suggesting blood loss. Platelet count decreased.",
+            // Troponin - cardiac specific
+            troponin: caseCategory === 'cardiac' ? 
+                "Levels are much higher than normal, which suggests stress or injury to the heart muscle." :
+                "Levels are within normal range, ruling out recent heart muscle damage.",
             
-            // Pediatric case results
-            pulse_ox: "Pulse Oximetry: Oxygen saturation 88% on room air (normal >95%). Improves to 94% with supplemental oxygen, indicating breathing difficulty.",
-            chest_xray_ped: "Chest X-ray: Hyperinflated lungs (over-expanded) with flattened diaphragms. No pneumonia visible. Findings suggest airway obstruction.",
-            blood_gas: "Arterial Blood Gas: pH 7.32 (slightly acidic), elevated CO2 levels. Indicates respiratory compromise (breathing problems).",
-            cbc: "Complete Blood Count (CBC): Slightly elevated white blood cells at 12,500 (normal 5,000-10,000). Suggests body fighting infection.",
+            // Chest X-Ray - varies by case
+            chest_xray: this.getChestXrayResult(caseCategory, isPediatric),
             
-            // Obstetric case results
-            ultrasound_ob: "Obstetric Ultrasound: Single healthy fetus in head-down position. Estimated gestational age 38 weeks (full-term). Normal amniotic fluid levels.",
-            fetal_monitor: "Fetal Heart Monitor: Baby's heart rate 140-150 beats per minute with good variability (healthy pattern). Regular contractions every 3-4 minutes.",
-            blood_pressure: "BP: 140/90 mmHg. Elevated from baseline of 120/80 mmHg.",
-            urine_test: "Proteinuria: 2+ on dipstick. Glucose: negative. Ketones: trace.",
+            // Blood gas - case and age-appropriate language
+            blood_gas: this.getBloodGasResult(caseCategory, isPediatric),
             
-            // Psychiatric case results
-            mental_status: "Patient alert and oriented x3. Mood: depressed. Affect: flat. No psychotic symptoms.",
-            drug_screen: "Positive for benzodiazepines. Negative for other substances.",
-            thyroid_test: "TSH: 0.8 mIU/L (normal 0.4-4.0). T4: 1.2 ng/dL (normal 0.8-1.8). Normal thyroid function.",
-            cbc_psych: "Hemoglobin: 13.2 g/dL. White blood cells: 7,800/μL. No significant abnormalities.",
+            // Pulse oximetry - age-appropriate
+            pulse_ox: isPediatric ?
+                "Oxygen levels are lower than normal but improve with oxygen support. (Shows the child is having trouble breathing.)" :
+                "Oxygen levels are below normal but improve with supplemental oxygen. (Indicates breathing difficulties.)",
             
-            // Toxicology case results
-            drug_screen_tox: "Positive for opioids (morphine), benzodiazepines, and cocaine metabolites.",
-            blood_alcohol: "Blood alcohol level: 0.08% (legal limit: 0.08%).",
-            liver_function: "AST: 85 U/L, ALT: 92 U/L. Mildly elevated liver enzymes.",
-            kidney_function: "Creatinine: 1.8 mg/dL (elevated). BUN: 25 mg/dL. Acute kidney injury.",
+            // CBC - generic but appropriate
+            cbc: "White blood cells are slightly elevated, which can happen when the body is fighting something.",
             
-            // Pregnancy test results
-            pregnancy_test: "Pregnancy test: NEGATIVE. No hCG detected in urine. Rules out pregnancy and ectopic pregnancy.",
+            // Cardiac enzymes
+            cardiac_enzymes: caseCategory === 'cardiac' ?
+                "Elevated enzyme levels that can occur when heart muscle is under stress or damaged." :
+                "Enzyme levels are normal, no signs of heart muscle damage.",
             
-            // Default results for other tests
-            default: "Test completed. Results within normal limits."
+            // CT Scan - trauma specific
+            ct_scan: caseCategory === 'trauma' ?
+                "Shows blood in the abdomen with active bleeding from the liver. Several broken ribs visible. No head injury detected." :
+                "No acute abnormalities detected. All major organs appear normal.",
+            
+            // Ultrasound - varies by case
+            ultrasound: this.getUltrasoundResult(caseCategory),
+            
+            // X-Ray - trauma specific
+            xray: caseCategory === 'trauma' ?
+                "Multiple rib fractures on the right side. No collapsed lung visible." :
+                "No fractures or acute abnormalities visible.",
+            
+            // Blood work - trauma specific
+            blood_work: caseCategory === 'trauma' ?
+                "Hemoglobin is low, suggesting significant blood loss. (Normal levels would be much higher.)" :
+                "Blood counts are within normal limits with no signs of anemia or infection.",
+            
+            // Obstetric tests
+            ultrasound_ob: "Baby appears healthy and is in the correct head-down position for delivery. Full-term pregnancy.",
+            fetal_monitor: "Baby's heart rate looks good with healthy patterns. Contractions are regular and getting stronger.",
+            
+            // General tests
+            blood_pressure: "Higher than normal at 140/90. (Patient's usual pressure is around 120/80.)",
+            urine_test: "Shows some protein present, which can indicate kidney stress. No sugar or other concerning findings.",
+            
+            // Psychiatric tests
+            mental_status: "Patient is alert and knows where they are. Mood appears very low with little emotional expression.",
+            thyroid_test: "Hormone levels are normal, so thyroid problems aren't causing the symptoms.",
+            
+            // Drug screen - varies by case
+            drug_screen: caseCategory === 'toxicology' ?
+                "Positive for opioids and benzodiazepines. High concentrations detected in blood and urine." :
+                "Shows recent use of anxiety medication. No other substances detected.",
+            
+            // Toxicology tests - case specific
+            drug_screen_tox: caseCategory === 'toxicology' ?
+                "Positive for multiple substances including opioids, anxiety medications, and cocaine." :
+                "No substances detected in the blood or urine.",
+            blood_alcohol: caseCategory === 'toxicology' ?
+                "At the legal limit, indicating recent alcohol consumption." :
+                "No alcohol detected in the blood.",
+            liver_function: caseCategory === 'toxicology' ?
+                "Enzyme levels are mildly elevated, suggesting some liver stress." :
+                "Liver function tests are normal.",
+            kidney_function: caseCategory === 'toxicology' ?
+                "Tests show the kidneys aren't working as well as they should." :
+                "Kidney function appears normal.",
+            
+            // Neurological tests
+            ct_head: caseCategory === 'neurological' ?
+                "Shows signs of reduced blood flow to part of the brain. No bleeding detected." :
+                "No acute abnormalities detected in the brain.",
+            mri_brain: caseCategory === 'neurological' ?
+                "Confirms areas of brain tissue damage consistent with stroke." :
+                "Brain tissue appears normal with no signs of damage.",
+            
+            // Surgical/Abdominal tests
+            ct_abdomen: caseCategory === 'surgical' ?
+                "Shows inflammation and swelling around the appendix area. No other abnormalities detected." :
+                "Abdominal organs appear normal with no signs of inflammation.",
+            abdominal_ultrasound: caseCategory === 'surgical' ?
+                "Appendix appears thickened and inflamed. Free fluid visible around the area." :
+                "All abdominal organs appear normal on ultrasound.",
+            
+            // Pregnancy test
+            pregnancy_test: "Negative result rules out pregnancy as a cause of symptoms.",
+            
+            // Default
+            default: "All findings are within normal limits."
         };
         
         return testResults[test.id] || testResults.default;
+    }
+
+    getChestXrayResult(caseCategory, isPediatric) {
+        switch (caseCategory) {
+            case 'cardiac':
+                return "Heart appears enlarged with some fluid visible in the lungs.";
+            case 'respiratory':
+                return isPediatric ? 
+                    "Lungs appear over-expanded with flattened breathing muscles. No signs of pneumonia." :
+                    "Lungs show signs of over-expansion. No pneumonia or other acute changes visible.";
+            case 'trauma':
+                return "Multiple rib fractures visible. No collapsed lung or other chest injuries detected.";
+            case 'toxicology':
+                return "Lungs appear clear with no signs of fluid or infection.";
+            case 'neurological':
+                return "Chest appears normal. Heart and lungs look healthy.";
+            case 'surgical':
+                return "Chest is clear with no abnormalities detected.";
+            default:
+                return "Chest appears normal with no acute abnormalities detected.";
+        }
+    }
+
+    getUltrasoundResult(caseCategory) {
+        switch (caseCategory) {
+            case 'trauma':
+                return "Free fluid seen throughout the abdomen, which usually means internal bleeding.";
+            case 'obstetric':
+                return "Baby appears healthy and is in the correct head-down position for delivery. Full-term pregnancy.";
+            default:
+                return "No acute abnormalities detected. All visualized organs appear normal.";
+        }
+    }
+
+    getBloodGasResult(caseCategory, isPediatric) {
+        switch (caseCategory) {
+            case 'toxicology':
+                return "Shows dangerously low oxygen levels and high carbon dioxide. (Indicates severe breathing depression.)";
+            case 'respiratory':
+                return isPediatric ? 
+                    "Shows the child is retaining too much carbon dioxide. (Indicates breathing problems.)" :
+                    "Shows elevated carbon dioxide levels, indicating breathing difficulties.";
+            default:
+                return "Blood gas levels are within normal limits.";
+        }
     }
 
     updateMedicalTestsSection() {

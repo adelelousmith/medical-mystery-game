@@ -114,9 +114,9 @@ const medicalCases = {
                 critical: true,
                 resultNarrative: [
                     "The ECG machine prints a rhythm strip with concerning findings.",
-                    "12-Lead ECG: Abnormal electrical patterns visible in leads II, III, and aVF.",
-                    "The nurse reviews the trace. 'ST-segment elevation in inferior leads,' she notes professionally.",
-                    "These findings suggest significant cardiac changes requiring immediate clinical correlation."
+                    "Shows irregular electrical changes in several leads.",
+                    "The nurse reviews the trace. 'Abnormal patterns in the bottom leads,' she notes.",
+                    "These changes may indicate strain on the heart and need immediate attention."
                 ]
             },
             {
@@ -128,9 +128,9 @@ const medicalCases = {
                 critical: true,
                 resultNarrative: [
                     "The lab calls back within minutes with urgent results.",
-                    "Cardiac Troponin I: Significantly elevated at 15.2 ng/mL (normal <0.04).",
-                    "The registrar reviews the results. 'Markedly elevated cardiac markers,' she notes.",
-                    "These levels suggest significant myocardial injury (heart muscle damage)."
+                    "Levels are much higher than normal.",
+                    "The registrar reviews the results. 'These cardiac markers are quite elevated,' she notes.",
+                    "High levels like this suggest the heart muscle may be under significant stress or injury."
                 ]
             },
             {

@@ -13,8 +13,8 @@ const caseEnhancements = {
             revealed: {
                 "chest_pain": ["Described as 'crushing' chest pain", "Pain rated 9/10 severity"],
                 "radiation_pain": ["Pain radiates to left arm and jaw", "Classic pattern for cardiac event"],
-                "ecg": ["12-Lead ECG: Abnormal electrical patterns in inferior leads", "ST-segment elevation noted, suggesting cardiac changes"],
-                "troponin": ["Cardiac Troponin I: Markedly elevated at 15.2 ng/mL (normal <0.04)", "Findings consistent with myocardial injury"],
+                "ecg": ["Shows irregular electrical changes in several leads", "May indicate strain on the heart"],
+                "troponin": ["Levels are much higher than normal", "Suggests stress or injury to the heart muscle"],
                 "sweating": ["Heavy sweating observed", "Body's stress response to heart problems"]
             }
         },

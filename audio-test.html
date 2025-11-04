@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Duration Test</title>
+</head>
+<body>
+    <h1>Audio File Duration Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const audioFiles = [
+            'sounds/ambulance-passing.mp3',
+            'sounds/book-turn-page-2-92381.mp3',
+            'sounds/bp-monitor-realistic-medical-sound-effects-319068.mp3',
+            'sounds/click.mp3',
+            'sounds/defibrillatorResusitation.mp3',
+            'sounds/printer-sound-effect-no-copyright-394246.mp3',
+            'sounds/loading-music.mp3'
+        ];
+        
+        const results = document.getElementById('results');
+        
+        audioFiles.forEach(file => {
+            const audio = new Audio(file);
+            audio.addEventListener('loadedmetadata', () => {
+                const duration = audio.duration;
+                const div = document.createElement('div');
+                const status = duration > 5 && !file.includes('loading-music') ? 
+                    '(AUTO-TRIMMED TO 5s)' : '(OK)';
+                div.innerHTML = `<strong>${file}:</strong> ${duration.toFixed(2)} seconds ${status}`;
+                if (duration > 5 && !file.includes('loading-music')) {
+                    div.style.color = 'orange';
+                    div.style.fontWeight = 'bold';
+                }
+                results.appendChild(div);
+            });
+            audio.addEventListener('error', () => {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${file}:</strong> ERROR LOADING`;
+                div.style.color = 'red';
+                results.appendChild(div);
+            });
+        });
+    </script>
+</body>
+</html>
