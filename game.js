@@ -120,7 +120,7 @@ const SPECIALISTS = {
         consultationLimit: 2,
         description: 'Bones, joints, and musculoskeletal specialist'
     },
-    PEDIATRICIAN: {
+    PAEDIATRICIAN: {
         id: 'paediatrician',
         name: 'Paediatrician',
         icon: 'fas fa-baby',
@@ -215,113 +215,72 @@ class MedicalMysteryGame {
 
     initAudio() {
         try {
-            // Create audio context for sound generation
+            // Create audio context for sound effects only
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Initialize background music
-            this.initBackgroundMusic();
         } catch (error) {
-            console.warn('Audio not supported:', error);
+            console.warn('Audio context not supported:', error);
         }
+        
+        // Initialize background music (uses HTML5 Audio, not Web Audio API)
+        this.initBackgroundMusic();
+        
+        // Preload sound effects
+        this.initSoundEffects();
+    }
+
+    initSoundEffects() {
+        // Preload real audio files for better performance
+        this.soundEffects = {
+            heartbeat: new Audio('sounds/heartbeat.mp3'),
+            childCough: new Audio('sounds/child-cough.mp3'),
+            hospitalAmbience: new Audio('sounds/hospital-ambience.mp3'),
+            malePain: new Audio('sounds/male-pain.mp3'),
+            elderlyDistress: new Audio('sounds/elderly-distress.mp3'),
+            vomiting: new Audio('sounds/vomiting.mp3'),
+            ultrasound: new Audio('sounds/ultrasound.mp3')
+        };
+        
+        // Set volume levels for sound effects
+        Object.values(this.soundEffects).forEach(audio => {
+            audio.volume = 0.4; // 40% volume for sound effects
+            audio.preload = 'auto';
+        });
+        
+        console.log('✅ Real sound effects loaded');
     }
 
     initBackgroundMusic() {
-        // Create ambient medical background music using Web Audio API
-        if (!this.audioContext) return;
-        
+        // Load custom background music file
         try {
-            // Create a simple ambient medical theme
-            this.createAmbientBackgroundMusic();
+            this.backgroundMusic = new Audio('backgroundMusic.mp3');
+            this.backgroundMusic.loop = true;
+            this.backgroundMusic.volume = 0.08; // Set to 8% volume (much quieter)
+            this.backgroundMusic.preload = 'auto';
+            
+            // Handle loading errors gracefully
+            this.backgroundMusic.addEventListener('error', (e) => {
+                console.warn('Background music file could not be loaded:', e);
+                this.backgroundMusic = null;
+            });
+            
+            console.log('✅ Custom background music loaded');
         } catch (error) {
             console.warn('Background music not supported:', error);
+            this.backgroundMusic = null;
         }
     }
 
-    createAmbientBackgroundMusic() {
-        if (!this.audioContext) return;
-        
-        // Create royalty-free medical background music using Web Audio API
-        // This creates a gentle, professional medical atmosphere
-        
-        const oscillator1 = this.audioContext.createOscillator();
-        const oscillator2 = this.audioContext.createOscillator();
-        const oscillator3 = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
-        const filter = this.audioContext.createBiquadFilter();
-        const compressor = this.audioContext.createDynamicsCompressor();
-        
-        // Connect the audio chain properly
-        oscillator1.connect(filter);
-        oscillator2.connect(filter);
-        oscillator3.connect(filter);
-        filter.connect(compressor);
-        compressor.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-        
-        // Set up filter for medical/hospital ambient sound
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1200, this.audioContext.currentTime);
-        filter.Q.setValueAtTime(0.2, this.audioContext.currentTime);
-        
-        // Set up compressor for professional sound
-        compressor.threshold.setValueAtTime(-24, this.audioContext.currentTime);
-        compressor.knee.setValueAtTime(30, this.audioContext.currentTime);
-        compressor.ratio.setValueAtTime(12, this.audioContext.currentTime);
-        compressor.attack.setValueAtTime(0.003, this.audioContext.currentTime);
-        compressor.release.setValueAtTime(0.25, this.audioContext.currentTime);
-        
-        // Medical-themed frequencies (gentle, professional)
-        const baseFreq = 220; // A3
-        const harmonyFreq = 330; // E4
-        const melodyFreq = 440; // A4
-        
-        // Set up oscillators
-        oscillator1.frequency.setValueAtTime(baseFreq, this.audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(harmonyFreq, this.audioContext.currentTime);
-        oscillator3.frequency.setValueAtTime(melodyFreq, this.audioContext.currentTime);
-        
-        oscillator1.type = 'sine';
-        oscillator2.type = 'sine';
-        oscillator3.type = 'triangle';
-        
-        // Start oscillators
-        oscillator1.start(this.audioContext.currentTime);
-        oscillator2.start(this.audioContext.currentTime);
-        oscillator3.start(this.audioContext.currentTime);
-        
-        // Create gentle volume modulation with proper audio chain
-        const modulationGain = this.audioContext.createGain();
-        gainNode.connect(modulationGain);
-        modulationGain.connect(this.audioContext.destination);
-        
-        // Gentle volume changes every 4 seconds
-        this.modulationInterval = setInterval(() => {
-            if (this.settings.backgroundMusicEnabled) {
-                modulationGain.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-                modulationGain.gain.exponentialRampToValueAtTime(0.04, this.audioContext.currentTime + 2);
-            }
-        }, 4000);
-        
-        // Store reference for control
-        this.backgroundMusic = {
-            oscillators: [oscillator1, oscillator2, oscillator3],
-            gainNode: gainNode,
-            filter: filter,
-            compressor: compressor,
-            modulationGain: modulationGain
-        };
-        
-        // Start with background music disabled by default
-        this.toggleBackgroundMusic(false);
-    }
+    // Background music now uses MP3 file instead of generated tones
 
     toggleBackgroundMusic(enabled) {
         if (!this.backgroundMusic) return;
         
         if (enabled) {
-            this.backgroundMusic.gainNode.gain.setValueAtTime(0.06, this.audioContext.currentTime);
+            this.backgroundMusic.play().catch(e => {
+                console.warn('Could not play background music:', e);
+            });
         } else {
-            this.backgroundMusic.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+            this.backgroundMusic.pause();
         }
     }
 
@@ -361,6 +320,51 @@ class MedicalMysteryGame {
                 case 'critical':
                     this.createCriticalAlert();
                     break;
+                case 'notification':
+                    this.createNotificationSound();
+                    break;
+                case 'page_turn':
+                    this.createPageTurnSound();
+                    break;
+                case 'test_result':
+                    this.createTestResultSound();
+                    break;
+                case 'timer_tick':
+                    this.createTimerTick();
+                    break;
+                case 'diagnosis_correct':
+                    this.createDiagnosisCorrectSound();
+                    break;
+                case 'consultation':
+                    this.createConsultationSound();
+                    break;
+                case 'patient_stable':
+                    this.createPatientStableSound();
+                    break;
+                case 'patient_critical':
+                    this.createPatientCriticalSound();
+                    break;
+                case 'cough':
+                    this.createCoughSound();
+                    break;
+                case 'child_cry':
+                    this.createChildCrySound();
+                    break;
+                case 'male_pain':
+                    this.createMalePainSound();
+                    break;
+                case 'elderly_distress':
+                    this.createElderlyDistressSound();
+                    break;
+                case 'vomiting':
+                    this.createVomitingSound();
+                    break;
+                case 'ultrasound':
+                    this.createUltrasoundSound();
+                    break;
+                case 'hospital_ambience':
+                    this.createHospitalAmbienceSound();
+                    break;
                 default:
                     this.createTone(600, 0.1, 'sine');
             }
@@ -381,7 +385,7 @@ class MedicalMysteryGame {
         oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
         oscillator.type = type;
         
-        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime); // Increased volume for sound effects
         gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
         
         oscillator.start(this.audioContext.currentTime);
@@ -399,15 +403,30 @@ class MedicalMysteryGame {
     }
 
     createHeartbeat() {
-        if (!this.audioContext) return;
-        
-        // First beat
-        this.createTone(60, 0.1, 'sine');
-        
-        // Second beat after 0.2 seconds
-        setTimeout(() => {
+        // Use real heartbeat audio if available, fallback to generated sound
+        if (this.soundEffects && this.soundEffects.heartbeat) {
+            this.playRealSound('heartbeat');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
             this.createTone(60, 0.1, 'sine');
-        }, 200);
+            setTimeout(() => {
+                this.createTone(60, 0.1, 'sine');
+            }, 200);
+        }
+    }
+
+    playRealSound(soundName) {
+        if (!this.soundEffects || !this.soundEffects[soundName]) return;
+        
+        try {
+            const audio = this.soundEffects[soundName];
+            audio.currentTime = 0; // Reset to beginning
+            audio.play().catch(e => {
+                console.warn(`Could not play ${soundName}:`, e);
+            });
+        } catch (error) {
+            console.warn(`Error playing ${soundName}:`, error);
+        }
     }
 
     createMonitorBeep() {
@@ -457,6 +476,221 @@ class MedicalMysteryGame {
             setTimeout(() => {
                 this.createTone(800 + (i * 100), 0.2, 'sawtooth');
             }, i * 200);
+        }
+    }
+
+    createNotificationSound() {
+        if (!this.audioContext) return;
+        this.createChord([440, 554, 659], 0.2); // A major chord
+    }
+
+    createPageTurnSound() {
+        if (!this.audioContext) return;
+        this.createTone(300, 0.08, 'triangle');
+        setTimeout(() => this.createTone(250, 0.06, 'triangle'), 50);
+    }
+
+    createTestResultSound() {
+        if (!this.audioContext) return;
+        this.createTone(600, 0.1, 'sine');
+        setTimeout(() => this.createTone(800, 0.1, 'sine'), 100);
+        setTimeout(() => this.createTone(1000, 0.15, 'sine'), 200);
+    }
+
+    createTimerTick() {
+        if (!this.audioContext) return;
+        this.createTone(1200, 0.05, 'square');
+    }
+
+    createDiagnosisCorrectSound() {
+        if (!this.audioContext) return;
+        // Triumphant ascending chord progression
+        const chords = [
+            [523, 659, 784], // C major
+            [587, 740, 880], // D major
+            [659, 831, 988]  // E major
+        ];
+        chords.forEach((chord, index) => {
+            setTimeout(() => this.createChord(chord, 0.4), index * 150);
+        });
+    }
+
+    createConsultationSound() {
+        if (!this.audioContext) return;
+        this.createTone(700, 0.12, 'sine');
+        setTimeout(() => this.createTone(900, 0.12, 'sine'), 120);
+    }
+
+    createPatientStableSound() {
+        if (!this.audioContext) return;
+        this.createTone(523, 0.2, 'sine'); // Gentle C note
+    }
+
+    createPatientCriticalSound() {
+        if (!this.audioContext) return;
+        // Rapid beeping like a medical monitor in distress
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.createTone(1000, 0.1, 'square');
+            }, i * 150);
+        }
+    }
+
+    createCoughSound() {
+        // Use real child cough audio for pediatric cases
+        if (this.gameState.currentCase && this.gameState.currentCase.id === 'pediatric') {
+            if (this.soundEffects && this.soundEffects.childCough) {
+                this.playRealSound('childCough');
+                return;
+            }
+        }
+        
+        // Fallback to generated cough sound
+        if (this.audioContext) {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    this.createTone(150 + Math.random() * 100, 0.08, 'sawtooth');
+                }, i * 200);
+            }
+        }
+    }
+
+    createChildCrySound() {
+        // Use real child cough audio (can represent crying/distress)
+        if (this.soundEffects && this.soundEffects.childCough) {
+            this.playRealSound('childCough');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    this.createTone(400 + Math.random() * 200, 0.2, 'sawtooth');
+                }, i * 300);
+            }
+        }
+    }
+
+    createMalePainSound() {
+        // Use real male pain audio
+        if (this.soundEffects && this.soundEffects.malePain) {
+            this.playRealSound('malePain');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
+            this.createTone(200, 0.3, 'sawtooth');
+        }
+    }
+
+    createElderlyDistressSound() {
+        // Use real elderly distress audio
+        if (this.soundEffects && this.soundEffects.elderlyDistress) {
+            this.playRealSound('elderlyDistress');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
+            this.createTone(180, 0.4, 'triangle');
+        }
+    }
+
+    createVomitingSound() {
+        // Use real vomiting audio
+        if (this.soundEffects && this.soundEffects.vomiting) {
+            this.playRealSound('vomiting');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
+            for (let i = 0; i < 2; i++) {
+                setTimeout(() => {
+                    this.createTone(120 + Math.random() * 80, 0.15, 'sawtooth');
+                }, i * 400);
+            }
+        }
+    }
+
+    createUltrasoundSound() {
+        // Use real ultrasound audio
+        if (this.soundEffects && this.soundEffects.ultrasound) {
+            this.playRealSound('ultrasound');
+        } else if (this.audioContext) {
+            // Fallback to generated sound
+            this.createTone(2000, 0.3, 'sine');
+        }
+    }
+
+    createHospitalAmbienceSound() {
+        // Use real hospital ambience audio
+        if (this.soundEffects && this.soundEffects.hospitalAmbience) {
+            this.playRealSound('hospitalAmbience');
+        } else {
+            // Fallback to existing ambient sound
+            this.createAmbientSound();
+        }
+    }
+
+    playContextualCaseSound(case_) {
+        // Play ambient sounds based on case category and patient demographics
+        setTimeout(() => {
+            switch (case_.category) {
+                case 'cardiac':
+                    this.playSound('hospital_ambience');
+                    break;
+                case 'respiratory':
+                case 'paediatric':
+                    if (case_.id === 'pediatric' || case_.patientHistory?.demographics?.includes('3-year-old')) {
+                        this.playSound('child_cry');
+                        setTimeout(() => this.playSound('cough'), 1500);
+                    } else {
+                        this.playSound('cough');
+                    }
+                    break;
+                case 'neurological':
+                    this.playSound('hospital_ambience');
+                    break;
+                case 'trauma':
+                    // Check patient demographics for appropriate pain sound
+                    if (case_.patientHistory?.demographics?.includes('male') || 
+                        case_.patientHistory?.demographics?.includes('Male')) {
+                        this.playSound('male_pain');
+                    } else if (case_.patientHistory?.demographics?.includes('elderly') ||
+                               case_.patientHistory?.demographics?.includes('old')) {
+                        this.playSound('elderly_distress');
+                    } else {
+                        this.playSound('critical');
+                    }
+                    break;
+                case 'gastrointestinal':
+                    this.playSound('vomiting');
+                    break;
+                default:
+                    this.playSound('hospital_ambience');
+            }
+        }, 500); // Delay to let the case load first
+    }
+
+    playContextualTestSound(test) {
+        // Play specific sounds based on test type
+        console.log('Playing contextual test sound for:', test.id);
+        switch (test.id) {
+            case 'ecg':
+                console.log('Playing heartbeat sound for ECG test');
+                this.playSound('heartbeat');
+                break;
+            case 'cardiac_enzymes':
+            case 'troponin':
+                console.log('Playing notification sound for cardiac lab test');
+                this.playSound('notification');
+                break;
+            case 'ultrasound':
+            case 'abdominal_ultrasound':
+            case 'pelvic_ultrasound':
+                this.playSound('ultrasound');
+                break;
+            case 'chest_xray':
+            case 'xray':
+                this.playSound('notification');
+                break;
+            case 'blood_pressure':
+            case 'vitals':
+                this.playSound('notification');
+                break;
+            default:
+                this.playSound('test_result');
         }
     }
 
@@ -815,6 +1049,9 @@ class MedicalMysteryGame {
             // Reset game state completely for new case
             this.gameState.currentCase = case_;
             this.gameState.timeRemaining = case_.timeLimit * 60; // Convert to seconds
+            
+            // Play contextual sound based on case category
+            this.playContextualCaseSound(case_);
             this.gameState.score = 0;
             this.gameState.askedQuestions = [];
             this.gameState.orderedTests = [];
@@ -1773,12 +2010,12 @@ class MedicalMysteryGame {
     getQuestionAnswer(questionId) {
         // Comprehensive, realistic patient responses for each question
         const answers = {
-            // Cardiac case questions
-            'chest_pain': 'Yes, severe crushing chest pain that started 30 minutes ago. Patient describes it as "like an elephant sitting on my chest" and rates it 9/10.',
-            'shortness_breath': 'Yes, patient is having significant difficulty breathing. Speaking in short sentences and appears anxious about breathing.',
-            'sweating': 'Yes, patient is diaphoretic and clammy. Sweating profusely despite normal room temperature.',
-            'nausea': 'Yes, patient reports feeling nauseous and has vomited once. Says stomach feels "upset".',
-            'radiation_pain': 'Yes, pain radiates to left arm, jaw, and back. Patient describes it as "shooting down my arm".',
+            // Cardiac case questions (witness reports and clinical observations)
+            'chest_pain': 'Wife reports: "He was clutching his chest saying it felt like an elephant sitting on it. He rated the pain 9 out of 10 before he collapsed."',
+            'shortness_breath': 'Bystanders report: "He was gasping for air and could only speak a few words at a time before he went unconscious."',
+            'sweating': 'Clinical observation: Patient is diaphoretic and clammy. Profuse sweating despite normal room temperature.',
+            'witnessed_collapse': 'Wife states: "He suddenly grabbed his chest, said he couldn\'t breathe, then just collapsed. I\'ve never seen anything like it."',
+            'prior_symptoms': 'Wife reports: "He complained of chest tightness this morning but said it was just heartburn. He took antacids but it got worse."',
             
             // Trauma case questions
             'consciousness': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions.',
@@ -2044,6 +2281,8 @@ class MedicalMysteryGame {
     }
 
     updatePatientStability() {
+        const previousState = this.gameState.patientState;
+        
         // Enhanced deterioration system with phase manager integration
         if (this.phaseManager) {
             this.phaseManager.updatePatientCondition();
@@ -2064,6 +2303,15 @@ class MedicalMysteryGame {
             
             // Clamp stability between 0 and 100
             this.gameState.patientStability = Math.max(0, Math.min(100, this.gameState.patientStability));
+        }
+        
+        // Play sound effects based on patient state changes
+        if (previousState !== this.gameState.patientState) {
+            if (this.gameState.patientState === PATIENT_STATES.CRITICAL) {
+                this.playSound('patient_critical');
+            } else if (this.gameState.patientState === PATIENT_STATES.IMPROVING) {
+                this.playSound('patient_stable');
+            }
         }
     }
 
@@ -2135,6 +2383,11 @@ class MedicalMysteryGame {
         
         // Impact on patient stability
         const test = this.gameState.currentCase.tests.find(t => t.id === testId);
+        
+        // Play contextual sound when ordering the test
+        if (test) {
+            this.playContextualTestSound(test);
+        }
         if (test) {
             if (test.critical) {
                 this.gameState.patientStability += DETERIORATION_FACTORS.IMPROVEMENT;
@@ -2152,6 +2405,9 @@ class MedicalMysteryGame {
     }
 
     showTestResult(test) {
+        // Play contextual sound based on test type
+        this.playContextualTestSound(test);
+        
         // Check for narrative results first
         if (test.resultNarrative && test.resultNarrative.length > 0) {
             this.showNarrativeTestResult(test);
@@ -2262,26 +2518,26 @@ class MedicalMysteryGame {
         
         const testResults = {
             // Cardiac case results
-            ecg: "Sinus rhythm with ST-segment elevation in leads II, III, aVF. Q waves present in inferior leads. Consistent with acute inferior wall myocardial infarction.",
-            troponin: "Elevated troponin I: 15.2 ng/mL (normal <0.04). Confirms myocardial injury.",
-            chest_xray: "Cardiomegaly with pulmonary congestion. No pneumothorax or other acute findings.",
-            cardiac_enzymes: "Elevated CK-MB: 45 ng/mL, LDH: 280 U/L. Consistent with myocardial damage.",
+            ecg: "12-Lead ECG: Abnormal electrical patterns in leads II, III, and aVF. ST-segment elevation noted (abnormal heart rhythm changes). Clinical correlation required.",
+            troponin: "Cardiac Troponin I: Significantly elevated at 15.2 ng/mL (normal <0.04). Suggests possible heart muscle injury.",
+            chest_xray: "Chest X-ray: Cardiomegaly (enlarged heart) with pulmonary vascular congestion (fluid backing up into lungs). No pneumothorax.",
+            cardiac_enzymes: "Cardiac Enzymes Panel: Elevated CK-MB and LDH levels. Findings consistent with myocardial tissue damage (heart muscle injury).",
             
             // Trauma case results
-            ct_scan: "Large hemoperitoneum with active extravasation from liver laceration. Multiple rib fractures. No intracranial hemorrhage.",
-            ultrasound: "Free fluid in all quadrants. Positive FAST exam for intra-abdominal bleeding.",
-            xray: "Multiple rib fractures (3rd-8th ribs on right). No pneumothorax visible.",
-            blood_work: "Hemoglobin: 8.2 g/dL (normal 13-17). Platelets: 85,000/μL. Elevated lactate: 4.2 mmol/L.",
+            ct_scan: "CT Scan (Head and Abdomen): Hemoperitoneum (blood in abdominal cavity) with active bleeding from liver injury. Multiple rib fractures noted. No brain bleeding detected.",
+            ultrasound: "Abdominal Ultrasound: Free fluid visible in all abdominal quadrants. FAST exam positive, indicating internal bleeding.",
+            xray: "Chest X-ray: Multiple rib fractures (ribs 3-8 on right side). No pneumothorax (collapsed lung) visible.",
+            blood_work: "Complete Blood Count (CBC): Low hemoglobin at 8.2 g/dL (normal 13-17), suggesting blood loss. Platelet count decreased.",
             
             // Pediatric case results
-            pulse_ox: "Oxygen saturation: 88% on room air. Improves to 94% with supplemental oxygen.",
-            chest_xray_ped: "Hyperinflated lungs with flattened diaphragms. No infiltrates. Consistent with asthma exacerbation.",
-            blood_gas: "pH: 7.32, PaCO2: 48 mmHg, PaO2: 65 mmHg. Respiratory acidosis with hypoxemia.",
-            cbc: "White blood cells: 12,500/μL. Neutrophils: 8,200/μL. No significant anemia.",
+            pulse_ox: "Pulse Oximetry: Oxygen saturation 88% on room air (normal >95%). Improves to 94% with supplemental oxygen, indicating breathing difficulty.",
+            chest_xray_ped: "Chest X-ray: Hyperinflated lungs (over-expanded) with flattened diaphragms. No pneumonia visible. Findings suggest airway obstruction.",
+            blood_gas: "Arterial Blood Gas: pH 7.32 (slightly acidic), elevated CO2 levels. Indicates respiratory compromise (breathing problems).",
+            cbc: "Complete Blood Count (CBC): Slightly elevated white blood cells at 12,500 (normal 5,000-10,000). Suggests body fighting infection.",
             
             // Obstetric case results
-            ultrasound_ob: "Single viable fetus, vertex presentation. Estimated gestational age: 38 weeks. Amniotic fluid index: 8.5 cm.",
-            fetal_monitor: "Fetal heart rate: 140-150 bpm with good variability. Contractions every 3-4 minutes.",
+            ultrasound_ob: "Obstetric Ultrasound: Single healthy fetus in head-down position. Estimated gestational age 38 weeks (full-term). Normal amniotic fluid levels.",
+            fetal_monitor: "Fetal Heart Monitor: Baby's heart rate 140-150 beats per minute with good variability (healthy pattern). Regular contractions every 3-4 minutes.",
             blood_pressure: "BP: 140/90 mmHg. Elevated from baseline of 120/80 mmHg.",
             urine_test: "Proteinuria: 2+ on dipstick. Glucose: negative. Ketones: trace.",
             
@@ -2358,7 +2614,7 @@ class MedicalMysteryGame {
                 const stabilityBonus = this.gameState.patientStability > 80 ? SCORING.PERFECT_SCORE_BONUS : 0;
                 this.gameState.score += timeBonus + stabilityBonus;
                 
-                this.playSound('success');
+                this.playSound('diagnosis_correct');
                 this.endGame('✅ Correct Diagnosis! Patient saved!', true);
             } else {
                 this.gameState.score += SCORING.INCORRECT_DIAGNOSIS;
@@ -2982,6 +3238,8 @@ class MedicalMysteryGame {
         this.gameState.specialistConsultations.push(specialistId);
         this.gameState.consultationSlotsRemaining--;
         this.gameState.score += SCORING.SPECIALIST_CONSULT;
+        
+        this.playSound('consultation');
         
         if (isAppropriate) {
             this.gameState.score += SCORING.APPROPRIATE_REFERRAL;

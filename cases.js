@@ -20,7 +20,7 @@ const medicalCases = {
         icon: "fas fa-heartbeat",
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "myocardial_infarction",
-        description: "A 58-year-old male collapses in the waiting room. Bystanders report he was complaining of chest pain and shortness of breath before losing consciousness. The patient is unresponsive with no pulse.",
+        description: "A 58-year-old male collapses in the waiting room. Bystanders report he was clutching his chest and gasping for air before losing consciousness. The patient is unresponsive but has a weak, irregular pulse. He requires immediate resuscitation.",
         
         // NEW: Narrative enhancements for drama and immersion
         progressMessages: {
@@ -38,7 +38,7 @@ const medicalCases = {
             ],
             treat: [
                 "Treatment initiated. The monitors start to respond.",
-                "His pulse returns — weak, but there. The team exhales.",
+                "His pulse strengthens — still weak, but improving. The team exhales.",
                 "Every intervention matters now. No room for error.",
                 "The wife grips your hand. 'Is he going to be alright?'"
             ]
@@ -75,32 +75,32 @@ const medicalCases = {
         questions: [
             {
                 id: "chest_pain",
-                text: "Does the patient have chest pain or pressure?",
-                category: "symptoms",
+                text: "Did bystanders report the patient complaining of chest pain before collapse?",
+                category: "history",
                 critical: true
             },
             {
                 id: "shortness_breath",
-                text: "Is the patient experiencing shortness of breath?",
-                category: "symptoms",
+                text: "Was the patient experiencing shortness of breath before losing consciousness?",
+                category: "history",
                 critical: true
             },
             {
                 id: "sweating",
-                text: "Is the patient diaphoretic (sweating profusely)?",
-                category: "symptoms",
+                text: "Do you observe profuse sweating on the patient?",
+                category: "examination",
                 critical: false
             },
             {
-                id: "nausea",
-                text: "Does the patient have nausea or vomiting?",
-                category: "symptoms",
-                critical: false
+                id: "witnessed_collapse",
+                text: "Did anyone witness the collapse? What did they see?",
+                category: "history",
+                critical: true
             },
             {
-                id: "radiation_pain",
-                text: "Does the pain radiate to the arm, jaw, or back?",
-                category: "symptoms",
+                id: "prior_symptoms",
+                text: "What symptoms did the patient have in the hours before collapse?",
+                category: "history",
                 critical: true
             }
         ],
@@ -113,10 +113,10 @@ const medicalCases = {
                 timeRequired: 2,
                 critical: true,
                 resultNarrative: [
-                    "The ECG machine whirs to life, printing a rhythm strip that makes your stomach drop.",
-                    "Unmistakable ST elevation stares back at you from leads II, III, and aVF.",
-                    "The nurse glances at the trace, then at you. 'Inferior STEMI,' she says quietly.",
-                    "This isn't just chest pain anymore. This is the real thing."
+                    "The ECG machine prints a rhythm strip with concerning findings.",
+                    "12-Lead ECG: Abnormal electrical patterns visible in leads II, III, and aVF.",
+                    "The nurse reviews the trace. 'ST-segment elevation in inferior leads,' she notes professionally.",
+                    "These findings suggest significant cardiac changes requiring immediate clinical correlation."
                 ]
             },
             {
@@ -127,10 +127,10 @@ const medicalCases = {
                 timeRequired: 3,
                 critical: true,
                 resultNarrative: [
-                    "The lab calls back within minutes — never a good sign.",
-                    "Troponin I: 15.2 ng/mL. The normal range flashes mockingly: <0.04.",
-                    "The registrar whistles low. 'That's not just elevated, that's through the roof.'",
-                    "Heart muscle is dying. The clock is ticking."
+                    "The lab calls back within minutes with urgent results.",
+                    "Cardiac Troponin I: Significantly elevated at 15.2 ng/mL (normal <0.04).",
+                    "The registrar reviews the results. 'Markedly elevated cardiac markers,' she notes.",
+                    "These levels suggest significant myocardial injury (heart muscle damage)."
                 ]
             },
             {
@@ -165,10 +165,10 @@ const medicalCases = {
         diagnosisOptions: [
             {
                 id: "myocardial_infarction",
-                name: "Acute Myocardial Infarction (Heart Attack)",
-                description: "Complete blockage of coronary artery causing heart muscle death",
+                name: "Heart Attack (Acute Myocardial Infarction)",
+                description: "Complete blockage of heart blood vessel causing heart muscle damage",
                 correct: true,
-                consequences: "Immediate intervention required: thrombolytics, angioplasty, or bypass surgery",
+                consequences: "Immediate treatment required: clot-busting drugs, balloon procedure, or heart surgery",
                 emotionalImpact: "Patient's family is devastated but grateful for quick action"
             },
             {

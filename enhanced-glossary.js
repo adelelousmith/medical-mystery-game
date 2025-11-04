@@ -18,14 +18,14 @@ const medicalGlossary = {
         term: "Troponin",
         fullName: "Cardiac Troponin",
         plainEnglish: "A protein released when heart muscle is damaged",
-        clinicalSignificance: "Blood test that confirms if someone has had a heart attack",
+        clinicalSignificance: "Blood test that indicates possible heart muscle damage",
         category: "cardiac",
         urgency: "high",
         normalRange: "< 0.04 ng/mL",
         interpretation: {
             "normal": "No recent heart damage",
             "elevated": "Suggests heart attack or heart muscle injury",
-            "very_high": "Confirms significant heart attack"
+            "very_high": "Suggests significant myocardial injury"
         }
     },
     
