@@ -1248,6 +1248,33 @@ class MedicalMysteryGame {
         }
     }
 
+    showProgressMessage(phase) {
+        const currentCase = this.gameState.currentCase;
+        if (!currentCase.progressMessages || !currentCase.progressMessages[phase]) return;
+        
+        const messages = currentCase.progressMessages[phase];
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        const notification = document.createElement('div');
+        notification.className = 'progress-message-notification';
+        notification.innerHTML = `
+            <div class="progress-message-content">
+                <i class="fas fa-comment-medical"></i>
+                <p>${randomMessage}</p>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 4000);
+        
+        this.playSound('ambient');
+    }
+
     shouldShowPhases() {
         // Only show phases in examine phase, hide during diagnosis to reduce clutter
         return this.gameState.investigationPhase === 'examine';
@@ -1289,8 +1316,17 @@ class MedicalMysteryGame {
         this.gameState.investigationPhase = 'diagnose';
         this.render();
         
-        // Scroll to top to show diagnosis options clearly
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to diagnosis section instead of top of page
+        setTimeout(() => {
+            const diagnosisSection = document.querySelector('.diagnosis-selection');
+            if (diagnosisSection) {
+                diagnosisSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+            }
+        }, 100); // Small delay to ensure render is complete
     }
 
     renderCollapsibleHistory() {
@@ -1300,37 +1336,206 @@ class MedicalMysteryGame {
         return `
             <div class="section collapsible-section">
                 <div class="collapsible-header" onclick="game.toggleSection('history')">
-                    <h3><i class="fas fa-file-medical"></i> Medical History</h3>
+                    <h3><i class="fas fa-file-medical"></i> Patient Background</h3>
                     <i class="fas fa-chevron-down toggle-icon" id="history-toggle"></i>
                 </div>
                 <div class="collapsible-content" id="history-content" style="display: none;">
-                    <div class="history-grid">
-                        <div class="history-item">
-                            <strong>Demographics:</strong> ${history.demographics || 'Not specified'}
-                        </div>
-                        <div class="history-item">
-                            <strong>Past Medical History:</strong>
-                            <ul>${(history.pastMedicalHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                        <div class="history-item">
-                            <strong>Social History:</strong>
-                            <ul>${(history.socialHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                        <div class="history-item">
-                            <strong>Family History:</strong>
-                            <ul>${(history.familyHistory || []).map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                        <div class="history-item">
-                            <strong>Medications:</strong>
-                            <ul>${(history.medications || []).map(item => `<li>${item}</li>`).join('')}</ul>
-                        </div>
-                        <div class="history-item">
-                            <strong>Allergies:</strong> ${history.allergies || 'None reported'}
-                        </div>
+                    <div class="patient-narrative">
+                        ${this.renderPatientStory(history)}
                     </div>
                 </div>
             </div>
         `;
+    }
+
+    renderPatientStory(history) {
+        // Create a narrative story from the medical history
+        let story = '';
+        
+        // Patient introduction
+        if (history.demographics) {
+            story += `<div class="story-section patient-intro">
+                <h4>About the Patient</h4>
+                <p>${this.createPatientIntro(history)}</p>
+            </div>`;
+        }
+        
+        // Medical background
+        if (history.pastMedicalHistory && history.pastMedicalHistory.length > 0) {
+            story += `<div class="story-section medical-background">
+                <h4>Medical Background</h4>
+                <p>${this.createMedicalNarrative(history.pastMedicalHistory)}</p>
+            </div>`;
+        }
+        
+        // Lifestyle and social context
+        if (history.socialHistory && history.socialHistory.length > 0) {
+            story += `<div class="story-section lifestyle">
+                <h4>Lifestyle & Background</h4>
+                <p>${this.createLifestyleNarrative(history.socialHistory)}</p>
+            </div>`;
+        }
+        
+        // Family medical history
+        if (history.familyHistory && history.familyHistory.length > 0) {
+            story += `<div class="story-section family-history">
+                <h4>Family Medical History</h4>
+                <p>${this.createFamilyNarrative(history.familyHistory)}</p>
+            </div>`;
+        }
+        
+        // Current medications
+        if (history.medications && history.medications.length > 0) {
+            story += `<div class="story-section medications">
+                <h4>Current Treatment</h4>
+                <p>${this.createMedicationNarrative(history.medications)}</p>
+            </div>`;
+        }
+        
+        // Allergies
+        if (history.allergies) {
+            story += `<div class="story-section allergies">
+                <h4>Important Notes</h4>
+                <p>${this.createAllergyNarrative(history.allergies)}</p>
+            </div>`;
+        }
+        
+        // Emotional context
+        if (history.emotionalContext) {
+            story += `<div class="story-section emotional-context">
+                <h4>Current Situation</h4>
+                <p>${history.emotionalContext}</p>
+            </div>`;
+        }
+        
+        return story;
+    }
+
+    createPatientIntro(history) {
+        const demographics = history.demographics || '';
+        const social = history.socialHistory || [];
+        
+        let intro = demographics;
+        
+        // Add job if available
+        const jobInfo = social.find(item => item.toLowerCase().includes('job') || item.toLowerCase().includes('work'));
+        if (jobInfo) {
+            intro += `, ${jobInfo.toLowerCase()}`;
+        }
+        
+        intro += '.';
+        return intro;
+    }
+
+    createMedicalNarrative(medicalHistory) {
+        const conditions = medicalHistory.map(condition => {
+            // Add plain English explanations for common conditions
+            if (condition.toLowerCase().includes('hypertension')) {
+                return condition.replace(/hypertension/gi, 'high blood pressure');
+            }
+            if (condition.toLowerCase().includes('type 2 diabetes')) {
+                return condition + ' (a condition affecting blood sugar control)';
+            }
+            if (condition.toLowerCase().includes('high cholesterol')) {
+                return condition + ' (elevated fats in the blood)';
+            }
+            if (condition.toLowerCase().includes('stent')) {
+                return condition + ' (a small tube inserted to keep an artery open)';
+            }
+            return condition;
+        });
+        
+        if (conditions.length === 1) {
+            return `He has a history of ${conditions[0].toLowerCase()}.`;
+        } else if (conditions.length === 2) {
+            return `He has a history of ${conditions[0].toLowerCase()} and ${conditions[1].toLowerCase()}.`;
+        } else {
+            const lastCondition = conditions.pop();
+            return `He has a history of ${conditions.join(', ').toLowerCase()}, and ${lastCondition.toLowerCase()}.`;
+        }
+    }
+
+    createLifestyleNarrative(socialHistory) {
+        const lifestyle = [];
+        
+        socialHistory.forEach(item => {
+            if (item.toLowerCase().includes('smokes')) {
+                lifestyle.push(`he's been a heavy smoker for many years`);
+            } else if (item.toLowerCase().includes('sedentary')) {
+                lifestyle.push(`he leads a fairly inactive lifestyle`);
+            } else if (item.toLowerCase().includes('stress')) {
+                lifestyle.push(`his work involves considerable stress`);
+            } else if (item.toLowerCase().includes('family history')) {
+                lifestyle.push(`heart disease runs in his family`);
+            } else if (!item.toLowerCase().includes('job') && !item.toLowerCase().includes('work')) {
+                lifestyle.push(item.toLowerCase());
+            }
+        });
+        
+        if (lifestyle.length === 0) return 'No significant lifestyle factors noted.';
+        
+        if (lifestyle.length === 1) {
+            return `Unfortunately, ${lifestyle[0]}.`;
+        } else if (lifestyle.length === 2) {
+            return `Unfortunately, ${lifestyle[0]} and ${lifestyle[1]}.`;
+        } else {
+            const lastItem = lifestyle.pop();
+            return `Unfortunately, ${lifestyle.join(', ')}, and ${lastItem}.`;
+        }
+    }
+
+    createFamilyNarrative(familyHistory) {
+        const family = familyHistory.map(item => {
+            // Make family history more readable
+            if (item.toLowerCase().includes('died suddenly')) {
+                return item.replace(/died suddenly/gi, 'passed away unexpectedly');
+            }
+            return item;
+        });
+        
+        if (family.length === 1) {
+            return `His ${family[0].toLowerCase()}.`;
+        } else if (family.length === 2) {
+            return `His ${family[0].toLowerCase()}, and his ${family[1].toLowerCase()}.`;
+        } else {
+            const lastItem = family.pop();
+            return `His ${family.join(', his ').toLowerCase()}, and his ${lastItem.toLowerCase()}.`;
+        }
+    }
+
+    createMedicationNarrative(medications) {
+        const meds = medications.map(med => {
+            // Add explanations for common medications
+            if (med.toLowerCase().includes('metformin')) {
+                return med + ' (for diabetes)';
+            }
+            if (med.toLowerCase().includes('lisinopril')) {
+                return med + ' (for blood pressure)';
+            }
+            if (med.toLowerCase().includes('atorvastatin')) {
+                return med + ' (for cholesterol)';
+            }
+            if (med.toLowerCase().includes('paracetamol')) {
+                return med + ' (for pain relief)';
+            }
+            return med;
+        });
+        
+        if (meds.length === 1) {
+            return `He takes ${meds[0].toLowerCase()}.`;
+        } else if (meds.length === 2) {
+            return `He takes ${meds[0].toLowerCase()} and ${meds[1].toLowerCase()}.`;
+        } else {
+            const lastMed = meds.pop();
+            return `He takes ${meds.join(', ').toLowerCase()}, and ${lastMed.toLowerCase()}.`;
+        }
+    }
+
+    createAllergyNarrative(allergies) {
+        if (allergies.toLowerCase().includes('no known')) {
+            return 'He has no known drug allergies, which is helpful for treatment options.';
+        }
+        return `Important: He is allergic to ${allergies.toLowerCase()}.`;
     }
 
     renderCollapsibleFindings() {
@@ -1897,6 +2102,10 @@ class MedicalMysteryGame {
             if (question.critical) {
                 this.gameState.patientStability += DETERIORATION_FACTORS.IMPROVEMENT;
                 this.playSound('success');
+                // Show progress message for critical findings
+                if (Math.random() < 0.3) { // 30% chance
+                    setTimeout(() => this.showProgressMessage('examine'), 1000);
+                }
             } else {
                 this.gameState.patientStability -= DETERIORATION_FACTORS.INCORRECT_ACTIONS;
                 this.gameState.incorrectActions++;
@@ -1936,10 +2145,80 @@ class MedicalMysteryGame {
     }
 
     showTestResult(test) {
-        // Generate realistic test results based on the test type
+        // Check for narrative results first
+        if (test.resultNarrative && test.resultNarrative.length > 0) {
+            this.showNarrativeTestResult(test);
+        } else {
+            // Fallback to original system
+            this.showStandardTestResult(test);
+        }
+    }
+
+    showNarrativeTestResult(test) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay narrative-result-modal';
+        
+        modal.innerHTML = `
+            <div class="modal-content narrative-content">
+                <div class="narrative-header">
+                    <div class="timestamp">2 minutes later...</div>
+                    <h3><i class="fas fa-clipboard-list"></i> ${test.name} Results</h3>
+                </div>
+                <div class="narrative-body">
+                    <div class="narrative-text" id="narrative-text">
+                        ${test.resultNarrative[0]}
+                    </div>
+                </div>
+                <div class="narrative-controls">
+                    <button class="action-btn secondary" id="narrative-continue" onclick="game.continueNarrative()">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Store narrative state
+        this.currentNarrative = {
+            lines: test.resultNarrative,
+            currentLine: 0,
+            modal: modal
+        };
+        
+        this.playSound('success');
+    }
+
+    continueNarrative() {
+        if (!this.currentNarrative) return;
+        
+        this.currentNarrative.currentLine++;
+        const textElement = document.getElementById('narrative-text');
+        const continueBtn = document.getElementById('narrative-continue');
+        
+        if (this.currentNarrative.currentLine < this.currentNarrative.lines.length) {
+            // Show next line with fade effect
+            textElement.style.opacity = '0';
+            setTimeout(() => {
+                textElement.textContent = this.currentNarrative.lines[this.currentNarrative.currentLine];
+                textElement.style.opacity = '1';
+            }, 200);
+        } else {
+            // End of narrative
+            continueBtn.innerHTML = 'Close <i class="fas fa-times"></i>';
+            continueBtn.onclick = () => {
+                this.currentNarrative.modal.remove();
+                this.currentNarrative = null;
+            };
+        }
+        
+        this.playSound('click');
+    }
+
+    showStandardTestResult(test) {
+        // Original test result system for backwards compatibility
         const results = this.generateTestResult(test);
         
-        // Create a temporary notification
         const notification = document.createElement('div');
         notification.className = 'test-result-notification';
         
@@ -1958,12 +2237,10 @@ class MedicalMysteryGame {
             </div>
         `;
         
-        // Add to the game container
         const gameContainer = document.getElementById('game-container');
         if (gameContainer) {
             gameContainer.appendChild(notification);
             
-            // Auto-remove after 5 seconds
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.remove();

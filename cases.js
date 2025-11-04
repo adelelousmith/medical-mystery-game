@@ -21,6 +21,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "myocardial_infarction",
         description: "A 58-year-old male collapses in the waiting room. Bystanders report he was complaining of chest pain and shortness of breath before losing consciousness. The patient is unresponsive with no pulse.",
+        
+        // NEW: Narrative enhancements for drama and immersion
+        progressMessages: {
+            examine: [
+                "The monitors are screaming. Every second counts now.",
+                "His wife's eyes search yours for answers you don't have yet.",
+                "The team moves with practiced urgency — this isn't their first cardiac arrest.",
+                "You feel the weight of the decision ahead. Get this wrong and..."
+            ],
+            diagnose: [
+                "The evidence is mounting. The pattern becomes clearer.",
+                "Lab results flash on screen. The numbers tell a story.",
+                "Everything points to one conclusion. Time to commit.",
+                "The registrar nods grimly. 'What's your call, doctor?'"
+            ],
+            treat: [
+                "Treatment initiated. The monitors start to respond.",
+                "His pulse returns — weak, but there. The team exhales.",
+                "Every intervention matters now. No room for error.",
+                "The wife grips your hand. 'Is he going to be alright?'"
+            ]
+        },
 
         patientHistory: {
             demographics: "58-year-old male",
@@ -89,7 +111,13 @@ const medicalCases = {
                 description: "Electrocardiogram to assess heart rhythm and detect ischemia",
                 cost: 150,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The ECG machine whirs to life, printing a rhythm strip that makes your stomach drop.",
+                    "Unmistakable ST elevation stares back at you from leads II, III, and aVF.",
+                    "The nurse glances at the trace, then at you. 'Inferior STEMI,' she says quietly.",
+                    "This isn't just chest pain anymore. This is the real thing."
+                ]
             },
             {
                 id: "troponin",
@@ -97,7 +125,13 @@ const medicalCases = {
                 description: "Blood test to detect heart muscle damage",
                 cost: 200,
                 timeRequired: 3,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The lab calls back within minutes — never a good sign.",
+                    "Troponin I: 15.2 ng/mL. The normal range flashes mockingly: <0.04.",
+                    "The registrar whistles low. 'That's not just elevated, that's through the roof.'",
+                    "Heart muscle is dying. The clock is ticking."
+                ]
             },
             {
                 id: "chest_xray",
@@ -105,7 +139,13 @@ const medicalCases = {
                 description: "Imaging to rule out other causes of chest pain",
                 cost: 100,
                 timeRequired: 4,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The X-ray slides onto the lightbox with a satisfying click.",
+                    "Heart shadow looks enlarged, but no obvious pneumothorax.",
+                    "The radiographer points to subtle pulmonary congestion.",
+                    "'Heart's struggling,' she notes. 'Backing up into the lungs.'"
+                ]
             },
             {
                 id: "cardiac_enzymes",
@@ -113,7 +153,13 @@ const medicalCases = {
                 description: "Comprehensive blood work for cardiac markers",
                 cost: 300,
                 timeRequired: 5,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The blood results ping onto your screen with clinical precision.",
+                    "CK-MB elevated, LDH climbing — the heart's distress signals written in numbers.",
+                    "The consultant nods grimly. 'Confirms what we already suspected.'",
+                    "Sometimes being right feels absolutely dreadful."
+                ]
             }
         ],
         diagnosisOptions: [
@@ -224,7 +270,13 @@ const medicalCases = {
                 description: "Comprehensive imaging to assess internal injuries",
                 cost: 800,
                 timeRequired: 3,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The CT scanner hums ominously as cross-sections of trauma appear on screen.",
+                    "There — a large dark pool in the abdomen where blood shouldn't be.",
+                    "The radiologist's face says it all before she speaks: 'Significant haemoperitoneum.'",
+                    "Internal bleeding. Theatre's looking increasingly likely."
+                ]
             },
             {
                 id: "xray_series",
@@ -232,7 +284,13 @@ const medicalCases = {
                 description: "Chest, pelvis, and extremity X-rays",
                 cost: 400,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "X-rays clatter onto the viewing box like a grim slideshow.",
+                    "Multiple rib fractures light up the chest film — at least five broken.",
+                    "The orthopaedic registrar winces. 'Blunt force trauma, significant impact.'",
+                    "Motorcycles versus cars rarely end well for the rider."
+                ]
             },
             {
                 id: "blood_work",
@@ -240,7 +298,13 @@ const medicalCases = {
                 description: "Blood tests to assess for internal bleeding",
                 cost: 150,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The blood results flash red on the monitor — literally and figuratively.",
+                    "Haemoglobin dropping fast: 8.2 and falling like a stone.",
+                    "The nurse catches your eye. 'He's bleeding somewhere, and bleeding fast.'",
+                    "Time to find the source before he bleeds out."
+                ]
             },
             {
                 id: "ultrasound",
@@ -248,7 +312,13 @@ const medicalCases = {
                 description: "Focused assessment for trauma",
                 cost: 200,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The ultrasound probe glides across his abdomen with practiced efficiency.",
+                    "Dark fluid appears in all four quadrants — free blood, lots of it.",
+                    "The sonographer nods grimly. 'Positive FAST. He needs surgery now.'",
+                    "Sometimes the simplest tests give the clearest answers."
+                ]
             }
         ],
         diagnosisOptions: [
@@ -359,7 +429,13 @@ const medicalCases = {
                 description: "Non-invasive oxygen saturation monitoring",
                 cost: 50,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The tiny probe clips onto her finger like a glowing fairy light.",
+                    "88% oxygen saturation — definitely not the 98% you'd want to see.",
+                    "The paediatric nurse frowns. 'She's working too hard to breathe.'",
+                    "Mum's face crumples. Sometimes numbers tell the whole story."
+                ]
             },
             {
                 id: "chest_xray",
@@ -367,7 +443,13 @@ const medicalCases = {
                 description: "Imaging to assess airway and lung condition",
                 cost: 100,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "Getting a three-year-old to stay still for X-rays requires tactical bribery.",
+                    "The film shows hyperinflated lungs — air trapped like balloons that won't deflate.",
+                    "Classic croup pattern, the radiographer confirms with a knowing nod.",
+                    "At least it's not pneumonia. Small mercies in paediatrics."
+                ]
             },
             {
                 id: "blood_work",
@@ -375,7 +457,13 @@ const medicalCases = {
                 description: "Complete blood count and inflammatory markers",
                 cost: 150,
                 timeRequired: 3,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The blood draw requires three staff and considerable negotiation with a tearful toddler.",
+                    "White cell count slightly elevated — her body's fighting something viral.",
+                    "The lab tech smiles. 'Nothing too scary, just a typical childhood bug.'",
+                    "Mum's shoulders finally relax for the first time today."
+                ]
             },
             {
                 id: "viral_test",
@@ -383,7 +471,13 @@ const medicalCases = {
                 description: "Testing for common respiratory viruses",
                 cost: 200,
                 timeRequired: 4,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The nasal swab provokes indignant protests from your small patient.",
+                    "Parainfluenza virus positive — the usual suspect for croup in autumn.",
+                    "The consultant nods. 'Textbook case. Steroids and steam should sort her out.'",
+                    "Sometimes the simplest diagnoses are the most reassuring."
+                ]
             }
         ],
         diagnosisOptions: [
@@ -639,7 +733,13 @@ const medicalCases = {
                 description: "Emergency brain imaging to rule out hemorrhage",
                 cost: 600,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The CT scanner whirs as it captures slices of brain tissue in stark black and white.",
+                    "No bright white blood visible — that's the good news about ruling out a bleed.",
+                    "The stroke consultant squints at the screen. 'Clear for thrombolysis if we're quick.'",
+                    "The tPA clock is ticking. Every minute costs brain cells."
+                ]
             },
             {
                 id: "blood_work",
@@ -647,7 +747,13 @@ const medicalCases = {
                 description: "Check blood counts and clotting function",
                 cost: 200,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "Blood results stream in faster than usual — the lab knows stroke means urgency.",
+                    "INR slightly elevated from his warfarin, but nothing that stops treatment.",
+                    "The haematology registrar nods approvingly. 'Safe to proceed with clot-busters.'",
+                    "Sometimes being on blood thinners is exactly what you need."
+                ]
             },
             {
                 id: "ecg",
@@ -655,7 +761,13 @@ const medicalCases = {
                 description: "Check for atrial fibrillation or other heart rhythm problems",
                 cost: 150,
                 timeRequired: 1,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The ECG trace dances across the screen in familiar irregular patterns.",
+                    "Atrial fibrillation — his heart's been throwing clots like confetti.",
+                    "The cardiology nurse sighs. 'Classic AF stroke. Should've been on better anticoagulation.'",
+                    "Hindsight's always 20/20 in medicine, unfortunately."
+                ]
             },
             {
                 id: "glucose",
@@ -663,7 +775,13 @@ const medicalCases = {
                 description: "Rule out hypoglycemia mimicking stroke",
                 cost: 25,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The glucometer beeps with reassuring normality: 6.2 mmol/L.",
+                    "Not hypoglycaemia then — this weakness is the real neurological deal.",
+                    "The diabetes nurse nods. 'At least his sugars are behaving themselves today.'",
+                    "One less thing to worry about in an already complicated case."
+                ]
             }
         ],
         diagnosisOptions: [
@@ -780,7 +898,13 @@ const medicalCases = {
                 description: "Detailed imaging to visualize appendix and rule out other causes",
                 cost: 800,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The CT images scroll past like a medical detective story unfolding.",
+                    "There — a thickened, inflamed appendix glowing angry on the screen.",
+                    "The radiologist points with grim satisfaction. 'Textbook appendicitis, needs surgery tonight.'",
+                    "At least it hasn't burst yet. Theatre team, you're up."
+                ]
             },
             {
                 id: "blood_work",
@@ -788,7 +912,13 @@ const medicalCases = {
                 description: "Check white blood cell count for signs of infection",
                 cost: 150,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The blood results ping back with telltale signs of trouble brewing.",
+                    "White cell count elevated to 15,000 — her body's fighting an infection.",
+                    "The surgical registrar nods knowingly. 'Classic inflammatory response.'",
+                    "Numbers don't lie, especially when they're shouting 'appendicitis' this loudly."
+                ]
             },
             {
                 id: "urinalysis",
@@ -796,7 +926,13 @@ const medicalCases = {
                 description: "Rule out urinary tract infection or kidney stones",
                 cost: 75,
                 timeRequired: 1,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The urine dipstick emerges clean as a whistle — no infection here.",
+                    "Sometimes the most useful tests are the ones that rule things out.",
+                    "The nurse smiles. 'Well, at least it's not her kidneys causing grief.'",
+                    "Process of elimination in action — one less thing to worry about."
+                ]
             },
             {
                 id: "pregnancy_test",
@@ -804,7 +940,13 @@ const medicalCases = {
                 description: "Rule out ectopic pregnancy in women of childbearing age",
                 cost: 50,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The pregnancy test develops with the efficiency of modern chemistry.",
+                    "Negative — which in this context is exactly what everyone hoped for.",
+                    "The gynaecology registrar exhales with relief. 'Not ectopic then.'",
+                    "Sometimes negative results are the most positive news you can get."
+                ]
             }
         ],
         diagnosisOptions: [

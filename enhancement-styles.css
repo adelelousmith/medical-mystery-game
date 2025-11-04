@@ -663,12 +663,14 @@
 }
 
 .findings-section h5 {
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 1rem 0;
     color: var(--primary-blue);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.5rem;
 }
 
 .findings-section ul {
@@ -683,22 +685,52 @@
 }
 
 .findings-list {
-    max-height: 300px;
+    max-height: 350px;
     overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.findings-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.findings-list::-webkit-scrollbar-track {
+    background: var(--surface-light);
+    border-radius: 2px;
+}
+
+.findings-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 2px;
+}
+
+.findings-list::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-blue);
 }
 
 .finding-item {
     background: rgba(59, 130, 246, 0.05);
     border-left: 3px solid var(--primary-blue);
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
     border-radius: 0 var(--radius) var(--radius) 0;
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.finding-item:hover {
+    background: rgba(59, 130, 246, 0.08);
+    transform: translateX(2px);
 }
 
 .finding-item strong {
     color: var(--text-primary);
+    font-weight: 600;
+}
+
+.finding-item:last-child {
+    margin-bottom: 0;
 }
 
 .differential-diagnosis {
@@ -796,35 +828,178 @@
     }
 }
 
+/* Patient Narrative Layout */
+.patient-narrative {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.story-section {
+    background: var(--surface-white);
+    border-left: 4px solid var(--primary-blue);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.story-section:hover {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    transform: translateX(2px);
+}
+
+.story-section h4 {
+    color: var(--primary-blue);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.story-section h4::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+}
+
+.story-section p {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    text-align: justify;
+}
+
+/* Special styling for different sections */
+.patient-intro {
+    border-left-color: #10b981;
+}
+
+.patient-intro h4::before {
+    background: #10b981;
+}
+
+.medical-background {
+    border-left-color: #f59e0b;
+}
+
+.medical-background h4::before {
+    background: #f59e0b;
+}
+
+.lifestyle {
+    border-left-color: #8b5cf6;
+}
+
+.lifestyle h4::before {
+    background: #8b5cf6;
+}
+
+.family-history {
+    border-left-color: #ef4444;
+}
+
+.family-history h4::before {
+    background: #ef4444;
+}
+
+.medications {
+    border-left-color: #06b6d4;
+}
+
+.medications h4::before {
+    background: #06b6d4;
+}
+
+.allergies {
+    border-left-color: #f97316;
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.05) 0%, var(--surface-white) 100%);
+}
+
+.allergies h4::before {
+    background: #f97316;
+}
+
+.emotional-context {
+    border-left-color: #ec4899;
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, var(--surface-white) 100%);
+    font-style: italic;
+}
+
+.emotional-context h4::before {
+    background: #ec4899;
+}
+
+/* Legacy history grid for backwards compatibility */
 .history-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
 }
 
 .history-item {
     background: var(--surface-white);
     border: 1px solid var(--border-light);
     border-radius: var(--radius);
-    padding: 1rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.history-item:hover {
+    border-color: var(--border-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .history-item strong {
     color: var(--primary-blue);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 600;
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.5rem;
+}
+
+.history-item > p,
+.history-item > div:not(ul) {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
 }
 
 .history-item ul {
-    margin: 0.5rem 0 0 0;
-    padding-left: 1.2rem;
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
 }
 
 .history-item li {
-    margin-bottom: 0.25rem;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.history-item li:before {
+    content: "•";
+    color: var(--primary-blue);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.history-item li:last-child {
+    margin-bottom: 0;
 }
 
 /* Enhanced Diagnosis Selection */
@@ -944,6 +1119,218 @@
     font-style: italic;
 }
 
+/* Narrative Test Results */
+.narrative-result-modal .modal-content {
+    max-width: 600px;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.narrative-header {
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1.5rem;
+}
+
+.timestamp {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.narrative-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.narrative-body {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.narrative-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+    font-style: italic;
+    transition: opacity 0.3s ease;
+}
+
+.narrative-controls {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.narrative-controls .action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.narrative-controls .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Progress Messages */
+.progress-message-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.95) 100%);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-width: 500px;
+    animation: slideUpFade 0.5s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.progress-message-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-message-content i {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.2rem;
+}
+
+.progress-message-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Glossary Terms */
+.glossary-term {
+    color: var(--primary-blue);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    cursor: help;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.glossary-term:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 3px;
+    padding: 0 2px;
+}
+
+.glossary-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: white;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    font-size: 0.8rem;
+    white-space: normal;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    max-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    line-height: 1.4;
+}
+
+.glossary-term:hover .glossary-tooltip {
+    opacity: 1;
+}
+
+.glossary-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--text-primary);
+}
+
+/* Enhanced Medical History Sections */
+.medical-history-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.medical-history-section:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.medical-history-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.medical-history-section h4::before {
+    content: '';
+    width: 4px;
+    height: 1rem;
+    background: var(--primary-blue);
+    border-radius: 2px;
+}
+
+.medical-history-section li {
+    list-style-type: disc;
+    margin-left: 1.25rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.medical-history-section p {
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .investigation-phases {
@@ -966,6 +1353,28 @@
     .diagnosis-list {
         grid-template-columns: 1fr;
     }
+    
+    .history-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .history-item {
+        padding: 1rem;
+    }
+    
+    .collapsible-header {
+        padding: 1rem;
+    }
+    
+    .collapsible-content {
+        padding: 1rem;
+    }
+    
+    .diagnosis-options {
+        grid-template-columns: 1fr;
+    }
+}
     
     .event-notification,
     .clue-notification,
