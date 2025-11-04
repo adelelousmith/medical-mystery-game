@@ -734,21 +734,28 @@ class MedicalMysteryGame {
                 throw new Error('Game container not found');
             }
             
-            const caseCards = cases.map(case_ => `
+            const caseCards = cases.map(case_ => {
+                // Create a brief summary from the full description
+                const briefDescription = case_.description ? 
+                    case_.description.split('.')[0] + '.' : 
+                    'Emergency medical case requiring immediate attention.';
+                
+                return `
                 <div class="case-card ${case_.difficulty}" onclick="game.startCase('${case_.id}')">
                     <div class="case-icon">
                         <i class="${case_.icon}"></i>
                     </div>
                     <div class="case-content">
                         <h3>${case_.title}</h3>
-                        <p>${case_.description}</p>
+                        <p class="case-brief">${briefDescription}</p>
                         <div class="case-meta">
                             <span class="difficulty ${case_.difficulty}">${case_.difficulty.toUpperCase()}</span>
                             <span class="specialty">${case_.specialty}</span>
                         </div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             
             gameContainer.innerHTML = `
                 <div class="case-selection">
