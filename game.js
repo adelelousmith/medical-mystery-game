@@ -1149,6 +1149,7 @@ class MedicalMysteryGame {
             this.gameState.askedQuestions = [];
             this.gameState.orderedTests = [];
             this.gameState.historyRevealed = false;
+            this.gameState.hintDismissed = false;
             this.gameState.gamePhase = GAME_PHASES.PLAYING;
             this.gameState.finalDiagnosis = null;
             this.gameState.patientState = PATIENT_STATES.STABLE;
@@ -1312,6 +1313,8 @@ class MedicalMysteryGame {
                 </div>
             </div>
 
+            ${this.renderHintSystem()}
+            
             <div class="game-content">
                 ${this.renderPatientImage()}
                 ${this.renderPatientCondition()}
@@ -1332,6 +1335,159 @@ class MedicalMysteryGame {
         `;
         
         this.attachEventHandlers();
+    }
+
+    renderHintSystem() {
+        const hint = this.getCurrentHint();
+        
+        if (!hint) return '';
+        
+        return `
+            <div class="hint-container ${hint.type}">
+                <div class="hint-icon">
+                    <i class="${hint.icon}"></i>
+                </div>
+                <div class="hint-content">
+                    <div class="hint-text">${hint.message}</div>
+                    ${hint.showButton ? `
+                        <button class="hint-btn" onclick="game.useHint()">
+                            <i class="fas fa-lightbulb"></i> Get Hint (-10 points)
+                        </button>
+                    ` : ''}
+                </div>
+                <button class="hint-close" onclick="game.dismissHint()" title="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    getCurrentHint() {
+        if (this.gameState.gamePhase !== 'playing') return null;
+        if (this.gameState.hintDismissed) return null;
+        
+        const timeElapsed = (this.gameState.currentCase.timeLimit * 60) - this.gameState.timeRemaining;
+        const criticalTests = this.gameState.currentCase.tests.filter(t => t.critical);
+        const criticalTestsOrdered = this.gameState.orderedTests.filter(tId => 
+            criticalTests.find(t => t.id === tId)
+        ).length;
+        const criticalQuestions = this.gameState.currentCase.questions.filter(q => q.critical);
+        const criticalQuestionsAsked = this.gameState.askedQuestions.filter(qId =>
+            criticalQuestions.find(q => q.id === qId)
+        ).length;
+        
+        // Hint 1: No critical tests after 2 minutes
+        if (timeElapsed > 120 && criticalTestsOrdered === 0 && this.gameState.orderedTests.length < 2) {
+            return {
+                type: 'warning',
+                icon: 'fas fa-flask',
+                message: '💡 Consider ordering diagnostic tests to gather more information about the patient\'s condition.',
+                showButton: false
+            };
+        }
+        
+        // Hint 2: No critical questions after 90 seconds
+        if (timeElapsed > 90 && criticalQuestionsAsked === 0 && this.gameState.askedQuestions.length < 2) {
+            return {
+                type: 'info',
+                icon: 'fas fa-question-circle',
+                message: '💡 Try asking questions about the patient\'s symptoms and medical history.',
+                showButton: false
+            };
+        }
+        
+        // Hint 3: Too many incorrect actions
+        if (this.gameState.incorrectActions >= 3) {
+            return {
+                type: 'warning',
+                icon: 'fas fa-exclamation-triangle',
+                message: '💡 Review the patient history and symptoms carefully. Focus on tests related to the chief complaint.',
+                showButton: false
+            };
+        }
+        
+        // Hint 4: Patient stability critical
+        if (this.gameState.patientStability < 30 && criticalTestsOrdered < criticalTests.length) {
+            return {
+                type: 'danger',
+                icon: 'fas fa-heartbeat',
+                message: '⚠️ Patient condition is critical! Order essential diagnostic tests immediately.',
+                showButton: false
+            };
+        }
+        
+        // Hint 5: Time running out
+        if (this.gameState.timeRemaining < 60 && !this.gameState.finalDiagnosis) {
+            return {
+                type: 'danger',
+                icon: 'fas fa-clock',
+                message: '⏰ Time is running out! Review your findings and make a diagnosis.',
+                showButton: false
+            };
+        }
+        
+        // Hint 6: Offer detailed hint button after 3 minutes
+        if (timeElapsed > 180 && criticalTestsOrdered < criticalTests.length / 2) {
+            return {
+                type: 'info',
+                icon: 'fas fa-lightbulb',
+                message: 'Stuck? Get a specific hint to help guide your investigation.',
+                showButton: true
+            };
+        }
+        
+        return null;
+    }
+
+    useHint() {
+        // Deduct points for using hint
+        this.gameState.score = Math.max(0, this.gameState.score - 10);
+        
+        // Get specific hint based on case
+        const criticalTests = this.gameState.currentCase.tests.filter(t => t.critical);
+        const unorderedCriticalTests = criticalTests.filter(t => 
+            !this.gameState.orderedTests.includes(t.id)
+        );
+        
+        const criticalQuestions = this.gameState.currentCase.questions.filter(q => q.critical);
+        const unaskedCriticalQuestions = criticalQuestions.filter(q =>
+            !this.gameState.askedQuestions.includes(q.id)
+        );
+        
+        let hintMessage = '';
+        
+        if (unorderedCriticalTests.length > 0) {
+            const test = unorderedCriticalTests[0];
+            hintMessage = `💡 Specific Hint: Consider ordering "${test.name}" - ${test.description}`;
+        } else if (unaskedCriticalQuestions.length > 0) {
+            const question = unaskedCriticalQuestions[0];
+            hintMessage = `💡 Specific Hint: Ask about: "${question.text}"`;
+        } else {
+            hintMessage = `💡 You've covered the key tests and questions. Review your findings and consider making a diagnosis.`;
+        }
+        
+        // Show hint in modal
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content hint-modal">
+                <h3><i class="fas fa-lightbulb"></i> Hint (-10 points)</h3>
+                <p class="hint-detail">${hintMessage}</p>
+                <button class="action-btn primary" onclick="this.closest('.modal-overlay').remove()">
+                    <i class="fas fa-check"></i> Got it
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        this.playSound('click');
+        this.render();
+    }
+
+    dismissHint() {
+        this.gameState.hintDismissed = true;
+        this.render();
+        this.playSound('click');
     }
 
     renderInvestigationPhases() {
@@ -1533,10 +1689,18 @@ class MedicalMysteryGame {
                                 ${orderedTests.map(tId => {
                                     const test = this.gameState.currentCase.tests.find(t => t.id === tId);
                                     const result = this.generateTestResult(test);
+                                    const testImage = test ? this.getTestResultImage(test.id) : null;
+                                    console.log('Rendering test:', test?.id, 'Image:', testImage);
+                                    
                                     return test ? `
                                         <div class="finding-item">
                                             <strong>${test.name}:</strong><br>
                                             ${result}
+                                            ${testImage ? `
+                                                <div class="test-result-image">
+                                                    <img src="${testImage}" alt="${test.name} Result" onclick="game.showImageModal('${testImage}', '${test.name}')" />
+                                                </div>
+                                            ` : ''}
                                         </div>
                                     ` : '';
                                 }).join('')}
@@ -1921,10 +2085,18 @@ class MedicalMysteryGame {
                                     ${orderedTests.map(tId => {
                                         const test = this.gameState.currentCase.tests.find(t => t.id === tId);
                                         const result = this.generateTestResult(test);
+                                        const testImage = test ? this.getTestResultImage(test.id) : null;
+                                        console.log('Rendering test:', test?.id, 'Image:', testImage);
+                                        
                                         return test ? `
                                             <div class="finding-item">
                                                 <strong>${test.name}:</strong><br>
                                                 ${result}
+                                                ${testImage ? `
+                                                    <div class="test-result-image">
+                                                        <img src="${testImage}" alt="${test.name} Result" onclick="game.showImageModal('${testImage}', '${test.name}')" />
+                                                    </div>
+                                                ` : ''}
                                             </div>
                                         ` : '';
                                     }).join('')}
@@ -2106,7 +2278,7 @@ class MedicalMysteryGame {
             // Cardiac case questions (witness reports and clinical observations)
             'chest_pain': 'Wife reports: "He was clutching his chest saying it felt like an elephant sitting on it. He rated the pain 9 out of 10 before he collapsed."',
             'shortness_breath': 'Bystanders report: "He was gasping for air and could only speak a few words at a time before he went unconscious."',
-            'sweating': 'Clinical observation: Patient is diaphoretic and clammy. Profuse sweating despite normal room temperature.',
+            'sweating': 'Clinical observation: Patient is sweating heavily and skin feels clammy. Profuse sweating despite normal room temperature.',
             'witnessed_collapse': 'Wife states: "He suddenly grabbed his chest, said he couldn\'t breathe, then just collapsed. I\'ve never seen anything like it."',
             'prior_symptoms': 'Wife reports: "He complained of chest tightness this morning but said it was just heartburn. He took antacids but it got worse."',
             
@@ -2142,7 +2314,7 @@ class MedicalMysteryGame {
             'consciousness': 'Patient is drowsy and difficult to arouse. Responds to painful stimuli but not verbal commands.',
             'breathing': 'Respiratory rate is 8/min and shallow. Patient appears to be struggling to breathe.',
             'pupil_size': 'Pupils are pinpoint (2mm) and reactive to light. Both eyes affected equally.',
-            'skin_color': 'Patient appears pale and slightly cyanotic around lips and fingertips.',
+            'skin_color': 'Patient appears pale with a bluish tint around lips and fingertips (sign of low oxygen).',
             'needle_marks': 'Yes, multiple track marks on both arms. Some appear fresh, others are older scars.',
             
             // Additional common symptoms
@@ -2164,7 +2336,7 @@ class MedicalMysteryGame {
             // Stroke case questions
             'symptom_onset': 'Symptoms began 45 minutes ago. Patient was watching TV when he suddenly noticed left arm weakness and slurred speech.',
             'consciousness_level': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions but speech is slurred.',
-            'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
+            'speech_problems': 'Yes, patient has slurred speech and mild word-finding difficulties. Speech is slow but comprehensible.',
             'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
             'headache': 'No headache reported. Patient denies any head or neck pain.',
             'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.',
@@ -2176,7 +2348,7 @@ class MedicalMysteryGame {
             'activity_level': 'Child is active and playful when fever is controlled with medication. Sleeps normally.',
             
             // Abdominal pain case questions
-            'pain_location': 'Pain is located in the right iliac fossa. Patient has localised tenderness in this area.',
+            'pain_location': 'Pain is located in the right lower abdomen. Patient has localised tenderness in this area.',
             'pain_migration': 'Yes, pain started around the belly button this morning and moved to the right lower abdomen over 4-6 hours.',
             'nausea_vomiting': 'Yes, patient has been nauseous for 6 hours and vomited twice. Can\'t keep food down.',
             'fever': 'Yes, low-grade fever of 38°C. Patient feels warm to touch.',
@@ -2203,7 +2375,7 @@ class MedicalMysteryGame {
             'consciousness': 'Patient is alert and oriented to person, place, and time. Responds to questions but speech is impaired.',
             'symptom_onset': 'Symptoms began 2 hours ago. Patient was watching TV when he suddenly noticed right arm weakness and slurred speech.',
             'consciousness_level': 'Patient is alert and oriented to person, place, and time. Responds appropriately to questions but speech is slurred.',
-            'speech_problems': 'Yes, patient has dysarthria (slurred speech) and mild word-finding difficulties. Speech is slow but comprehensible.',
+            'speech_problems': 'Yes, patient has slurred speech and mild word-finding difficulties. Speech is slow but comprehensible.',
             'vision_problems': 'No visual disturbances reported. Patient denies double vision or field cuts.',
             'headache': 'No headache reported. Patient denies any head or neck pain.',
             'recent_trauma': 'No recent head trauma or falls. Patient was sitting in his chair when symptoms began.'
@@ -2250,11 +2422,22 @@ class MedicalMysteryGame {
                 content += `
                     <div class="ordered-tests">
                         <h4>Ordered Tests:</h4>
-                        ${orderedTests.map(test => `
-                            <div class="test-result-item">
-                                <strong>${test.name}:</strong> ${test.result}
-                            </div>
-                        `).join('')}
+                        ${orderedTests.map(test => {
+                            const testObj = this.gameState.currentCase.tests.find(t => t.id === test.id);
+                            const testImage = testObj ? this.getTestResultImage(testObj.id) : null;
+                            console.log('Rendering test in Medical Tests:', test.id, 'Image:', testImage);
+                            
+                            return `
+                                <div class="test-result-item">
+                                    <strong>${test.name}:</strong> ${test.result}
+                                    ${testImage ? `
+                                        <div class="test-result-image">
+                                            <img src="${testImage}" alt="${test.name} Result" onclick="game.showImageModal('${testImage}', '${test.name}')" />
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
             }
@@ -2501,6 +2684,10 @@ class MedicalMysteryGame {
         // Play printer sound for test results
         this.playSound('test_result');
         
+        // Add result image if available
+        test.resultImage = this.getTestResultImage(test.id);
+        console.log('Test result image for', test.id, ':', test.resultImage);
+        
         // Check for narrative results first
         if (test.resultNarrative && test.resultNarrative.length > 0) {
             this.showNarrativeTestResult(test);
@@ -2510,9 +2697,113 @@ class MedicalMysteryGame {
         }
     }
 
+    getTestResultImage(testId) {
+        const caseId = this.gameState.currentCase?.id;
+        const caseCategory = this.gameState.currentCase?.category;
+        
+        console.log('Looking for image - testId:', testId, 'caseId:', caseId, 'category:', caseCategory);
+        
+        // Map test IDs and cases to image files
+        const imageMap = {
+            // ECG images
+            'ecg': {
+                'stroke': 'testResults/12_Lead_ECG_stroke_75.png',
+                'cardiac': 'testResults/xRay_58_heartattack.png' // Using xray as placeholder
+            },
+            // CT Scan images
+            'ct_scan': {
+                'trauma': 'testResults/24_CT_crash.png'
+            },
+            'ct_head': {
+                'stroke': 'testResults/CT_75_stroke.png'
+            },
+            'ct_abdomen': {
+                'surgical': 'testResults/CT_scan_45_appendix.png'
+            },
+            // Cardiac enzymes
+            'cardiac_enzymes': {
+                'cardiac': 'testResults/58_CardiacEnzyme_heartAttack.png'
+            },
+            'troponin': {
+                'cardiac': 'testResults/58_CardiacEnzyme_heartAttack.png'
+            },
+            // Ultrasound
+            'ultrasound': {
+                'trauma': 'testResults/FastUltrasound_24_crash.png'
+            },
+            // Drug tests
+            'drug_screen': {
+                'toxicology': 'testResults/drugTest_25_Overdose.png'
+            },
+            'drug_screen_tox': {
+                'toxicology': 'testResults/drugTest_25_Overdose.png'
+            },
+            // Blood gas
+            'blood_gas': {
+                'toxicology': 'testResults/arterialBloodGas_25_overdose.png'
+            },
+            // Pregnancy test
+            'pregnancy_test': {
+                'surgical': 'testResults/pregtest_45_appendix.png'
+            },
+            // Viral panel
+            'viral_test': {
+                'pediatric': 'testResults/viralTestingPanel_3_croup.png'
+            },
+            // Chest X-ray
+            'chest_xray': {
+                'pediatric': 'testResults/x-ray-3-astma:croup.png',
+                'cardiac': 'testResults/xRay_58_heartattack.png'
+            }
+        };
+        
+        // Try to find image by test ID and case ID first
+        if (imageMap[testId] && imageMap[testId][caseId]) {
+            console.log('Found image by caseId:', imageMap[testId][caseId]);
+            return imageMap[testId][caseId];
+        }
+        
+        // Try to find image by test ID and case category
+        if (imageMap[testId] && imageMap[testId][caseCategory]) {
+            console.log('Found image by category:', imageMap[testId][caseCategory]);
+            return imageMap[testId][caseCategory];
+        }
+        
+        // No image available
+        console.log('No image found for test:', testId);
+        return null;
+    }
+
+    showImageModal(imagePath, testName) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay image-modal';
+        modal.innerHTML = `
+            <div class="modal-content image-modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-image"></i> ${testName} Result</h3>
+                    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="image-container">
+                    <img src="${imagePath}" alt="${testName} Result" />
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        this.playSound('click');
+    }
+
     showNarrativeTestResult(test) {
         const modal = document.createElement('div');
         modal.className = 'modal-overlay narrative-result-modal';
+        
+        const imageHtml = test.resultImage ? `
+            <div class="test-result-image">
+                <img src="${test.resultImage}" alt="${test.name} Result" />
+            </div>
+        ` : '';
         
         modal.innerHTML = `
             <div class="modal-content narrative-content">
@@ -2520,6 +2811,7 @@ class MedicalMysteryGame {
                     <div class="timestamp">2 minutes later...</div>
                     <h3><i class="fas fa-clipboard-list"></i> ${test.name} Results</h3>
                 </div>
+                ${imageHtml}
                 <div class="narrative-body">
                     <div class="narrative-text" id="narrative-text">
                         ${test.resultNarrative[0]}
@@ -2697,15 +2989,15 @@ class MedicalMysteryGame {
                 "Shows signs of reduced blood flow to part of the brain. No bleeding detected." :
                 "No acute abnormalities detected in the brain.",
             mri_brain: caseCategory === 'neurological' ?
-                "Confirms areas of brain tissue damage consistent with stroke." :
+                "Shows areas of reduced blood flow and tissue damage in the brain." :
                 "Brain tissue appears normal with no signs of damage.",
             
             // Surgical/Abdominal tests
             ct_abdomen: caseCategory === 'surgical' ?
-                "Shows inflammation and swelling around the appendix area. No other abnormalities detected." :
+                "Shows inflammation and swelling in the right lower abdomen. Free fluid visible. No other abnormalities detected." :
                 "Abdominal organs appear normal with no signs of inflammation.",
             abdominal_ultrasound: caseCategory === 'surgical' ?
-                "Appendix appears thickened and inflamed. Free fluid visible around the area." :
+                "Structure in right lower abdomen appears thickened and inflamed. Free fluid visible around the area." :
                 "All abdominal organs appear normal on ultrasound.",
             
             // Pregnancy test
@@ -2742,7 +3034,7 @@ class MedicalMysteryGame {
     getUltrasoundResult(caseCategory) {
         switch (caseCategory) {
             case 'trauma':
-                return "Free fluid seen throughout the abdomen, which usually means internal bleeding.";
+                return "Free fluid seen throughout the abdomen. Significant amount of fluid visible in multiple areas.";
             case 'obstetric':
                 return "Baby appears healthy and is in the correct head-down position for delivery. Full-term pregnancy.";
             default:
@@ -3572,9 +3864,9 @@ class MedicalMysteryGame {
             case 'neurologist':
                 if (caseData.category === 'neurological') {
                     if (caseData.id === 'stroke') {
-                        return `"This is an acute ischemic stroke. The CT shows no hemorrhage, and we're within the tPA window. We need to start thrombolytic therapy immediately to restore blood flow."`;
+                        return `"This is an acute ischemic event. The CT shows no bleeding, and we're within the treatment window. We need to start clot-busting therapy immediately to restore blood flow."`;
                     } else {
-                        return `"The neurological examination and imaging findings are concerning for ${caseData.correctDiagnosis}. Immediate intervention is warranted."`;
+                        return `"The neurological examination and imaging findings are concerning. There's evidence of acute cerebrovascular compromise. Immediate intervention is warranted."`;
                     }
                 } else {
                     return `"No acute neurological findings. The symptoms may be secondary to other conditions."`;
