@@ -1493,3 +1493,28 @@
         padding: 0.75rem;
     }
 }
+
+/*
+ ========================================
+   MICRO UX IMPROVEMENTS - Tier 1
+   ======================================== */
+
+/* Critical Test Indicator */
+.test-btn.critical-test {
+    border-left: 3px solid #f44336;
+    font-weight: 600;
+}
+
+.test-btn.critical-test:hover {
+    border-left-width: 4px;
+    background: #ffebee;
+}
+
+/* Status Item Tooltips - Better Cursor */
+.status-item {
+    cursor: help;
+}
+
+.status-item:hover {
+    opacity: 0.9;
+}

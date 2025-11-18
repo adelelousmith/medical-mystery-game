@@ -1274,25 +1274,25 @@ class MedicalMysteryGame {
                 ${this.shouldShowPhases() ? this.renderInvestigationPhases() : ''}
                 
                 <div class="status-bar">
-                    <div class="status-item">
+                    <div class="status-item" title="Time Remaining">
                         <i class="fas fa-clock"></i>
                         <span>${this.formatTime(this.gameState.timeRemaining / 60)}</span>
                     </div>
-                    <div class="status-item">
+                    <div class="status-item" title="Current Score">
                         <i class="fas fa-star"></i>
                         <span>${this.gameState.score}</span>
                     </div>
-                    <div class="status-item ${this.gameState.patientState}">
+                    <div class="status-item ${this.gameState.patientState}" title="Patient Stability">
                         <i class="fas fa-heartbeat"></i>
                         <span>${this.gameState.patientState.charAt(0).toUpperCase() + this.gameState.patientState.slice(1)} (${Math.round(this.gameState.patientStability)}%)</span>
                     </div>
-                    <div class="status-item ${this.gameState.questionsRemaining <= 1 ? 'limited' : ''}">
+                    <div class="status-item ${this.gameState.questionsRemaining <= 1 ? 'limited' : ''}" title="Questions Remaining">
                         <i class="fas fa-question-circle"></i>
-                        <span>Q: ${this.gameState.questionsRemaining}</span>
+                        <span>Questions: ${this.gameState.questionsRemaining}</span>
                     </div>
-                    <div class="status-item ${this.gameState.consultationSlotsRemaining <= 1 ? 'limited' : ''}">
+                    <div class="status-item ${this.gameState.consultationSlotsRemaining <= 1 ? 'limited' : ''}" title="Consultations Available">
                         <i class="fas fa-user-md"></i>
-                        <span>C: ${this.gameState.consultationSlotsRemaining}</span>
+                        <span>Consults: ${this.gameState.consultationSlotsRemaining}</span>
                     </div>
                 </div>
                 <div class="game-controls">
@@ -2230,8 +2230,8 @@ class MedicalMysteryGame {
                         <h4>Available Tests:</h4>
                         <div class="test-grid">
                             ${availableTests.map(t => `
-                                <button class="action-btn secondary test-btn" data-test="${t.id}" onclick="game.orderTest('${t.id}')">
-                                    ${t.name}
+                                <button class="action-btn secondary test-btn ${t.critical ? 'critical-test' : ''}" data-test="${t.id}" onclick="game.orderTest('${t.id}')" title="${t.critical ? 'Critical test for diagnosis' : ''}">
+                                    ${t.critical ? '⚠️ ' : ''}${t.name}${t.critical ? ' (Critical)' : ''}
                                 </button>
                             `).join('')}
                         </div>
