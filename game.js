@@ -266,36 +266,47 @@ class MedicalMysteryGame {
     }
 
     initBackgroundMusic() {
-        // Background music temporarily disabled to fix looping issue
-        console.log('🔇 Background music disabled');
-        this.backgroundMusic = null;
-        
-        // Original code commented out:
-        // try {
-        //     this.backgroundMusic = new Audio('sounds/loading-music.mp3');
-        //     this.backgroundMusic.loop = true;
-        //     this.backgroundMusic.volume = 0.08;
-        //     this.backgroundMusic.preload = 'auto';
-        // } catch (error) {
-        //     this.backgroundMusic = null;
-        // }
+        // Load background music for welcome screen
+        try {
+            this.backgroundMusic = new Audio('sounds/loading-music.mp3');
+            this.backgroundMusic.loop = false; // Play once only
+            this.backgroundMusic.volume = 0.08;
+            this.backgroundMusic.preload = 'auto';
+            this.musicHasPlayed = false; // Track if music has played
+            
+            console.log('🎵 Loading music ready');
+        } catch (error) {
+            console.warn('Loading music not supported:', error);
+            this.backgroundMusic = null;
+        }
+    }
+    
+    playLoadingMusicOnce() {
+        // Play loading music once when user first interacts
+        if (this.backgroundMusic && !this.musicHasPlayed) {
+            this.backgroundMusic.play().catch(e => {
+                console.warn('Could not play loading music:', e);
+            });
+            this.musicHasPlayed = true;
+            console.log('🎵 Loading music playing (once)');
+        }
     }
 
     // Background music now uses MP3 file instead of generated tones
 
     toggleBackgroundMusic(enabled) {
-        // Background music disabled - do nothing
         if (!this.backgroundMusic) {
-            console.log('🔇 Background music is disabled');
             return;
         }
         
         if (enabled) {
-            this.backgroundMusic.play().catch(e => {
-                console.warn('Could not play background music:', e);
-            });
+            // Don't restart - loading music plays once only
+            return;
         } else {
+            // Stop the music
             this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
+            console.log('🔇 Loading music stopped');
         }
     }
 
@@ -1008,6 +1019,9 @@ class MedicalMysteryGame {
     }
 
     showCaseSelection() {
+        // Play loading music once on first interaction
+        this.playLoadingMusicOnce();
+        
         // Reset game state when returning to case selection
         this.gameState.gamePhase = GAME_PHASES.CASE_SELECTION;
         this.gameState.currentCase = null;
@@ -1031,14 +1045,7 @@ class MedicalMysteryGame {
             this.timer = null;
         }
         
-        // Stop all sound effects first
-        this.stopAllSounds();
-        
-        // Restart background music if enabled
-        if (this.settings.backgroundMusicEnabled) {
-            this.toggleBackgroundMusic(true);
-        }
-        this.stopAllSounds();
+        // Don't stop loading music here - let it play while browsing cases
         
         try {
             const cases = getAllCases();
@@ -2230,8 +2237,8 @@ class MedicalMysteryGame {
                         <h4>Available Tests:</h4>
                         <div class="test-grid">
                             ${availableTests.map(t => `
-                                <button class="action-btn secondary test-btn ${t.critical ? 'critical-test' : ''}" data-test="${t.id}" onclick="game.orderTest('${t.id}')" title="${t.critical ? 'Critical test for diagnosis' : ''}">
-                                    ${t.critical ? '⚠️ ' : ''}${t.name}${t.critical ? ' (Critical)' : ''}
+                                <button class="action-btn secondary test-btn ${t.critical ? 'critical-test' : ''}" data-test="${t.id}" onclick="game.orderTest('${t.id}')">
+                                    ${t.name}
                                 </button>
                             `).join('')}
                         </div>
