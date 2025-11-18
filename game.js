@@ -200,6 +200,9 @@ class MedicalMysteryGame {
         // Initialize phase manager
         this.phaseManager = null;
         
+        // Initialize crisis event manager
+        this.crisisManager = new CrisisEventManager(this);
+        
         // Initialize audio system
         this.audioContext = null;
         this.backgroundMusic = null;
@@ -1181,6 +1184,11 @@ class MedicalMysteryGame {
             // Initialize phase manager
             if (typeof InvestigationPhaseManager !== 'undefined') {
                 this.phaseManager = new InvestigationPhaseManager(this);
+            }
+            
+            // Reset crisis manager
+            if (this.crisisManager) {
+                this.crisisManager.reset();
             }
             
             // Reset case start time for performance tracking
@@ -2538,6 +2546,11 @@ class MedicalMysteryGame {
             
             // Update patient stability based on time pressure
             this.updatePatientStability();
+            
+            // Check for crisis events
+            if (this.crisisManager) {
+                this.crisisManager.checkForCrisis();
+            }
             
             // Update timer display
             const timerElement = document.querySelector('.status-bar .status-item:first-child span');
