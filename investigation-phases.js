@@ -242,18 +242,41 @@ class InvestigationPhaseManager {
     }
 
     updatePatientStability() {
+        // Apply continuous time-based deterioration
+        this.game.gameState.patientStability -= DETERIORATION_FACTORS.TIME_PRESSURE;
+        
+        // Additional deterioration based on condition parameters
         const condition = this.game.gameState.patientCondition;
-        let stability = 100;
+        let additionalDeterioration = 0;
 
-        // Calculate stability based on condition parameters
-        if (condition.consciousness === 'drowsy') stability -= 20;
-        if (condition.consciousness === 'unconscious') stability -= 40;
-        if (condition.breathing === 'laboured') stability -= 15;
-        if (condition.breathing === 'critical') stability -= 35;
-        if (condition.circulation === 'compromised') stability -= 20;
-        if (condition.circulation === 'critical') stability -= 40;
+        if (condition.consciousness === 'drowsy') additionalDeterioration += 0.05;
+        if (condition.consciousness === 'unconscious') additionalDeterioration += 0.1;
+        if (condition.breathing === 'laboured') additionalDeterioration += 0.05;
+        if (condition.breathing === 'critical') additionalDeterioration += 0.15;
+        if (condition.circulation === 'compromised') additionalDeterioration += 0.05;
+        if (condition.circulation === 'critical') additionalDeterioration += 0.1;
 
-        this.game.gameState.patientStability = Math.max(0, stability);
+        this.game.gameState.patientStability -= additionalDeterioration;
+        
+        // Clamp between 0 and 100
+        const previousStability = this.game.gameState.patientStability;
+        this.game.gameState.patientStability = Math.max(0, Math.min(100, this.game.gameState.patientStability));
+        
+        // Debug logging every 10% drop
+        if (Math.floor(previousStability / 10) !== Math.floor(this.game.gameState.patientStability / 10)) {
+            console.log(`⏱️ Patient Stability: ${Math.round(this.game.gameState.patientStability)}% (${Math.round(this.game.gameState.timeRemaining)}s remaining)`);
+        }
+        
+        // Update patient state based on stability
+        if (this.game.gameState.patientStability <= 20) {
+            this.game.gameState.patientState = PATIENT_STATES.CRITICAL;
+        } else if (this.game.gameState.patientStability <= 50) {
+            this.game.gameState.patientState = PATIENT_STATES.DETERIORATING;
+        } else if (this.game.gameState.patientStability >= 80) {
+            this.game.gameState.patientState = PATIENT_STATES.IMPROVING;
+        } else {
+            this.game.gameState.patientState = PATIENT_STATES.STABLE;
+        }
     }
 
     getTimeElapsed() {
