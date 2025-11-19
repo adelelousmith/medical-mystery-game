@@ -2544,6 +2544,11 @@ class MedicalMysteryGame {
         this.timer = setInterval(() => {
             this.gameState.timeRemaining = Math.max(0, this.gameState.timeRemaining - 1);
             
+            // Debug: Log every 10 seconds
+            if (this.gameState.timeRemaining % 10 === 0) {
+                console.log(`⏰ Timer: ${this.gameState.timeRemaining}s, Stability: ${Math.round(this.gameState.patientStability)}%`);
+            }
+            
             // Update patient stability based on time pressure
             this.updatePatientStability();
             

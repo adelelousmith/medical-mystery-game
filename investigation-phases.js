@@ -7,6 +7,33 @@ const INVESTIGATION_PHASES = {
     TREAT: 'treat'
 };
 
+// Access deterioration factors from game.js
+// These are defined globally in game.js
+const getDeterioration = () => {
+    if (typeof DETERIORATION_FACTORS !== 'undefined') {
+        return DETERIORATION_FACTORS;
+    }
+    // Fallback values if not defined
+    return {
+        TIME_PRESSURE: 0.1,
+        INCORRECT_ACTIONS: 0.2,
+        MISSED_CRITICAL: 0.5,
+        IMPROVEMENT: -0.3
+    };
+};
+
+const getPatientStates = () => {
+    if (typeof PATIENT_STATES !== 'undefined') {
+        return PATIENT_STATES;
+    }
+    return {
+        STABLE: 'stable',
+        DETERIORATING: 'deteriorating',
+        CRITICAL: 'critical',
+        IMPROVING: 'improving'
+    };
+};
+
 const PHASE_REQUIREMENTS = {
     examine: {
         minActions: 3, // Minimum questions/tests before advancing
@@ -242,8 +269,17 @@ class InvestigationPhaseManager {
     }
 
     updatePatientStability() {
+        const previousStability = this.game.gameState.patientStability;
+        const DETERIORATION = getDeterioration();
+        const STATES = getPatientStates();
+        
+        // Debug: Verify method is being called
+        if (this.game.gameState.timeRemaining % 30 === 0) {
+            console.log(`📊 updatePatientStability called - Current: ${Math.round(previousStability)}%`);
+        }
+        
         // Apply continuous time-based deterioration
-        this.game.gameState.patientStability -= DETERIORATION_FACTORS.TIME_PRESSURE;
+        this.game.gameState.patientStability -= DETERIORATION.TIME_PRESSURE;
         
         // Additional deterioration based on condition parameters
         const condition = this.game.gameState.patientCondition;
@@ -259,7 +295,6 @@ class InvestigationPhaseManager {
         this.game.gameState.patientStability -= additionalDeterioration;
         
         // Clamp between 0 and 100
-        const previousStability = this.game.gameState.patientStability;
         this.game.gameState.patientStability = Math.max(0, Math.min(100, this.game.gameState.patientStability));
         
         // Debug logging every 10% drop
@@ -269,13 +304,13 @@ class InvestigationPhaseManager {
         
         // Update patient state based on stability
         if (this.game.gameState.patientStability <= 20) {
-            this.game.gameState.patientState = PATIENT_STATES.CRITICAL;
+            this.game.gameState.patientState = STATES.CRITICAL;
         } else if (this.game.gameState.patientStability <= 50) {
-            this.game.gameState.patientState = PATIENT_STATES.DETERIORATING;
+            this.game.gameState.patientState = STATES.DETERIORATING;
         } else if (this.game.gameState.patientStability >= 80) {
-            this.game.gameState.patientState = PATIENT_STATES.IMPROVING;
+            this.game.gameState.patientState = STATES.IMPROVING;
         } else {
-            this.game.gameState.patientState = PATIENT_STATES.STABLE;
+            this.game.gameState.patientState = STATES.STABLE;
         }
     }
 
