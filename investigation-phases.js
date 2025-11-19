@@ -258,13 +258,18 @@ class InvestigationPhaseManager {
         const DETERIORATION = getDeterioration();
         const STATES = getPatientStates();
         
-        // Debug: Verify method is being called
+        // Debug: Verify method is being called and show deterioration
         if (this.game.gameState.timeRemaining % 30 === 0) {
-            console.log(`📊 updatePatientStability called - Current: ${Math.round(previousStability)}%`);
+            console.log(`📊 updatePatientStability - Before: ${Math.round(previousStability)}%, Deterioration: ${DETERIORATION.TIME_PRESSURE}`);
         }
         
         // Apply continuous time-based deterioration
         this.game.gameState.patientStability -= DETERIORATION.TIME_PRESSURE;
+        
+        // Debug: Show after deterioration
+        if (this.game.gameState.timeRemaining % 30 === 0) {
+            console.log(`📊 After deterioration: ${Math.round(this.game.gameState.patientStability)}%`);
+        }
         
         // Additional deterioration based on condition parameters
         const condition = this.game.gameState.patientCondition;

@@ -62,7 +62,7 @@ const CRISIS_TYPES = {
         name: 'Respiratory Failure',
         description: '⚠️ RESPIRATORY DISTRESS! Patient cannot breathe!',
         urgentMessage: 'Oxygen saturation dropping! 85%... 78%... 70%!',
-        triggerCondition: (gameState) => gameState.patientStability < 35 && gameState.currentCase.category === 'respiratory',
+        triggerCondition: (gameState) => gameState.patientStability < 50 && gameState.currentCase.category === 'respiratory',
         timeLimit: 12,
         alarmSound: 'bp_monitor',
         visualEffect: 'respiratory-crisis',

@@ -15,7 +15,7 @@ The Crisis Event System adds real-time patient deterioration events that create 
 - **Reward**: +25% stability, +100 points
 
 #### 2. Respiratory Failure
-- **Trigger**: Patient stability < 35% in respiratory cases
+- **Trigger**: Patient stability < 50% in respiratory cases
 - **Time Limit**: 12 seconds
 - **Correct Action**: Emergency Intubation
 - **Visual**: Blue pulsing screen with breathing alarm
