@@ -292,14 +292,22 @@ class InvestigationPhaseManager {
             console.log(`⏱️ Patient Stability: ${Math.round(this.game.gameState.patientStability)}% (${Math.round(this.game.gameState.timeRemaining)}s remaining)`);
         }
         
-        // Update patient state based on stability
+        // Update patient state based on stability AND trend
+        // Only show "IMPROVING" if stability actually increased
+        const isImproving = this.game.gameState.patientStability > previousStability;
+        
         if (this.game.gameState.patientStability <= 20) {
             this.game.gameState.patientState = STATES.CRITICAL;
         } else if (this.game.gameState.patientStability <= 50) {
             this.game.gameState.patientState = STATES.DETERIORATING;
-        } else if (this.game.gameState.patientStability >= 80) {
+        } else if (isImproving && this.game.gameState.patientStability >= 70) {
+            // Only show improving if stability is high AND actually increased
             this.game.gameState.patientState = STATES.IMPROVING;
+        } else if (this.game.gameState.patientStability >= 70) {
+            // High stability but not improving = stable
+            this.game.gameState.patientState = STATES.STABLE;
         } else {
+            // 50-70% range = stable
             this.game.gameState.patientState = STATES.STABLE;
         }
     }

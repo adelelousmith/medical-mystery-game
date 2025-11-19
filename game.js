@@ -2582,21 +2582,24 @@ class MedicalMysteryGame {
             this.phaseManager.updatePatientCondition();
         } else {
             // Fallback to original system
+            const previousStability = this.gameState.patientStability;
             this.gameState.patientStability -= DETERIORATION_FACTORS.TIME_PRESSURE;
             
-            // Update patient state based on stability
+            // Clamp stability between 0 and 100
+            this.gameState.patientStability = Math.max(0, Math.min(100, this.gameState.patientStability));
+            
+            // Update patient state based on stability AND trend
+            const isImproving = this.gameState.patientStability > previousStability;
+            
             if (this.gameState.patientStability <= 20) {
                 this.gameState.patientState = PATIENT_STATES.CRITICAL;
             } else if (this.gameState.patientStability <= 50) {
                 this.gameState.patientState = PATIENT_STATES.DETERIORATING;
-            } else if (this.gameState.patientStability >= 80) {
+            } else if (isImproving && this.gameState.patientStability >= 70) {
                 this.gameState.patientState = PATIENT_STATES.IMPROVING;
             } else {
                 this.gameState.patientState = PATIENT_STATES.STABLE;
             }
-            
-            // Clamp stability between 0 and 100
-            this.gameState.patientStability = Math.max(0, Math.min(100, this.gameState.patientStability));
         }
         
         // Play sound effects based on patient state changes
