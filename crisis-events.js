@@ -7,7 +7,7 @@ const CRISIS_TYPES = {
         name: 'Cardiac Arrest',
         description: '⚠️ PATIENT CRASHING! Heart rate dropping rapidly!',
         urgentMessage: 'NO PULSE DETECTED! Monitor shows Ventricular Fibrillation!',
-        triggerCondition: (gameState) => gameState.patientStability < 30 && gameState.currentCase.category === 'cardiac',
+        triggerCondition: (gameState) => gameState.patientStability < 35 && gameState.currentCase.category === 'cardiac',
         timeLimit: 10,
         alarmSound: 'heartbeat',
         visualEffect: 'cardiac-crisis',
@@ -108,7 +108,7 @@ const CRISIS_TYPES = {
         name: 'Severe Hemorrhage',
         description: '⚠️ MASSIVE BLEEDING! Blood pressure crashing!',
         urgentMessage: 'BP: 90/60... 70/40... 50/30! Patient going into shock!',
-        triggerCondition: (gameState) => gameState.patientStability < 25 && gameState.currentCase.category === 'trauma',
+        triggerCondition: (gameState) => gameState.patientStability < 40 && gameState.currentCase.category === 'trauma',
         timeLimit: 8,
         alarmSound: 'bp_monitor',
         visualEffect: 'bleeding-crisis',
@@ -300,6 +300,14 @@ class CrisisEventManager {
     checkForCrisis() {
         // Don't trigger if already in crisis
         if (this.activeCrisis) return;
+
+        // Debug logging
+        const stability = this.game.gameState.patientStability;
+        const category = this.game.gameState.currentCase?.category;
+        
+        if (stability < 50) {
+            console.log(`🏥 Crisis Check - Stability: ${Math.round(stability)}%, Category: ${category}`);
+        }
 
         // Check each crisis type
         for (const crisisType of Object.values(CRISIS_TYPES)) {

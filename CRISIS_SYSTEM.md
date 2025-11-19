@@ -8,7 +8,7 @@ The Crisis Event System adds real-time patient deterioration events that create 
 ### 🚨 Crisis Types
 
 #### 1. Cardiac Arrest
-- **Trigger**: Patient stability < 30% in cardiac cases
+- **Trigger**: Patient stability < 35% in cardiac cases
 - **Time Limit**: 10 seconds
 - **Correct Action**: Defibrillate (200J)
 - **Visual**: Red pulsing screen with cardiac alarm
@@ -22,7 +22,7 @@ The Crisis Event System adds real-time patient deterioration events that create 
 - **Reward**: +20% stability, +90 points
 
 #### 3. Severe Bleeding
-- **Trigger**: Patient stability < 25% in trauma cases
+- **Trigger**: Patient stability < 40% in trauma cases
 - **Time Limit**: 8 seconds
 - **Correct Actions**: Direct Pressure + Fluids OR Emergency Transfusion
 - **Visual**: Red bleeding effect with BP alarm
