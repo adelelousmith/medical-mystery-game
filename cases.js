@@ -983,6 +983,299 @@ const medicalCases = {
                 emotionalImpact: "Patient requires emergency surgery, prolonged recovery"
             }
         ]
+    },
+
+    ozempic_misuse: {
+        id: "ozempic_misuse",
+        title: "Severe Weight Loss - Young Woman",
+        specialty: "General Medicine",
+        category: "toxicology",
+        difficulty: "expert",
+        icon: "fas fa-weight",
+        timeLimit: TIME_PRESSURE.MODERATE,
+        correctDiagnosis: "glp1_misuse_malnutrition",
+        description: "A 28-year-old woman presents to A&E with severe weakness, dizziness, and fainting episodes. She appears dangerously underweight and malnourished. Her partner brought her in after she collapsed at home. She seems reluctant to discuss her medical history.",
+        
+        progressMessages: {
+            examine: [
+                "She avoids eye contact when you ask about her weight.",
+                "Her partner whispers: 'She won't eat. I'm really worried.'",
+                "The numbers don't lie - BMI 15.2. This is critical.",
+                "Something doesn't add up. She's hiding something."
+            ],
+            diagnose: [
+                "The pieces are falling into place. But why won't she admit it?",
+                "You've seen this pattern before. Social media's latest trend.",
+                "Her partner found empty medication boxes. The truth emerges.",
+                "This isn't just an eating disorder. It's pharmaceutical misuse."
+            ],
+            treat: [
+                "She finally breaks down. 'I just wanted to look like them...'",
+                "Refeeding syndrome is a real risk. Proceed carefully.",
+                "Psychiatry consult is essential. This goes beyond physical health.",
+                "Recovery will be long. But at least she's finally getting help."
+            ]
+        },
+
+        patientHistory: {
+            demographics: "28-year-old female",
+            pastMedicalHistory: [
+                "No significant medical history",
+                "Previously healthy weight (BMI 22, 6 months ago)",
+                "Denies eating disorders (initially)",
+                "No diabetes or metabolic conditions"
+            ],
+            socialHistory: [
+                "Works in social media marketing",
+                "Active on Instagram and TikTok",
+                "Recently lost 45 pounds in 4 months",
+                "Partner reports obsessive weighing behavior",
+                "Denies drug use (initially)",
+                "Lives with long-term partner"
+            ],
+            familyHistory: [
+                "Mother has anxiety disorder",
+                "No family history of eating disorders",
+                "No diabetes in family"
+            ],
+            medications: [
+                "Denies taking any medications (initially)",
+                "Later admits to 'weight loss medication from online'"
+            ],
+            allergies: "No known drug allergies",
+            emotionalContext: "Patient is defensive and evasive. Partner is extremely concerned and frustrated. She's been lying about eating and hiding medication use."
+        },
+
+        questions: [
+            {
+                id: "weight_loss",
+                text: "How much weight have you lost and over what period?",
+                answer: "She hesitates... 'Maybe 20 pounds? Over a few months.' (Partner interjects: 'It's been 45 pounds in 4 months!')",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "eating_habits",
+                text: "Can you describe your typical daily food intake?",
+                answer: "'I eat normally...' She trails off. Partner: 'She barely eats anything. Maybe one small meal a day, if that.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "medications_initial",
+                text: "Are you taking any medications or supplements?",
+                answer: "'No, nothing.' She looks away. Her body language suggests she's not being truthful.",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "medications_probe",
+                text: "Have you been taking any weight loss medications, even if not prescribed to you?",
+                answer: "Long pause. 'I... I got some medication online. For weight loss. It's called Ozempic or something like that.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "dosage",
+                text: "What dose of semaglutide have you been taking, and how often?",
+                answer: "'I started with the lowest dose, but it wasn't working fast enough. I've been taking 2mg weekly for the past 2 months. Sometimes more.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "social_media",
+                text: "Have you been influenced by social media content about weight loss?",
+                answer: "'Everyone on TikTok is using it. They all look amazing. I just wanted to look like them...' She starts crying.",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "symptoms",
+                text: "What symptoms have you been experiencing?",
+                answer: "'Constant nausea, dizziness, weakness. I can't keep food down even when I try to eat. My heart races all the time.'",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "mental_health",
+                text: "How would you describe your relationship with food and your body image?",
+                answer: "She becomes defensive. 'I just want to be healthy. Is that so wrong?' Tears well up. 'I hate how I look...'",
+                category: "psychological",
+                critical: true
+            },
+            {
+                id: "fainting",
+                text: "How many times have you fainted or felt like you might faint?",
+                answer: "'This is the third time this week. I thought I just needed to eat more, but I can't keep anything down.'",
+                category: "symptoms",
+                critical: false
+            },
+            {
+                id: "partner_concern",
+                text: "How long has your partner been concerned about your health?",
+                answer: "Partner responds: 'About 2 months. She's been hiding it, lying about eating. I found the medication boxes hidden in her car.'",
+                category: "collateral",
+                critical: true
+            }
+        ],
+
+        tests: [
+            {
+                id: "blood_work",
+                name: "Comprehensive Metabolic Panel",
+                description: "Full blood chemistry including electrolytes, kidney function, liver function",
+                result: "CRITICAL: Severe hypokalemia (K+ 2.8), hyponatremia (Na+ 128), hypoglycemia (glucose 3.2 mmol/L), elevated creatinine, low albumin. Severe malnutrition evident.",
+                critical: true
+            },
+            {
+                id: "ecg",
+                name: "12-Lead ECG",
+                description: "Check for cardiac complications from electrolyte imbalances",
+                result: "Sinus tachycardia (HR 110), prolonged QT interval (concerning for sudden cardiac death risk), low voltage. Consistent with severe malnutrition.",
+                critical: true
+            },
+            {
+                id: "thyroid",
+                name: "Thyroid Function Tests",
+                description: "TSH, T3, T4 levels",
+                result: "Low T3 syndrome (euthyroid sick syndrome) - TSH normal, T3 low, T4 low-normal. Consistent with severe malnutrition.",
+                critical: false
+            },
+            {
+                id: "vitamin_levels",
+                name: "Vitamin and Mineral Panel",
+                description: "B12, folate, vitamin D, iron studies",
+                result: "Severe deficiencies across the board: Vitamin D <10, B12 low, folate low, iron deficiency anemia. Thiamine critically low (refeeding syndrome risk).",
+                critical: true
+            },
+            {
+                id: "drug_screen",
+                name: "Toxicology Screen",
+                description: "Screen for other substances",
+                result: "Negative for recreational drugs. GLP-1 agonist levels elevated (consistent with semaglutide use).",
+                critical: false
+            },
+            {
+                id: "bone_density",
+                name: "DEXA Scan",
+                description: "Bone density assessment",
+                result: "Severe osteopenia. T-score -2.8. Significant bone loss for her age. High fracture risk.",
+                critical: false
+            }
+        ],
+
+        diagnosisOptions: [
+            {
+                id: "glp1_misuse_malnutrition",
+                name: "GLP-1 Agonist Misuse with Severe Malnutrition",
+                description: "Inappropriate use of semaglutide (Ozempic) for weight loss leading to dangerous malnutrition, electrolyte imbalances, and eating disorder behaviors",
+                correct: true,
+                explanation: "This patient has been misusing prescription GLP-1 agonists obtained online without medical supervision, leading to severe malnutrition, life-threatening electrolyte imbalances, and psychological dependence. Requires immediate medical stabilization, psychiatric intervention, and nutritional rehabilitation."
+            },
+            {
+                id: "anorexia_nervosa",
+                name: "Anorexia Nervosa",
+                description: "Primary eating disorder with severe restriction",
+                correct: false,
+                explanation: "While eating disorder behaviors are present, the primary driver is pharmaceutical misuse of GLP-1 agonists. The medication is suppressing appetite and causing severe GI symptoms, making it impossible to eat even when she tries."
+            },
+            {
+                id: "hyperthyroidism",
+                name: "Hyperthyroidism",
+                description: "Overactive thyroid causing weight loss",
+                correct: false,
+                explanation: "Thyroid function tests show low T3 syndrome, not hyperthyroidism. The weight loss is due to medication-induced appetite suppression and malnutrition."
+            },
+            {
+                id: "malabsorption",
+                name: "Malabsorption Syndrome",
+                description: "GI disorder preventing nutrient absorption",
+                correct: false,
+                explanation: "While malnutrition is severe, this is due to inadequate intake (medication-induced) rather than malabsorption. The GLP-1 agonist is causing severe nausea and gastroparesis."
+            }
+        ],
+
+        treatments: [
+            {
+                id: "iv_fluids_electrolytes",
+                name: "IV Fluids with Electrolyte Replacement",
+                description: "Careful rehydration and correction of electrolyte imbalances",
+                helpful: true
+            },
+            {
+                id: "stop_glp1",
+                name: "Discontinue GLP-1 Agonist",
+                description: "Immediately stop semaglutide",
+                helpful: true
+            },
+            {
+                id: "refeeding_protocol",
+                name: "Refeeding Protocol",
+                description: "Careful nutritional rehabilitation to avoid refeeding syndrome",
+                helpful: true
+            },
+            {
+                id: "thiamine",
+                name: "IV Thiamine",
+                description: "Prevent Wernicke's encephalopathy and refeeding syndrome",
+                helpful: true
+            },
+            {
+                id: "psychiatry_consult",
+                name: "Emergency Psychiatry Consultation",
+                description: "Mental health assessment and eating disorder evaluation",
+                helpful: true
+            },
+            {
+                id: "cardiac_monitoring",
+                name: "Continuous Cardiac Monitoring",
+                description: "Monitor for arrhythmias due to electrolyte imbalances",
+                helpful: true
+            },
+            {
+                id: "antiemetics",
+                name: "Anti-nausea Medication",
+                description: "Help manage GLP-1 induced nausea",
+                helpful: true
+            },
+            {
+                id: "rapid_refeeding",
+                name: "Aggressive Nutritional Replacement",
+                description: "Rapid caloric replacement",
+                helpful: false
+            }
+        ],
+
+        specialists: [
+            {
+                id: "psychiatrist",
+                name: "Psychiatrist",
+                specialty: "Mental Health",
+                advice: "This is a complex case involving body dysmorphia, social media influence, and pharmaceutical misuse. She needs immediate psychiatric admission for eating disorder treatment. The GLP-1 misuse is a symptom of underlying body image issues and possible social media addiction. Long-term therapy and possibly medication for anxiety/depression will be needed. Family therapy with her partner is also recommended.",
+                appropriate: true
+            },
+            {
+                id: "endocrinologist",
+                name: "Endocrinologist",
+                specialty: "Metabolism",
+                advice: "GLP-1 agonists like semaglutide are powerful medications that should only be used under medical supervision. She's been taking doses meant for diabetes management without monitoring. The severe malnutrition has caused metabolic derangements. She'll need careful metabolic monitoring during recovery.",
+                appropriate: true
+            },
+            {
+                id: "dietitian",
+                name: "Clinical Dietitian",
+                specialty: "Nutrition",
+                advice: "Refeeding syndrome is a real risk here. We need to start very slowly - maybe 800-1000 calories initially, then gradually increase. High-risk nutrients like phosphate must be monitored closely. She'll need specialized eating disorder nutritional rehabilitation.",
+                appropriate: true
+            },
+            {
+                id: "cardiologist",
+                name: "Cardiologist",
+                specialty: "Cardiology",
+                advice: "The prolonged QT interval is concerning. With her electrolyte imbalances, she's at risk for sudden cardiac death. She needs continuous monitoring until electrolytes normalize. The malnutrition has affected her cardiac function.",
+                appropriate: false
+            }
+        ]
     }
 };
 
