@@ -243,29 +243,14 @@ class InvestigationPhaseManager {
     }
 
     showConditionChange(reason) {
+        // Removed intrusive notification - stability bar and crisis events provide sufficient feedback
+        // Just log to console for debugging
         const messages = {
             time_pressure: "Patient's condition is deteriorating due to delayed treatment",
             missed_critical: "Patient showing signs of distress - critical actions needed"
         };
-
-        const notification = document.createElement('div');
-        notification.className = 'condition-change-notification warning';
-        notification.innerHTML = `
-            <div class="condition-content">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>${messages[reason]}</p>
-            </div>
-        `;
         
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.remove();
-            }
-        }, 5000);
-
-        this.game.playSound('warning');
+        console.log(`⚕️ ${messages[reason]}`);
     }
 
     updatePatientStability() {
