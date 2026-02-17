@@ -76,32 +76,58 @@ const medicalCases = {
             {
                 id: "chest_pain",
                 text: "Did bystanders report the patient complaining of chest pain before collapse?",
+                answer: "Wife reports: 'He was clutching his chest saying it felt like an elephant sitting on it. He rated the pain 9 out of 10 before he collapsed.'",
                 category: "history",
                 critical: true
             },
             {
                 id: "shortness_breath",
                 text: "Was the patient experiencing shortness of breath before losing consciousness?",
+                answer: "Bystanders report: 'He was gasping for air and could only speak a few words at a time before he went unconscious.'",
                 category: "history",
                 critical: true
             },
             {
                 id: "sweating",
                 text: "Do you observe profuse sweating on the patient?",
+                answer: "Clinical observation: Patient is sweating heavily and skin feels clammy. Profuse sweating despite normal room temperature.",
                 category: "examination",
                 critical: false
             },
             {
                 id: "witnessed_collapse",
                 text: "Did anyone witness the collapse? What did they see?",
+                answer: "Wife states: 'He suddenly grabbed his chest, said he couldn't breathe, then just collapsed. I've never seen anything like it.'",
                 category: "history",
                 critical: true
             },
             {
                 id: "prior_symptoms",
                 text: "What symptoms did the patient have in the hours before collapse?",
+                answer: "Wife reports: 'He complained of chest tightness this morning but said it was just heartburn. He took antacids but it got worse.'",
                 category: "history",
                 critical: true
+            },
+            {
+                id: "medical_history",
+                text: "Does the patient have any known heart conditions?",
+                answer: "Wife confirms: 'He had a stent put in two years ago. His doctor told him to take it easy but he never listens. He's on blood pressure tablets and cholesterol pills.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "arm_pain",
+                text: "Did the patient mention any pain radiating to his arm or jaw?",
+                answer: "Wife recalls: 'Yes! He was rubbing his left arm about an hour before. Said it felt tingly and numb. I told him to sit down.'",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "skin_colour",
+                text: "What is the patient's skin colour and temperature?",
+                answer: "Clinical observation: Patient appears grey and ashen. Skin is cool and clammy to touch. Peripheral cyanosis noted in fingertips.",
+                category: "examination",
+                critical: false
             }
         ],
         tests: [
@@ -208,6 +234,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "internal_bleeding",
         description: "A 24-year-old male arrives via ambulance after a high-speed motorcycle accident. Patient is conscious but confused, with multiple injuries and signs of shock.",
+        
+        progressMessages: {
+            examine: [
+                "His fiancée bursts through the doors. 'Is he going to be okay? We're getting married next month!'",
+                "His blood pressure is dropping. You need to find the source of bleeding — fast.",
+                "The paramedics exchange worried looks. He was stable en route but he's deteriorating.",
+                "Something inside him is bleeding. The question is where, and how badly."
+            ],
+            diagnose: [
+                "The imaging tells a story his body has been trying to tell you.",
+                "Every minute you delay is a minute he's losing blood.",
+                "The surgical team is on standby. They need your call.",
+                "Trust the evidence. The diagnosis is becoming clear."
+            ],
+            treat: [
+                "Theatre is prepped and waiting. The clock is ticking.",
+                "His fiancée grips the nurse's hand. 'Please save him.'",
+                "The anaesthetist nods. 'He's under. Let's find that bleeder.'",
+                "Good decisions now will determine whether he walks down that aisle."
+            ]
+        },
+
         patientHistory: {
             demographics: "24-year-old male",
             pastMedicalHistory: [
@@ -235,32 +283,58 @@ const medicalCases = {
             {
                 id: "consciousness",
                 text: "Is the patient alert and oriented?",
+                answer: "Patient is alert but confused. He knows his name but is unsure of the date. He keeps asking about his fiancée and whether she's okay.",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "abdominal_pain",
                 text: "Does the patient have severe abdominal pain?",
+                answer: "Yes, severe abdominal pain in the right upper quadrant. Patient guards the area and winces with any movement. 'It feels like something's torn inside,' he says through gritted teeth.",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "bleeding",
                 text: "Is there visible bleeding or bruising?",
+                answer: "Extensive bruising across the left chest wall and abdomen. No external haemorrhage but the bruising pattern suggests significant blunt force trauma to the torso.",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "breathing",
                 text: "Is the patient breathing normally?",
+                answer: "Breathing is rapid and shallow at 28 breaths per minute. Patient splints when breathing deeply — likely due to rib fractures. Oxygen saturations are 94% on air.",
                 category: "respiratory",
                 critical: true
             },
             {
                 id: "extremity_movement",
                 text: "Can the patient move all extremities?",
+                answer: "Patient can move all four limbs but has reduced power in the right leg. He reports tingling in his feet. Sensation appears intact throughout.",
                 category: "neurological",
                 critical: true
+            },
+            {
+                id: "mechanism",
+                text: "What happened in the accident? How fast was he going?",
+                answer: "Paramedics report: 'High-speed collision with a car at approximately 40 mph. He was thrown from the motorcycle. No helmet. He was conscious when we arrived but deteriorating.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "pulse_check",
+                text: "What are the patient's vital signs?",
+                answer: "Heart rate 120 bpm and thready. Blood pressure 90/60 — dangerously low. He's tachycardic and hypotensive. Classic signs of significant blood loss.",
+                category: "examination",
+                critical: false
+            },
+            {
+                id: "last_meal",
+                text: "When did the patient last eat or drink?",
+                answer: "Friend who was riding with him says: 'We had lunch about 3 hours ago. Burgers and a couple of beers.' Important for anaesthetic planning if surgery is needed.",
+                category: "history",
+                critical: false
             }
         ],
         tests: [
@@ -284,7 +358,7 @@ const medicalCases = {
                 description: "Chest, pelvis, and extremity X-rays",
                 cost: 400,
                 timeRequired: 2,
-                critical: true,
+                critical: false,
                 resultNarrative: [
                     "X-rays clatter onto the viewing box like a grim slideshow.",
                     "Multiple rib fractures light up the chest film — at least five broken.",
@@ -298,7 +372,7 @@ const medicalCases = {
                 description: "Blood tests to assess for internal bleeding",
                 cost: 150,
                 timeRequired: 1,
-                critical: true,
+                critical: false,
                 resultNarrative: [
                     "The blood results flash red on the monitor — literally and figuratively.",
                     "Haemoglobin dropping fast: 8.2 and falling like a stone.",
@@ -367,6 +441,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.URGENT,
         correctDiagnosis: "croup",
         description: "A 3-year-old girl is brought to A&E by her frantic mum. The child is struggling to breathe and making a high-pitched sound when inhaling. She has a fever and has been coughing for the past 2 days.",
+        
+        progressMessages: {
+            examine: [
+                "The little girl clings to her mum, each breath a raspy battle.",
+                "Mum's eyes are red. 'I should have come in yesterday. I'm a terrible mother.'",
+                "That barking cough echoes through the cubicle. Every nurse on the ward turns.",
+                "She's working hard to breathe. You need to work out why — and fast."
+            ],
+            diagnose: [
+                "The clinical picture is coming together. Think about what fits.",
+                "Age, symptoms, season — the clues are all there.",
+                "The paediatric registrar raises an eyebrow. 'What's your impression?'",
+                "Common things are common. But you need to be sure."
+            ],
+            treat: [
+                "The nebuliser hisses gently. The little girl looks up at you with big eyes.",
+                "Mum strokes her daughter's hair. 'Is she going to be alright, doctor?'",
+                "The right treatment should bring relief quickly. Fingers crossed.",
+                "Sometimes the smallest patients teach you the biggest lessons."
+            ]
+        },
+
         patientHistory: {
             demographics: "3-year-old female",
             pastMedicalHistory: [
@@ -394,31 +490,57 @@ const medicalCases = {
             {
                 id: "breathing_difficulty",
                 text: "Is the child having difficulty breathing?",
+                answer: "Yes, obvious increased work of breathing. The child is using her tummy muscles and the muscles between her ribs to breathe. Nasal flaring is visible. She looks frightened.",
                 category: "respiratory",
                 critical: true
             },
             {
                 id: "fever",
                 text: "Does the child have a fever?",
+                answer: "Temperature is 38.5°C. Mum says: 'She's been hot on and off for two days. Calpol brings it down but it keeps coming back.'",
                 category: "symptoms",
                 critical: false
             },
             {
                 id: "cough",
-                text: "Is the child coughing?",
+                text: "Is the child coughing? What does it sound like?",
+                answer: "Yes, a distinctive harsh barking cough — like a seal. It comes in fits and is much worse when she cries or gets upset. Mum says it started yesterday evening.",
                 category: "symptoms",
-                critical: false
+                critical: true
             },
             {
                 id: "stridor",
                 text: "Is there a high-pitched sound when breathing in?",
+                answer: "Yes, audible inspiratory stridor — a harsh, high-pitched sound with every breath in. It gets louder when the child is agitated. No expiratory wheeze.",
                 category: "respiratory",
                 critical: true
             },
             {
                 id: "activity_level",
                 text: "Is the child less active than usual?",
+                answer: "Mum says: 'She's been really clingy and just wants cuddles. She won't play with her toys. She's drinking a bit but won't eat anything.'",
                 category: "behavioral",
+                critical: false
+            },
+            {
+                id: "onset_timeline",
+                text: "When did the symptoms start and how have they progressed?",
+                answer: "Mum explains: 'She had a runny nose two days ago, then the cough started last night. It got really bad around 2am — that barking sound scared me. It's been getting worse all day.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "drooling",
+                text: "Is the child drooling or having difficulty swallowing?",
+                answer: "No drooling. She's swallowing her own saliva without difficulty and managed a few sips of water. She can open her mouth normally and there's no 'hot potato' voice.",
+                category: "examination",
+                critical: false
+            },
+            {
+                id: "vaccination_history",
+                text: "Is the child up to date with vaccinations?",
+                answer: "Mum confirms: 'Yes, she's had all her jabs on time. The health visitor checked last month.' Red book confirms full vaccination history including Hib.",
+                category: "history",
                 critical: false
             }
         ],
@@ -526,6 +648,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.CRITICAL,
         correctDiagnosis: "opioid_overdose",
         description: "A 25-year-old male is brought to A&E unconscious by friends. They report he suddenly collapsed at a party. Patient is barely breathing and unresponsive.",
+        
+        progressMessages: {
+            examine: [
+                "His friends huddle in the corner, whispering. They know more than they're saying.",
+                "His breathing is barely there. Each slow breath could be his last.",
+                "The clinical signs are telling you something. What fits this picture?",
+                "Time is running out. His oxygen levels are dropping."
+            ],
+            diagnose: [
+                "The pieces are falling into place. The signs all point one way.",
+                "His friends finally start talking. The truth trickles out.",
+                "There's a treatment that could reverse this — if you're right about the cause.",
+                "Trust what his body is telling you. Make the call."
+            ],
+            treat: [
+                "You watch for the response. Seconds feel like hours.",
+                "His friend breaks down. 'He said he was clean. He promised.'",
+                "The right intervention now could mean the difference between life and death.",
+                "Recovery is possible. But the harder battle starts when he wakes up."
+            ]
+        },
+
         patientHistory: {
             demographics: "25-year-old male",
             pastMedicalHistory: [
@@ -556,32 +700,58 @@ const medicalCases = {
             {
                 id: "consciousness",
                 text: "What is the patient's level of consciousness?",
+                answer: "Patient is barely rousable. He opens his eyes briefly to painful stimuli but doesn't follow commands. GCS is 6 — eyes 2, verbal 1, motor 3.",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "breathing",
                 text: "How is the patient's breathing?",
+                answer: "Respiratory rate is dangerously slow at 6 breaths per minute and very shallow. Oxygen saturations are 82% on air. His lips have a bluish tinge.",
                 category: "respiratory",
                 critical: true
             },
             {
                 id: "pupil_size",
                 text: "What do the patient's pupils look like?",
+                answer: "Both pupils are pinpoint — approximately 1mm — and sluggishly reactive to light. This is a very specific and telling clinical sign.",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "skin_color",
-                text: "What is the patient's skin color?",
+                text: "What is the patient's skin colour and condition?",
+                answer: "Patient appears pale with cyanosis around the lips and fingertips. Skin is cool and slightly sweaty. There's a greyish pallor to his face.",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "needle_marks",
                 text: "Are there any needle marks or track marks?",
+                answer: "Yes, multiple injection sites on both arms in the antecubital fossae. Some appear fresh with bruising, others are older scars. There's a recent puncture wound on the left hand.",
                 category: "symptoms",
                 critical: true
+            },
+            {
+                id: "friend_account",
+                text: "What can the patient's friends tell you about what happened?",
+                answer: "Friends are evasive at first, then one admits: 'He went to the bathroom at the party and didn't come back. We found him on the floor. He'd been clean for three months, I swear. Something must have happened.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "substances_used",
+                text: "Do the friends know what substances the patient may have taken?",
+                answer: "After some persuasion: 'He might have... look, he was really upset about his ex. Someone at the party might have had stuff. I don't know exactly what he took. Please just help him.'",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "medical_background",
+                text: "Does the patient have any known medical conditions?",
+                answer: "Friends say: 'He's been struggling with depression since his girlfriend died. He was in rehab last year and was doing well. He doesn't take any regular meds that I know of.'",
+                category: "history",
+                critical: false
             }
         ],
         tests: [
@@ -591,7 +761,13 @@ const medicalCases = {
                 description: "Blood and urine tests for common drugs of abuse",
                 cost: 300,
                 timeRequired: 2,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The toxicology panel results flash urgently on screen.",
+                    "Positive for opioids — high concentrations detected in both blood and urine.",
+                    "The toxicology consultant nods grimly. 'Classic opioid picture. High levels.'",
+                    "His friends shift uncomfortably. They knew, but couldn't bring themselves to call sooner."
+                ]
             },
             {
                 id: "blood_gas",
@@ -599,7 +775,13 @@ const medicalCases = {
                 description: "Assessment of oxygen, carbon dioxide, and pH levels",
                 cost: 150,
                 timeRequired: 1,
-                critical: true
+                critical: true,
+                resultNarrative: [
+                    "The blood gas results arrive with alarming numbers.",
+                    "pH 7.28, pCO2 elevated, pO2 dangerously low — respiratory acidosis.",
+                    "The registrar frowns. 'He's barely ventilating. CO2 is building up fast.'",
+                    "Every minute without intervention, his brain gets less oxygen."
+                ]
             },
             {
                 id: "basic_metabolic",
@@ -607,7 +789,13 @@ const medicalCases = {
                 description: "Electrolytes, kidney function, and glucose",
                 cost: 100,
                 timeRequired: 2,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "The metabolic panel paints a worrying but expected picture.",
+                    "Glucose low, creatinine slightly elevated — his kidneys are under stress.",
+                    "The nurse checks his IV line. 'He needs fluids and monitoring.'",
+                    "At least the electrolytes are holding. Small mercies."
+                ]
             },
             {
                 id: "liver_function",
@@ -615,7 +803,13 @@ const medicalCases = {
                 description: "Assessment of liver damage from drug use",
                 cost: 200,
                 timeRequired: 3,
-                critical: false
+                critical: false,
+                resultNarrative: [
+                    "Liver function tests reveal the toll of substance abuse.",
+                    "ALT and AST mildly elevated — chronic damage, not acute failure.",
+                    "The hepatology nurse sighs. 'His liver's been taking hits for a while.'",
+                    "Another organ quietly suffering while he chases the next high."
+                ]
             }
         ],
         diagnosisOptions: [
@@ -664,6 +858,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.URGENT,
         correctDiagnosis: "ischemic_stroke",
         description: "A 72-year-old man is brought to A&E by his daughter after suddenly developing weakness on his right side and difficulty speaking. The symptoms started about 2 hours ago while he was watching TV.",
+        
+        progressMessages: {
+            examine: [
+                "His daughter grips his good hand. 'Dad, I'm here. The doctors will help.'",
+                "He tries to speak but the words come out jumbled. The frustration in his eyes is heartbreaking.",
+                "Time is brain. Every minute that passes, more neurons die.",
+                "The clock on the wall seems to tick louder. The treatment window won't stay open forever."
+            ],
+            diagnose: [
+                "The clinical picture is becoming clearer. But which type is it?",
+                "The treatment depends entirely on getting the diagnosis right.",
+                "His daughter asks: 'Why can't you just fix him?' If only it were that simple.",
+                "One diagnosis means clot-busters. The other means they'd be fatal. Choose wisely."
+            ],
+            treat: [
+                "The stroke team assembles with practiced urgency.",
+                "His daughter watches the monitors, understanding none of the numbers but all of the fear.",
+                "The right treatment now could give him back his words, his movement, his life.",
+                "Minutes matter. The brain doesn't forgive delays."
+            ]
+        },
+
         patientHistory: {
             demographics: "72-year-old male",
             pastMedicalHistory: [
@@ -698,31 +914,57 @@ const medicalCases = {
             {
                 id: "weakness",
                 text: "Does the patient have weakness on one side of the body?",
+                answer: "Yes, obvious right-sided weakness. Patient cannot lift his right arm against gravity and his right leg drifts when raised. Left side has normal power.",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "speech_difficulty",
                 text: "Is the patient having difficulty speaking or understanding?",
+                answer: "Yes, speech is slurred and effortful. He understands simple commands but struggles to find words. He's getting frustrated trying to express himself. Daughter says: 'He was perfectly fine this morning.'",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "facial_droop",
                 text: "Does the patient have facial drooping?",
+                answer: "Yes, the right side of his face is noticeably drooping. When asked to smile, only the left side of his mouth moves. He can't puff out his right cheek.",
                 category: "neurological",
                 critical: true
             },
             {
                 id: "time_onset",
                 text: "When did the symptoms start?",
+                answer: "Daughter reports: 'I rang him at about 2pm and he sounded fine. When I popped round at 4pm he was slumped in his chair talking gibberish. So sometime in the last 2 hours.'",
                 category: "history",
                 critical: true
             },
             {
                 id: "consciousness",
                 text: "Is the patient alert and responsive?",
+                answer: "Patient is awake and aware of his surroundings but appears frightened and confused. He follows simple commands with a delay. GCS is 13 — eyes 4, verbal 4, motor 5.",
                 category: "neurological",
+                critical: false
+            },
+            {
+                id: "blood_thinners",
+                text: "Is the patient taking blood-thinning medication?",
+                answer: "Daughter confirms: 'Yes, he's on warfarin for his irregular heartbeat. He's supposed to get his blood checked regularly but I'm not sure he's been going lately.'",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "previous_episodes",
+                text: "Has anything like this happened before?",
+                answer: "Daughter says: 'About a year ago he had a funny turn — his hand went numb and he couldn't speak for about 10 minutes. His GP called it a mini-stroke and put him on more tablets.'",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "headache",
+                text: "Does the patient have a headache?",
+                answer: "Patient shakes his head when asked about headache. No neck stiffness. He doesn't appear to be in pain, just frightened and frustrated by his inability to communicate.",
+                category: "symptoms",
                 critical: false
             }
         ],
@@ -830,6 +1072,28 @@ const medicalCases = {
         timeLimit: TIME_PRESSURE.URGENT,
         correctDiagnosis: "appendicitis",
         description: "A 45-year-old woman presents to A&E with severe abdominal pain that started this morning. The pain began around her belly button and has now moved to the right lower abdomen. She feels nauseous and has vomited twice.",
+        
+        progressMessages: {
+            examine: [
+                "She winces every time she moves. Her husband holds her hand, looking helpless.",
+                "The pain is getting worse. She's guarding her abdomen protectively.",
+                "'I've never had pain like this,' she says through gritted teeth. 'Something's really wrong.'",
+                "Her temperature is climbing. The clinical picture is evolving."
+            ],
+            diagnose: [
+                "The history is textbook — but textbook for what, exactly?",
+                "The test results are pointing in a clear direction.",
+                "The surgical registrar pokes their head in. 'Need me for this one?'",
+                "Make the call. The sooner she gets the right treatment, the better."
+            ],
+            treat: [
+                "The surgical team reviews your findings and nods in agreement.",
+                "Her husband squeezes her hand. 'You're going to be fine, love.'",
+                "The anaesthetist introduces herself. The patient looks terrified but relieved.",
+                "A straightforward operation — if you caught it in time."
+            ]
+        },
+
         patientHistory: {
             demographics: "45-year-old female",
             pastMedicalHistory: [
@@ -863,31 +1127,57 @@ const medicalCases = {
             {
                 id: "pain_location",
                 text: "Where exactly is the pain located?",
+                answer: "Patient points to the right lower abdomen. 'It's right here and it's really sharp. It hurts more when I press on it and when I let go.' She winces when you palpate McBurney's point.",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "pain_migration",
                 text: "Has the pain moved from one area to another?",
+                answer: "'It started around my belly button this morning — a dull ache. Then over a few hours it moved down to the right side and got much sharper. Now it's constant and unbearable.'",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "nausea_vomiting",
                 text: "Is the patient experiencing nausea or vomiting?",
+                answer: "'I've been feeling sick all day and I've thrown up twice. Nothing helps — even sips of water make me feel queasy. I haven't been able to eat anything.'",
                 category: "symptoms",
                 critical: true
             },
             {
                 id: "fever",
                 text: "Does the patient have a fever?",
+                answer: "Temperature is 38.2°C. Patient reports feeling hot and cold alternately. 'I started shivering about an hour ago even though I feel warm.'",
                 category: "symptoms",
                 critical: false
             },
             {
                 id: "appetite",
                 text: "Has the patient lost their appetite?",
+                answer: "'I haven't wanted to eat all day. The thought of food makes me feel worse. I had toast for breakfast and that's the last thing I ate.'",
                 category: "symptoms",
+                critical: false
+            },
+            {
+                id: "bowel_changes",
+                text: "Have you noticed any changes in your bowel habits?",
+                answer: "'I haven't been to the loo today at all. I feel like I need to go but when I try, nothing happens and it just hurts more. No blood or anything like that though.'",
+                category: "symptoms",
+                critical: true
+            },
+            {
+                id: "menstrual_history",
+                text: "When was your last menstrual period?",
+                answer: "'About two weeks ago, it was normal. Regular as clockwork, always has been. I'm definitely not pregnant — we use condoms.' She looks at her husband who nods in agreement.",
+                category: "history",
+                critical: false
+            },
+            {
+                id: "similar_episodes",
+                text: "Have you ever had pain like this before?",
+                answer: "'Never anything like this. I had my gallbladder out five years ago but that was a completely different pain — up high on the right. This is lower down and much worse.'",
+                category: "history",
                 critical: false
             }
         ],
@@ -987,27 +1277,27 @@ const medicalCases = {
 
     ozempic_misuse: {
         id: "ozempic_misuse",
-        title: "Severe Weight Loss - Young Woman",
+        title: "Recurrent Collapse - Young Woman",
         specialty: "General Medicine",
         category: "toxicology",
         difficulty: "expert",
         icon: "fas fa-weight",
         timeLimit: TIME_PRESSURE.MODERATE,
         correctDiagnosis: "glp1_misuse_malnutrition",
-        description: "A 28-year-old woman presents to A&E with severe weakness, dizziness, and fainting episodes. She appears dangerously underweight and malnourished. Her partner brought her in after she collapsed at home. She seems reluctant to discuss her medical history.",
+        description: "A 28-year-old woman is brought to A&E by her partner after collapsing at home. This is reportedly the third episode this week. She appears thin and unwell but is alert and reluctant to answer questions. Her partner is visibly distressed and keeps trying to speak but the patient talks over them.",
         
         progressMessages: {
             examine: [
-                "She avoids eye contact when you ask about her weight.",
-                "Her partner whispers: 'She won't eat. I'm really worried.'",
-                "The numbers don't lie - BMI 15.2. This is critical.",
-                "Something doesn't add up. She's hiding something."
+                "She avoids eye contact when you ask about her recent health.",
+                "Her partner keeps trying to say something, but she shuts them down.",
+                "Her vitals are concerning. Something more is going on here.",
+                "Something doesn't add up. She's definitely hiding something."
             ],
             diagnose: [
                 "The pieces are falling into place. But why won't she admit it?",
-                "You've seen this pattern before. Social media's latest trend.",
-                "Her partner found empty medication boxes. The truth emerges.",
-                "This isn't just an eating disorder. It's pharmaceutical misuse."
+                "The lab results tell a story her words won't.",
+                "Her partner finally speaks up when she leaves for the bathroom.",
+                "There's more to this than meets the eye."
             ],
             treat: [
                 "She finally breaks down. 'I just wanted to look like them...'",
@@ -1021,100 +1311,84 @@ const medicalCases = {
             demographics: "28-year-old female",
             pastMedicalHistory: [
                 "No significant medical history",
-                "Previously healthy weight (BMI 22, 6 months ago)",
-                "Denies eating disorders (initially)",
-                "No diabetes or metabolic conditions"
+                "GP records show healthy weight at last check-up (6 months ago)",
+                "No diabetes or metabolic conditions",
+                "No prior hospital admissions"
             ],
             socialHistory: [
                 "Works in social media marketing",
-                "Active on Instagram and TikTok",
-                "Recently lost 45 pounds in 4 months",
-                "Partner reports obsessive weighing behavior",
-                "Denies drug use (initially)",
-                "Lives with long-term partner"
+                "Active on social media platforms",
+                "Lives with long-term partner",
+                "Non-smoker, occasional alcohol use"
             ],
             familyHistory: [
                 "Mother has anxiety disorder",
-                "No family history of eating disorders",
+                "No significant family history",
                 "No diabetes in family"
             ],
             medications: [
-                "Denies taking any medications (initially)",
-                "Later admits to 'weight loss medication from online'"
+                "Denies taking any medications"
             ],
             allergies: "No known drug allergies",
-            emotionalContext: "Patient is defensive and evasive. Partner is extremely concerned and frustrated. She's been lying about eating and hiding medication use."
+            lastPhysical: "6 months ago - GP noted healthy weight, no concerns",
+            emotionalContext: "Patient is defensive and evasive when asked about recent health changes. Partner appears very worried but patient keeps cutting them off."
         },
 
         questions: [
             {
-                id: "weight_loss",
-                text: "How much weight have you lost and over what period?",
-                answer: "She hesitates... 'Maybe 20 pounds? Over a few months.' (Partner interjects: 'It's been 45 pounds in 4 months!')",
+                id: "presenting_complaint",
+                text: "Can you tell me what happened today?",
+                answer: "'I just felt really dizzy and then... I don't remember. I woke up on the kitchen floor.' She rubs the back of her head. 'I'm fine now, honestly. I don't know why he brought me here.'",
                 category: "history",
                 critical: true
             },
             {
-                id: "eating_habits",
-                text: "Can you describe your typical daily food intake?",
-                answer: "'I eat normally...' She trails off. Partner: 'She barely eats anything. Maybe one small meal a day, if that.'",
+                id: "appetite_changes",
+                text: "How has your appetite been recently? Are you eating and drinking normally?",
+                answer: "'I eat fine.' She crosses her arms. Partner shakes their head behind her: 'She barely touches her food. One yoghurt a day, if that. She says she's just not hungry.'",
                 category: "history",
                 critical: true
             },
             {
-                id: "medications_initial",
-                text: "Are you taking any medications or supplements?",
-                answer: "'No, nothing.' She looks away. Her body language suggests she's not being truthful.",
+                id: "weight_changes",
+                text: "Have you noticed any recent changes in your weight?",
+                answer: "'I've lost a bit, nothing dramatic.' (Partner, frustrated: 'A bit?! She's lost over three stone in four months. None of her clothes fit anymore. Look at her!')",
+                category: "history",
+                critical: true
+            },
+            {
+                id: "medications",
+                text: "Are you currently taking any medications, supplements, or vitamins?",
+                answer: "'No, nothing.' She avoids eye contact. You notice she clutches her handbag a little tighter when you ask.",
                 category: "history",
                 critical: false
             },
             {
-                id: "medications_probe",
-                text: "Have you been taking any weight loss medications, even if not prescribed to you?",
-                answer: "Long pause. 'I... I got some medication online. For weight loss. It's called Ozempic or something like that.'",
-                category: "history",
-                critical: true
-            },
-            {
-                id: "dosage",
-                text: "What dose of semaglutide have you been taking, and how often?",
-                answer: "'I started with the lowest dose, but it wasn't working fast enough. I've been taking 2mg weekly for the past 2 months. Sometimes more.'",
-                category: "history",
-                critical: true
-            },
-            {
-                id: "social_media",
-                text: "Have you been influenced by social media content about weight loss?",
-                answer: "'Everyone on TikTok is using it. They all look amazing. I just wanted to look like them...' She starts crying.",
-                category: "history",
-                critical: true
-            },
-            {
-                id: "symptoms",
-                text: "What symptoms have you been experiencing?",
-                answer: "'Constant nausea, dizziness, weakness. I can't keep food down even when I try to eat. My heart races all the time.'",
+                id: "nausea_gi",
+                text: "Have you been experiencing any nausea, vomiting, or stomach problems?",
+                answer: "'I've been feeling sick a lot, yeah. And I throw up sometimes. I thought it might be a bug that won't go away.' She looks genuinely uncomfortable.",
                 category: "symptoms",
                 critical: true
             },
             {
-                id: "mental_health",
-                text: "How would you describe your relationship with food and your body image?",
-                answer: "She becomes defensive. 'I just want to be healthy. Is that so wrong?' Tears well up. 'I hate how I look...'",
-                category: "psychological",
+                id: "online_purchases",
+                text: "Have you bought anything online recently for your health or wellness?",
+                answer: "Long pause. She bites her lip. '...I ordered some stuff online. Supplements and... some medication. For weight management. Everyone uses it.' She won't say what it is.",
+                category: "history",
                 critical: true
             },
             {
-                id: "fainting",
-                text: "How many times have you fainted or felt like you might faint?",
-                answer: "'This is the third time this week. I thought I just needed to eat more, but I can't keep anything down.'",
-                category: "symptoms",
-                critical: false
-            },
-            {
-                id: "partner_concern",
-                text: "How long has your partner been concerned about your health?",
-                answer: "Partner responds: 'About 2 months. She's been hiding it, lying about eating. I found the medication boxes hidden in her car.'",
+                id: "partner_perspective",
+                text: "[To partner] Is there anything else you think I should know?",
+                answer: "Partner, voice breaking: 'I found boxes hidden in her car last week. Injection pens. I looked it up — it's that weight loss drug, Ozempic. She's been injecting herself. She won't listen to me.'",
                 category: "collateral",
+                critical: true
+            },
+            {
+                id: "emotional_state",
+                text: "How have you been feeling in yourself? Any anxiety or low mood?",
+                answer: "She's quiet for a long time. 'I just... I hate how I look. I see these girls online and they're all so perfect. I thought if I could just lose the weight...' Tears start falling. 'I can't stop even though I know something's wrong.'",
+                category: "psychological",
                 critical: true
             }
         ],
@@ -1124,44 +1398,58 @@ const medicalCases = {
                 id: "blood_work",
                 name: "Comprehensive Metabolic Panel",
                 description: "Full blood chemistry including electrolytes, kidney function, liver function",
-                result: "CRITICAL: Severe hypokalemia (K+ 2.8), hyponatremia (Na+ 128), hypoglycemia (glucose 3.2 mmol/L), elevated creatinine, low albumin. Severe malnutrition evident.",
-                critical: true
+                cost: 250,
+                timeRequired: 2,
+                critical: true,
+                resultNarrative: [
+                    "The metabolic panel results flash red across the screen — multiple critical values.",
+                    "Severe hypokalemia (K+ 2.8), hyponatremia (Na+ 128), hypoglycemia (glucose 3.2 mmol/L). Creatinine elevated, albumin critically low. Thyroid markers show low T3 syndrome — her body is in starvation mode.",
+                    "The registrar frowns. 'She hasn't been eating properly for a long time. But these electrolytes are immediately dangerous — she could arrest at any moment.'",
+                    "The numbers confirm severe malnutrition, but they don't explain WHY she's not eating. Something else is going on."
+                ]
             },
             {
                 id: "ecg",
                 name: "12-Lead ECG",
-                description: "Check for cardiac complications from electrolyte imbalances",
-                result: "Sinus tachycardia (HR 110), prolonged QT interval (concerning for sudden cardiac death risk), low voltage. Consistent with severe malnutrition.",
-                critical: true
-            },
-            {
-                id: "thyroid",
-                name: "Thyroid Function Tests",
-                description: "TSH, T3, T4 levels",
-                result: "Low T3 syndrome (euthyroid sick syndrome) - TSH normal, T3 low, T4 low-normal. Consistent with severe malnutrition.",
-                critical: false
+                description: "Assess cardiac rhythm and function",
+                cost: 150,
+                timeRequired: 1,
+                critical: true,
+                resultNarrative: [
+                    "The ECG trace stutters across the screen. Even the machine seems concerned.",
+                    "Sinus tachycardia at 110 bpm with a dangerously prolonged QT interval. Low voltage across all leads.",
+                    "The cardiology registrar looks grave. 'This QT prolongation with her potassium this low — she's a cardiac arrest waiting to happen. We need to fix those electrolytes urgently.'",
+                    "Her heart is under enormous strain. The ECG confirms how critical this is but doesn't point to the underlying cause."
+                ]
             },
             {
                 id: "vitamin_levels",
                 name: "Vitamin and Mineral Panel",
-                description: "B12, folate, vitamin D, iron studies",
-                result: "Severe deficiencies across the board: Vitamin D <10, B12 low, folate low, iron deficiency anemia. Thiamine critically low (refeeding syndrome risk).",
-                critical: true
+                description: "B12, folate, vitamin D, iron studies, thiamine",
+                cost: 300,
+                timeRequired: 3,
+                critical: true,
+                resultNarrative: [
+                    "The vitamin panel paints a grim picture of prolonged nutritional deprivation.",
+                    "Vitamin D critically low, B12 depleted, folate bottomed out, iron deficiency anaemia. Thiamine is dangerously low.",
+                    "The registrar notes: 'The thiamine level means refeeding syndrome is a real risk — we can't just start feeding her aggressively. And these deficiencies suggest weeks to months of near-starvation.'",
+                    "She's been barely absorbing any nutrition for a long time. But she says she 'eats normally'. Someone isn't telling the truth."
+                ]
             },
             {
                 id: "drug_screen",
                 name: "Toxicology Screen",
-                description: "Screen for other substances",
-                result: "Negative for recreational drugs. GLP-1 agonist levels elevated (consistent with semaglutide use).",
-                critical: false
+                description: "Comprehensive screen for drugs and medications",
+                cost: 300,
+                timeRequired: 2,
+                critical: true,
+                resultNarrative: [
+                    "The standard toxicology screen comes back negative for recreational drugs, alcohol, and common medications.",
+                    "However, the lab flags an unexpected finding: elevated levels of a GLP-1 receptor agonist — a class of injectable medication normally prescribed for type 2 diabetes.",
+                    "The pharmacist raises an eyebrow. 'She's not diabetic, so why is this in her system? These drugs are powerful appetite suppressants. That would explain why she can't eat.'",
+                    "A prescribed medication found in a patient it was never prescribed for. Where did she get it, and how much has she been taking?"
+                ]
             },
-            {
-                id: "bone_density",
-                name: "DEXA Scan",
-                description: "Bone density assessment",
-                result: "Severe osteopenia. T-score -2.8. Significant bone loss for her age. High fracture risk.",
-                critical: false
-            }
         ],
 
         diagnosisOptions: [
@@ -1170,28 +1458,32 @@ const medicalCases = {
                 name: "GLP-1 Agonist Misuse with Severe Malnutrition",
                 description: "Inappropriate use of semaglutide (Ozempic) for weight loss leading to dangerous malnutrition, electrolyte imbalances, and eating disorder behaviors",
                 correct: true,
-                explanation: "This patient has been misusing prescription GLP-1 agonists obtained online without medical supervision, leading to severe malnutrition, life-threatening electrolyte imbalances, and psychological dependence. Requires immediate medical stabilization, psychiatric intervention, and nutritional rehabilitation."
+                consequences: "Immediate medical stabilisation with careful electrolyte replacement, psychiatric intervention, and nutritional rehabilitation. GLP-1 agonist discontinued.",
+                emotionalImpact: "Patient finally breaks down and accepts help. Partner relieved but shaken. Long road to recovery begins."
             },
             {
                 id: "anorexia_nervosa",
                 name: "Anorexia Nervosa",
                 description: "Primary eating disorder with severe restriction",
                 correct: false,
-                explanation: "While eating disorder behaviors are present, the primary driver is pharmaceutical misuse of GLP-1 agonists. The medication is suppressing appetite and causing severe GI symptoms, making it impossible to eat even when she tries."
+                consequences: "Eating disorder treatment initiated but underlying medication misuse goes unaddressed. GLP-1 continues suppressing appetite.",
+                emotionalImpact: "Patient continues hiding medication use. Partner increasingly frustrated as condition doesn't improve."
             },
             {
                 id: "hyperthyroidism",
                 name: "Hyperthyroidism",
                 description: "Overactive thyroid causing weight loss",
                 correct: false,
-                explanation: "Thyroid function tests show low T3 syndrome, not hyperthyroidism. The weight loss is due to medication-induced appetite suppression and malnutrition."
+                consequences: "Anti-thyroid medication prescribed unnecessarily. Real cause of weight loss goes untreated, patient continues deteriorating.",
+                emotionalImpact: "Patient relieved to have a 'medical' explanation but condition worsens. Partner loses trust in medical team."
             },
             {
                 id: "malabsorption",
                 name: "Malabsorption Syndrome",
                 description: "GI disorder preventing nutrient absorption",
                 correct: false,
-                explanation: "While malnutrition is severe, this is due to inadequate intake (medication-induced) rather than malabsorption. The GLP-1 agonist is causing severe nausea and gastroparesis."
+                consequences: "Extensive GI investigations ordered while patient's malnutrition worsens. Medication misuse goes undetected.",
+                emotionalImpact: "Patient undergoes unnecessary invasive tests. Partner increasingly desperate as no improvement occurs."
             }
         ],
 
@@ -1251,28 +1543,28 @@ const medicalCases = {
                 id: "psychiatrist",
                 name: "Psychiatrist",
                 specialty: "Mental Health",
-                advice: "This is a complex case involving body dysmorphia, social media influence, and pharmaceutical misuse. She needs immediate psychiatric admission for eating disorder treatment. The GLP-1 misuse is a symptom of underlying body image issues and possible social media addiction. Long-term therapy and possibly medication for anxiety/depression will be needed. Family therapy with her partner is also recommended.",
+                advice: "There's clearly a significant body image component here. She shows disordered eating behaviour but it doesn't quite fit typical anorexia — she seems upset about not being able to eat rather than deliberately restricting. Her secrecy and defensiveness suggest she's hiding something she knows is harmful. I'd explore whether there's an external factor or substance driving the weight loss. The social media angle is worth investigating further.",
                 appropriate: true
             },
             {
                 id: "endocrinologist",
                 name: "Endocrinologist",
                 specialty: "Metabolism",
-                advice: "GLP-1 agonists like semaglutide are powerful medications that should only be used under medical supervision. She's been taking doses meant for diabetes management without monitoring. The severe malnutrition has caused metabolic derangements. She'll need careful metabolic monitoring during recovery.",
+                advice: "The metabolic picture is unusual for simple caloric restriction. The appetite suppression pattern seems almost pharmacological. Her thyroid is in starvation mode but the rapidity of decline doesn't match typical eating disorders. I'd recommend a targeted drug screen — there are medications circulating online that cause exactly this kind of profound appetite loss.",
                 appropriate: true
             },
             {
                 id: "dietitian",
                 name: "Clinical Dietitian",
                 specialty: "Nutrition",
-                advice: "Refeeding syndrome is a real risk here. We need to start very slowly - maybe 800-1000 calories initially, then gradually increase. High-risk nutrients like phosphate must be monitored closely. She'll need specialized eating disorder nutritional rehabilitation.",
+                advice: "Whatever the cause, refeeding syndrome is a serious risk at this stage. We need to start very slowly — 800-1000 calories initially. Thiamine and phosphate must be monitored closely. But I'd want to know why she stopped eating before we plan long-term rehabilitation.",
                 appropriate: true
             },
             {
                 id: "cardiologist",
                 name: "Cardiologist",
                 specialty: "Cardiology",
-                advice: "The prolonged QT interval is concerning. With her electrolyte imbalances, she's at risk for sudden cardiac death. She needs continuous monitoring until electrolytes normalize. The malnutrition has affected her cardiac function.",
+                advice: "The prolonged QT interval is concerning but it's secondary to the electrolyte derangements, not a primary cardiac problem. Fix the electrolytes and the heart should recover. She needs monitoring but this isn't fundamentally a cardiology case.",
                 appropriate: false
             }
         ]

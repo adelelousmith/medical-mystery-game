@@ -149,49 +149,168 @@ const CRISIS_TYPES = {
         ]
     },
 
-    ANAPHYLAXIS: {
-        id: 'anaphylaxis',
-        name: 'Anaphylactic Shock',
-        description: '⚠️ SEVERE ALLERGIC REACTION! Airway swelling!',
-        urgentMessage: 'Throat closing! Hives spreading! BP dropping rapidly!',
-        triggerCondition: (gameState) => gameState.patientStability < 40 && gameState.currentCase.category === 'toxicology',
+    OPIOID_RESPIRATORY_ARREST: {
+        id: 'opioid_respiratory_arrest',
+        name: 'Respiratory Arrest',
+        description: '⚠️ PATIENT STOPPED BREATHING! Opioid-induced respiratory arrest!',
+        urgentMessage: 'Respiratory rate ZERO! SpO2 plummeting! 65%... 55%... Cyanosis spreading!',
+        triggerCondition: (gameState) => gameState.patientStability < 40 && gameState.currentCase.id === 'toxicology',
         timeLimit: 10,
         alarmSound: 'bp_monitor',
-        visualEffect: 'anaphylaxis-crisis',
+        visualEffect: 'respiratory-crisis',
         options: [
             {
-                id: 'epi_im',
-                text: '💉 Epinephrine IM (0.3mg)',
-                description: 'Inject into thigh muscle immediately',
+                id: 'naloxone',
+                text: '💉 Naloxone IV (400mcg)',
+                description: 'Opioid antagonist to reverse respiratory depression',
                 correct: true,
-                outcome: 'Epinephrine working! Airway opening, BP rising. Crisis averted!',
+                outcome: 'Naloxone working! Patient gasps — breathing returns! SpO2 climbing. He opens his eyes.',
                 stabilityChange: 30,
                 scoreChange: 100
             },
             {
-                id: 'antihistamine',
-                text: '💊 Antihistamine IV',
-                description: 'Give diphenhydramine',
+                id: 'bag_mask',
+                text: '😷 Bag-Valve-Mask Ventilation',
+                description: 'Manual ventilation to buy time',
                 correct: false,
-                outcome: 'Too slow! Patient needs epinephrine NOW! Condition worsening!',
+                outcome: 'Oxygenation improves temporarily but patient still not breathing on his own! Need to reverse the cause!',
+                stabilityChange: 5,
+                scoreChange: -10
+            },
+            {
+                id: 'intubate',
+                text: '🫁 Emergency Intubation',
+                description: 'Secure airway with endotracheal tube',
+                correct: false,
+                outcome: 'Airway secured but still no spontaneous breathing! The opioids are still suppressing his drive to breathe!',
+                stabilityChange: 0,
+                scoreChange: -15
+            },
+            {
+                id: 'adrenaline',
+                text: '💉 Adrenaline IV',
+                description: 'Administer epinephrine',
+                correct: false,
+                outcome: 'Heart rate increases but respiratory depression continues! Wrong drug for this situation!',
                 stabilityChange: -10,
+                scoreChange: -25
+            }
+        ],
+        voiceLines: [
+            "He's stopped breathing!",
+            "Where's the naloxone?!",
+            "SpO2 crashing!",
+            "We need to reverse this NOW!"
+        ]
+    },
+
+    ELECTROLYTE_CARDIAC_CRISIS: {
+        id: 'electrolyte_cardiac_crisis',
+        name: 'Cardiac Arrhythmia',
+        description: '⚠️ DANGEROUS HEART RHYTHM! Electrolyte-induced cardiac emergency!',
+        urgentMessage: 'Monitor alarm! Torsades de Pointes on ECG! Patient losing consciousness!',
+        triggerCondition: (gameState) => gameState.patientStability < 40 && gameState.currentCase.id === 'ozempic_misuse',
+        timeLimit: 12,
+        alarmSound: 'heartbeat',
+        visualEffect: 'cardiac-crisis',
+        options: [
+            {
+                id: 'iv_potassium_magnesium',
+                text: '💉 IV Potassium + Magnesium',
+                description: 'Emergency electrolyte replacement to stabilise heart rhythm',
+                correct: true,
+                outcome: 'Electrolytes infusing! Rhythm stabilising... Sinus tachycardia returning. QT interval shortening. Crisis averted — for now.',
+                stabilityChange: 25,
+                scoreChange: 100
+            },
+            {
+                id: 'defib',
+                text: '⚡ Defibrillate',
+                description: 'Deliver electrical shock',
+                correct: false,
+                outcome: 'Shock delivered but rhythm returns to Torsades! The underlying electrolyte imbalance is still there!',
+                stabilityChange: 0,
+                scoreChange: -15
+            },
+            {
+                id: 'amiodarone',
+                text: '💊 Amiodarone IV',
+                description: 'Anti-arrhythmic medication',
+                correct: false,
+                outcome: 'Amiodarone can actually WORSEN Torsades! QT interval prolonging further! Bad choice!',
+                stabilityChange: -15,
+                scoreChange: -30
+            },
+            {
+                id: 'observe',
+                text: '⏸️ Monitor and Observe',
+                description: 'Wait to see if rhythm self-corrects',
+                correct: false,
+                outcome: 'Patient deteriorating! Torsades can degenerate into cardiac arrest at any moment!',
+                stabilityChange: -20,
+                scoreChange: -25
+            }
+        ],
+        voiceLines: [
+            "Torsades on the monitor!",
+            "Her potassium is critically low!",
+            "Get magnesium and potassium NOW!",
+            "She's going to arrest if we don't fix these electrolytes!"
+        ]
+    },
+
+    PERITONITIS: {
+        id: 'peritonitis',
+        name: 'Appendix Rupture',
+        description: '⚠️ APPENDIX HAS RUPTURED! Patient going into septic shock!',
+        urgentMessage: 'Sudden board-like abdominal rigidity! Temperature spiking to 39.5°C! BP crashing!',
+        triggerCondition: (gameState) => gameState.patientStability < 40 && gameState.currentCase.id === 'abdominal_pain',
+        timeLimit: 12,
+        alarmSound: 'bp_monitor',
+        visualEffect: 'bleeding-crisis',
+        options: [
+            {
+                id: 'abx_surgery',
+                text: '💉 IV Antibiotics + Emergency Surgery',
+                description: 'Broad-spectrum antibiotics and immediate laparotomy',
+                correct: true,
+                outcome: 'Antibiotics started! Surgical team rushing her to theatre! Quick action may have saved her life.',
+                stabilityChange: 20,
+                scoreChange: 100
+            },
+            {
+                id: 'antibiotics_only',
+                text: '💊 IV Antibiotics Only',
+                description: 'Start antibiotics and monitor',
+                correct: false,
+                outcome: 'Antibiotics alone won\'t fix a ruptured appendix! She needs surgery NOW! Peritoneal contamination spreading!',
+                stabilityChange: -5,
+                scoreChange: -20
+            },
+            {
+                id: 'pain_relief',
+                text: '💊 Stronger Pain Relief',
+                description: 'Increase analgesia to manage worsening pain',
+                correct: false,
+                outcome: 'Pain masked but sepsis progressing unchecked! She needs definitive treatment, not just pain relief!',
+                stabilityChange: -15,
                 scoreChange: -25
             },
             {
-                id: 'steroids',
-                text: '💉 Steroids IV',
-                description: 'Administer methylprednisolone',
+                id: 'more_imaging',
+                text: '🔍 Repeat CT Scan',
+                description: 'Get updated imaging to confirm diagnosis',
                 correct: false,
-                outcome: 'Steroids are adjunct therapy! Need epinephrine first!',
-                stabilityChange: -5,
+                outcome: 'No time for more scans! The clinical picture is clear — she has peritonitis and needs emergency surgery!',
+                stabilityChange: -10,
                 scoreChange: -20
             }
         ],
         voiceLines: [
-            "Anaphylaxis!",
-            "Get the epi-pen!",
-            "Airway's closing!",
-            "We need epinephrine NOW!"
+            "She's perforated!",
+            "Get the surgical team NOW!",
+            "Board-like abdomen — this is peritonitis!",
+            "We need theatre immediately!"
         ]
     },
 
@@ -478,6 +597,11 @@ class CrisisEventManager {
 
     addKeyboardShortcuts() {
         const crisis = this.activeCrisis;
+        
+        // Remove any existing handler to prevent memory leaks
+        if (this.keyHandler) {
+            document.removeEventListener('keydown', this.keyHandler);
+        }
         
         this.keyHandler = (e) => {
             const keyCode = e.key.toUpperCase();

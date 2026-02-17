@@ -18,8 +18,10 @@ export class TestManager {
 
         const imageMap = {
             'ecg': {
+                'cardiac': 'testResults/ecg_58_cardiac.svg',
                 'stroke': 'testResults/12_Lead_ECG_stroke_75.png',
-                'neurological': 'testResults/12_Lead_ECG_stroke_75.png'
+                'neurological': 'testResults/12_Lead_ECG_stroke_75.png',
+                'ozempic_misuse': 'testResults/ecg_28_ozempic.svg'
             },
             'ct_scan': {
                 'trauma': 'testResults/24_CT_crash.png'
@@ -41,7 +43,8 @@ export class TestManager {
                 'trauma': 'testResults/FastUltrasound_24_crash.png'
             },
             'drug_screen': {
-                'toxicology': 'testResults/drugTest_25_Overdose.png'
+                'toxicology': 'testResults/drugTest_25_Overdose.png',
+                'ozempic_misuse': 'testResults/tox_screen_28_ozempic.svg'
             },
             'drug_screen_tox': {
                 'toxicology': 'testResults/drugTest_25_Overdose.png'
@@ -58,6 +61,34 @@ export class TestManager {
             'chest_xray': {
                 'pediatric': 'testResults/x-ray-3-astma:croup.png',
                 'cardiac': 'testResults/xRay_58_heartattack.png'
+            },
+            'blood_work': {
+                'trauma': 'testResults/cbc_24_trauma.svg',
+                'pediatric': 'testResults/cbc_3_pediatric.svg',
+                'stroke': 'testResults/cbc_coag_72_stroke.svg',
+                'abdominal_pain': 'testResults/cbc_45_abdominal.svg',
+                'ozempic_misuse': 'testResults/metabolic_panel_28_ozempic.svg'
+            },
+            'xray_series': {
+                'trauma': 'testResults/xray_24_trauma.svg'
+            },
+            'pulse_oximetry': {
+                'pediatric': 'testResults/pulseox_3_pediatric.svg'
+            },
+            'basic_metabolic': {
+                'toxicology': 'testResults/bmp_25_toxicology.svg'
+            },
+            'liver_function': {
+                'toxicology': 'testResults/lft_25_toxicology.svg'
+            },
+            'glucose': {
+                'stroke': 'testResults/glucose_72_stroke.svg'
+            },
+            'urinalysis': {
+                'surgical': 'testResults/urinalysis_45_abdominal.svg'
+            },
+            'vitamin_levels': {
+                'ozempic_misuse': 'testResults/vitamin_panel_28_ozempic.svg'
             }
         };
 

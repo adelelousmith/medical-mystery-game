@@ -949,6 +949,8 @@
     padding: 1rem;
     margin-bottom: 1rem;
     font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
     position: relative;
 }
 

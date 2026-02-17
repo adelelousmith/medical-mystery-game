@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 330" font-family="'Segoe UI',Arial,sans-serif">
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="500" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e8449"/><stop offset="100%" stop-color="#27ae60"/>
+    </linearGradient>
+  </defs>
+  <rect width="500" height="330" rx="10" fill="#f8f9fa" stroke="#dee2e6"/>
+  <rect width="500" height="44" rx="10" fill="url(#hdr)"/>
+  <rect y="34" width="500" height="10" fill="url(#hdr)"/>
+  <text x="250" y="29" text-anchor="middle" fill="white" font-size="16" font-weight="bold">TOXICOLOGY SCREEN</text>
+  <text x="15" y="64" fill="#555" font-size="11">Patient: 28F | Specimen: Blood + Urine | Priority: URGENT</text>
+  <line x1="15" y1="72" x2="485" y2="72" stroke="#dee2e6"/>
+  <text x="20" y="92" fill="#666" font-size="10" font-weight="bold">SUBSTANCE</text>
+  <text x="340" y="92" fill="#666" font-size="10" font-weight="bold" text-anchor="end">RESULT</text>
+  <text x="400" y="92" fill="#666" font-size="10" font-weight="bold">STATUS</text>
+  <!-- Negative row 1 -->
+  <rect x="15" y="98" width="470" height="22" rx="3" fill="#eafaf1"/>
+  <text x="20" y="113" fill="#555" font-size="11">Opioids / Benzodiazepines / Amphetamines</text>
+  <text x="340" y="113" fill="#27ae60" font-size="12" font-weight="bold" text-anchor="end">NOT DETECTED</text>
+  <rect x="370" y="101" width="45" height="15" rx="7" fill="#27ae60"/>
+  <text x="393" y="112" fill="white" font-size="8" font-weight="bold" text-anchor="middle">NEG</text>
+  <!-- Negative row 2 -->
+  <rect x="15" y="124" width="470" height="22" rx="3" fill="#eafaf1"/>
+  <text x="20" y="139" fill="#555" font-size="11">Cannabis / Cocaine / Barbiturates</text>
+  <text x="340" y="139" fill="#27ae60" font-size="12" font-weight="bold" text-anchor="end">NOT DETECTED</text>
+  <rect x="370" y="127" width="45" height="15" rx="7" fill="#27ae60"/>
+  <text x="393" y="138" fill="white" font-size="8" font-weight="bold" text-anchor="middle">NEG</text>
+  <!-- Negative row 3 -->
+  <rect x="15" y="150" width="470" height="22" rx="3" fill="#eafaf1"/>
+  <text x="20" y="165" fill="#555" font-size="11">Ethanol / Paracetamol / Salicylates</text>
+  <text x="340" y="165" fill="#27ae60" font-size="12" font-weight="bold" text-anchor="end">NOT DETECTED</text>
+  <rect x="370" y="153" width="45" height="15" rx="7" fill="#27ae60"/>
+  <text x="393" y="164" fill="white" font-size="8" font-weight="bold" text-anchor="middle">NEG</text>
+  <!-- Divider -->
+  <line x1="15" y1="182" x2="485" y2="182" stroke="#dee2e6" stroke-dasharray="4"/>
+  <text x="250" y="198" text-anchor="middle" fill="#888" font-size="10" font-weight="bold">EXTENDED PANEL</text>
+  <!-- Semaglutide - DETECTED -->
+  <rect x="15" y="206" width="470" height="28" rx="3" fill="#fdedec" stroke="#c0392b" stroke-width="1"/>
+  <text x="20" y="225" fill="#333" font-size="13" font-weight="bold">GLP-1 Agonist (Semaglutide)</text>
+  <text x="340" y="225" fill="#c0392b" font-size="13" font-weight="bold" text-anchor="end">28.4 ng/mL</text>
+  <rect x="358" y="211" width="75" height="18" rx="9" fill="#c0392b"/>
+  <text x="396" y="224" fill="white" font-size="9" font-weight="bold" text-anchor="middle">DETECTED</text>
+  <text x="20" y="252" fill="#888" font-size="10">Therapeutic range: 8–16 ng/mL | Result: SUPRA-THERAPEUTIC</text>
+  <!-- Laxatives/Diuretics -->
+  <rect x="15" y="260" width="470" height="22" rx="3" fill="#eafaf1"/>
+  <text x="20" y="275" fill="#555" font-size="11">Laxatives / Diuretics</text>
+  <text x="340" y="275" fill="#27ae60" font-size="12" font-weight="bold" text-anchor="end">NOT DETECTED</text>
+  <rect x="370" y="263" width="45" height="15" rx="7" fill="#27ae60"/>
+  <text x="393" y="274" fill="white" font-size="8" font-weight="bold" text-anchor="middle">NEG</text>
+  <!-- Interpretation -->
+  <rect x="15" y="292" width="470" height="28" rx="6" fill="#fdecea" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="30" y="311" fill="#c0392b" font-size="11" font-weight="bold">⚠ Semaglutide at supra-therapeutic level. No prescription on record.</text>
+</svg>

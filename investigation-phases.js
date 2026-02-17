@@ -258,18 +258,8 @@ class InvestigationPhaseManager {
         const DETERIORATION = getDeterioration();
         const STATES = getPatientStates();
         
-        // Debug: Verify method is being called and show deterioration
-        if (this.game.gameState.timeRemaining % 30 === 0) {
-            console.log(`📊 updatePatientStability - Before: ${Math.round(previousStability)}%, Deterioration: ${DETERIORATION.TIME_PRESSURE}`);
-        }
-        
         // Apply continuous time-based deterioration
         this.game.gameState.patientStability -= DETERIORATION.TIME_PRESSURE;
-        
-        // Debug: Show after deterioration
-        if (this.game.gameState.timeRemaining % 30 === 0) {
-            console.log(`📊 After deterioration: ${Math.round(this.game.gameState.patientStability)}%`);
-        }
         
         // Additional deterioration based on condition parameters
         const condition = this.game.gameState.patientCondition;
@@ -286,11 +276,6 @@ class InvestigationPhaseManager {
         
         // Clamp between 0 and 100
         this.game.gameState.patientStability = Math.max(0, Math.min(100, this.game.gameState.patientStability));
-        
-        // Debug logging every 10% drop
-        if (Math.floor(previousStability / 10) !== Math.floor(this.game.gameState.patientStability / 10)) {
-            console.log(`⏱️ Patient Stability: ${Math.round(this.game.gameState.patientStability)}% (${Math.round(this.game.gameState.timeRemaining)}s remaining)`);
-        }
         
         // Update patient state based on stability AND trend
         // Only show "IMPROVING" if stability actually increased

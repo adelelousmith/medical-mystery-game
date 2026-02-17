@@ -135,6 +135,22 @@ const SPECIALISTS = {
         expertise: ['surgical', 'acute_abdomen', 'trauma_surgery'],
         consultationLimit: 1,
         description: 'Surgical intervention specialist'
+    },
+    PSYCHIATRIST: {
+        id: 'psychiatrist',
+        name: 'Psychiatrist',
+        icon: 'fas fa-comments',
+        expertise: ['mental_health', 'eating_disorder', 'body_dysmorphia', 'toxicology'],
+        consultationLimit: 2,
+        description: 'Mental health, eating disorders, and behavioural assessment specialist'
+    },
+    ENDOCRINOLOGIST: {
+        id: 'endocrinologist',
+        name: 'Endocrinologist',
+        icon: 'fas fa-vial',
+        expertise: ['endocrine', 'metabolic', 'toxicology', 'diabetes'],
+        consultationLimit: 2,
+        description: 'Hormones, metabolism, and endocrine system specialist'
     }
 };
 
@@ -155,7 +171,7 @@ class MedicalMysteryGame {
             incorrectActions: 0,
             specialistConsultations: [],
             consultationSlotsRemaining: 3, // Limited consultation slots
-            questionsRemaining: 5, // Limited questions
+            questionsRemaining: 5, // Limited questions — forces strategic choices
             
             // NEW: Three-phase investigative structure
             investigationPhase: 'examine', // examine → diagnose → treat
@@ -254,18 +270,7 @@ class MedicalMysteryGame {
             audio.volume = 0.4; // 40% volume for sound effects
             audio.preload = 'auto';
             audio.loop = false; // Ensure no looping
-            
-            // Log duration when metadata loads
-            audio.addEventListener('loadedmetadata', () => {
-                if (audio.duration > 5) {
-                    console.warn(`⚠️ ${key}: ${audio.duration.toFixed(2)}s (will be auto-trimmed to 5s)`);
-                } else {
-                    console.log(`✅ ${key}: ${audio.duration.toFixed(2)}s (OK)`);
-                }
-            });
         });
-        
-        console.log('✅ Real sound effects loaded');
     }
 
     initBackgroundMusic() {
@@ -389,7 +394,7 @@ class MedicalMysteryGame {
                     this.createTimerTick();
                     break;
                 case 'diagnosis_correct':
-                    this.playAudioFile('bpMonitor') || this.createDiagnosisCorrectSound();
+                    this.createDiagnosisCorrectSound();
                     break;
                 case 'consultation':
                     this.createConsultationSound(); // Keep synthetic
@@ -756,15 +761,12 @@ class MedicalMysteryGame {
 
     playContextualTestSound(test) {
         // Play specific sounds based on test type
-        console.log('Playing contextual test sound for:', test.id);
         switch (test.id) {
             case 'ecg':
-                console.log('Playing heartbeat sound for ECG test');
                 this.playSound('heartbeat');
                 break;
             case 'cardiac_enzymes':
             case 'troponin':
-                console.log('Playing notification sound for cardiac lab test');
                 this.playSound('notification');
                 break;
             case 'ultrasound':
@@ -1067,8 +1069,14 @@ class MedicalMysteryGame {
                     case_.description.split('.')[0] + '.' : 
                     'Emergency medical case requiring immediate attention.';
                 
+                // Check completion status
+                const timesCompleted = this.stats.casesCompleted[case_.id] || 0;
+                const bestScore = this.stats.bestScores[case_.id] || null;
+                const isCompleted = timesCompleted > 0;
+                
                 return `
-                <div class="case-card ${case_.difficulty}" onclick="game.startCase('${case_.id}')">
+                <div class="case-card ${case_.difficulty} ${isCompleted ? 'completed' : ''}" onclick="game.startCase('${case_.id}')">
+                    ${isCompleted ? `<div class="case-completion-badge" title="Completed ${timesCompleted} time${timesCompleted > 1 ? 's' : ''}"><i class="fas fa-check-circle"></i></div>` : ''}
                     <div class="case-icon">
                         <i class="${case_.icon}"></i>
                     </div>
@@ -1078,7 +1086,13 @@ class MedicalMysteryGame {
                         <div class="case-meta">
                             <span class="difficulty ${case_.difficulty}">${case_.difficulty.toUpperCase()}</span>
                             <span class="specialty">${case_.specialty}</span>
+                            <span class="time-limit"><i class="fas fa-clock"></i> ${case_.timeLimit} min</span>
                         </div>
+                        ${isCompleted ? `
+                            <div class="case-best-score">
+                                <i class="fas fa-trophy"></i> Best: ${bestScore}
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 `;
@@ -1201,10 +1215,12 @@ class MedicalMysteryGame {
             
             this.playSound('click');
             this.render();
-            this.startTimer();
             
             // Scroll to top of page when case starts
             window.scrollTo(0, 0);
+            
+            // Show case briefing modal — timer starts when player dismisses it
+            this.showCaseBriefing(case_);
             
         } catch (error) {
             console.error('Error starting case:', error);
@@ -1227,12 +1243,6 @@ class MedicalMysteryGame {
     performRender() {
         const gameContainer = document.getElementById('game-container');
         if (!gameContainer) return;
-
-        const currentTime = Date.now();
-        if (currentTime - this.lastRenderTime < 50) {
-            return; // Skip if rendering too frequently
-        }
-        this.lastRenderTime = currentTime;
 
         try {
             switch (this.gameState.gamePhase) {
@@ -1292,7 +1302,7 @@ class MedicalMysteryGame {
                 <div class="status-bar">
                     <div class="status-item" title="Time Remaining">
                         <i class="fas fa-clock"></i>
-                        <span>${this.formatTime(this.gameState.timeRemaining / 60)}</span>
+                        <span>${this.formatTime(this.gameState.timeRemaining)}</span>
                     </div>
                     <div class="status-item" title="Current Score">
                         <i class="fas fa-star"></i>
@@ -1304,7 +1314,11 @@ class MedicalMysteryGame {
                     </div>
                     <div class="status-item ${this.gameState.questionsRemaining <= 1 ? 'limited' : ''}" title="Questions Remaining">
                         <i class="fas fa-question-circle"></i>
-                        <span>Questions: ${this.gameState.questionsRemaining}</span>
+                        <span>Questions: ${this.gameState.questionsRemaining}/${5}</span>
+                    </div>
+                    <div class="status-item" title="Tests Ordered">
+                        <i class="fas fa-flask"></i>
+                        <span>Tests: ${this.gameState.orderedTests.length}/${this.gameState.currentCase?.tests?.length || 4}</span>
                     </div>
                     <div class="status-item ${this.gameState.consultationSlotsRemaining <= 1 ? 'limited' : ''}" title="Consultations Available">
                         <i class="fas fa-user-md"></i>
@@ -1343,6 +1357,89 @@ class MedicalMysteryGame {
         `;
         
         this.attachEventHandlers();
+    }
+
+    showCaseBriefing(case_) {
+        const overlay = document.createElement('div');
+        overlay.className = 'case-briefing-overlay';
+        overlay.id = 'case-briefing';
+        overlay.innerHTML = `
+            <div class="case-briefing-dialog">
+                <div class="briefing-header">
+                    <i class="${case_.icon} briefing-icon"></i>
+                    <div>
+                        <h2>${case_.title}</h2>
+                        <span class="briefing-specialty">${case_.specialty} — ${case_.difficulty.toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="briefing-presentation">
+                    <p>${case_.description}</p>
+                </div>
+                
+                <div class="briefing-patient">
+                    <strong><i class="fas fa-user-injured"></i> Patient:</strong> ${case_.patientHistory.demographics}
+                </div>
+                
+                <div class="briefing-resources">
+                    <h3><i class="fas fa-clipboard-list"></i> Your Resources</h3>
+                    <div class="resource-grid">
+                        <div class="resource-item">
+                            <i class="fas fa-comments"></i>
+                            <span class="resource-value">5</span>
+                            <span class="resource-label">Questions</span>
+                        </div>
+                        <div class="resource-item">
+                            <i class="fas fa-flask"></i>
+                            <span class="resource-value">${case_.tests.length}</span>
+                            <span class="resource-label">Tests</span>
+                        </div>
+                        <div class="resource-item">
+                            <i class="fas fa-user-md"></i>
+                            <span class="resource-value">3</span>
+                            <span class="resource-label">Consults</span>
+                        </div>
+                        <div class="resource-item">
+                            <i class="fas fa-clock"></i>
+                            <span class="resource-value">${case_.timeLimit}</span>
+                            <span class="resource-label">Minutes</span>
+                        </div>
+                    </div>
+                    <p class="resource-warning"><i class="fas fa-exclamation-circle"></i> You may only ask <strong>5 of ${case_.questions.length}</strong> questions — choose wisely.</p>
+                </div>
+                
+                <button class="action-btn primary briefing-start-btn" onclick="game.beginCase()">
+                    <i class="fas fa-play"></i> Begin Investigation
+                </button>
+            </div>
+        `;
+        
+        // Keyboard shortcut: Enter or Space to start
+        this._briefingKeyHandler = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.beginCase();
+            }
+        };
+        document.addEventListener('keydown', this._briefingKeyHandler);
+        
+        document.body.appendChild(overlay);
+    }
+
+    beginCase() {
+        const overlay = document.getElementById('case-briefing');
+        if (overlay) {
+            overlay.classList.add('briefing-exit');
+            setTimeout(() => {
+                if (overlay.parentNode) overlay.remove();
+            }, 350);
+        }
+        if (this._briefingKeyHandler) {
+            document.removeEventListener('keydown', this._briefingKeyHandler);
+            this._briefingKeyHandler = null;
+        }
+        // Timer starts now — player has read the brief
+        this.startTimer();
     }
 
     renderHintSystem() {
@@ -1644,6 +1741,7 @@ class MedicalMysteryGame {
 
     renderDiagnosePhase() {
         return `
+            ${this.renderClinicalConfidence()}
             ${this.renderCollapsibleHistory()}
             ${this.renderCollapsibleFindings()}
             ${this.renderDiagnosisOptions()}
@@ -1698,7 +1796,6 @@ class MedicalMysteryGame {
                                     const test = this.gameState.currentCase.tests.find(t => t.id === tId);
                                     const result = this.generateTestResult(test);
                                     const testImage = test ? this.getTestResultImage(test.id) : null;
-                                    console.log('Rendering test:', test?.id, 'Image:', testImage);
                                     
                                     return test ? `
                                         <div class="finding-item">
@@ -1825,6 +1922,9 @@ class MedicalMysteryGame {
         this.gameState.investigationPhase = 'diagnose';
         this.render();
         
+        // Show diagnose phase progress message
+        setTimeout(() => this.showProgressMessage('diagnose'), 800);
+        
         // Scroll to diagnosis section instead of top of page
         setTimeout(() => {
             const diagnosisSection = document.querySelector('.diagnosis-selection');
@@ -1836,6 +1936,54 @@ class MedicalMysteryGame {
                 });
             }
         }, 100); // Small delay to ensure render is complete
+    }
+
+    renderClinicalConfidence() {
+        const totalQuestions = this.gameState.currentCase.questions.length;
+        const totalTests = this.gameState.currentCase.tests.length;
+        const askedCount = this.gameState.askedQuestions.length;
+        const orderedCount = this.gameState.orderedTests.length;
+        const consultsUsed = this.gameState.specialistConsultations.length;
+        
+        // Calculate critical coverage
+        const criticalQuestions = this.gameState.currentCase.questions.filter(q => q.critical);
+        const criticalTests = this.gameState.currentCase.tests.filter(t => t.critical);
+        const criticalQAsked = criticalQuestions.filter(q => this.gameState.askedQuestions.includes(q.id)).length;
+        const criticalTOrdered = criticalTests.filter(t => this.gameState.orderedTests.includes(t.id)).length;
+        
+        const totalCritical = criticalQuestions.length + criticalTests.length;
+        const criticalFound = criticalQAsked + criticalTOrdered;
+        const criticalPercent = totalCritical > 0 ? Math.round((criticalFound / totalCritical) * 100) : 0;
+        
+        let confidenceLevel, confidenceClass, confidenceIcon;
+        if (criticalPercent >= 80) {
+            confidenceLevel = 'High';
+            confidenceClass = 'confidence-high';
+            confidenceIcon = 'fas fa-check-circle';
+        } else if (criticalPercent >= 50) {
+            confidenceLevel = 'Moderate';
+            confidenceClass = 'confidence-moderate';
+            confidenceIcon = 'fas fa-exclamation-circle';
+        } else {
+            confidenceLevel = 'Low';
+            confidenceClass = 'confidence-low';
+            confidenceIcon = 'fas fa-question-circle';
+        }
+        
+        return `
+            <div class="section clinical-confidence ${confidenceClass}">
+                <h3><i class="${confidenceIcon}"></i> Clinical Confidence: ${confidenceLevel}</h3>
+                <div class="confidence-details">
+                    <span>Questions: ${askedCount}/${totalQuestions}</span>
+                    <span>Tests: ${orderedCount}/${totalTests}</span>
+                    <span>Consults: ${consultsUsed}</span>
+                    <span>Key findings: ${criticalFound}/${totalCritical}</span>
+                </div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: ${criticalPercent}%"></div>
+                </div>
+            </div>
+        `;
     }
 
     renderCollapsibleHistory() {
@@ -1920,6 +2068,18 @@ class MedicalMysteryGame {
         return story;
     }
 
+    getPatientPronouns(history) {
+        const demographics = (history?.demographics || '').toLowerCase();
+        const isFemale = demographics.includes('female') || demographics.includes('woman') || demographics.includes('girl');
+        return {
+            subject: isFemale ? 'she' : 'he',
+            Subject: isFemale ? 'She' : 'He',
+            object: isFemale ? 'her' : 'him',
+            possessive: isFemale ? 'her' : 'his',
+            Possessive: isFemale ? 'Her' : 'His'
+        };
+    }
+
     createPatientIntro(history) {
         const demographics = history.demographics || '';
         const social = history.socialHistory || [];
@@ -1937,6 +2097,7 @@ class MedicalMysteryGame {
     }
 
     createMedicalNarrative(medicalHistory) {
+        const p = this.getPatientPronouns(this.gameState.currentCase?.patientHistory);
         const conditions = medicalHistory.map(condition => {
             // Add plain English explanations for common conditions
             if (condition.toLowerCase().includes('hypertension')) {
@@ -1955,27 +2116,28 @@ class MedicalMysteryGame {
         });
         
         if (conditions.length === 1) {
-            return `He has a history of ${conditions[0].toLowerCase()}.`;
+            return `${p.Subject} has a history of ${conditions[0].toLowerCase()}.`;
         } else if (conditions.length === 2) {
-            return `He has a history of ${conditions[0].toLowerCase()} and ${conditions[1].toLowerCase()}.`;
+            return `${p.Subject} has a history of ${conditions[0].toLowerCase()} and ${conditions[1].toLowerCase()}.`;
         } else {
             const lastCondition = conditions.pop();
-            return `He has a history of ${conditions.join(', ').toLowerCase()}, and ${lastCondition.toLowerCase()}.`;
+            return `${p.Subject} has a history of ${conditions.join(', ').toLowerCase()}, and ${lastCondition.toLowerCase()}.`;
         }
     }
 
     createLifestyleNarrative(socialHistory) {
+        const p = this.getPatientPronouns(this.gameState.currentCase?.patientHistory);
         const lifestyle = [];
         
         socialHistory.forEach(item => {
             if (item.toLowerCase().includes('smokes')) {
-                lifestyle.push(`he's been a heavy smoker for many years`);
+                lifestyle.push(`${p.subject}'s been a heavy smoker for many years`);
             } else if (item.toLowerCase().includes('sedentary')) {
-                lifestyle.push(`he leads a fairly inactive lifestyle`);
+                lifestyle.push(`${p.subject} leads a fairly inactive lifestyle`);
             } else if (item.toLowerCase().includes('stress')) {
-                lifestyle.push(`his work involves considerable stress`);
+                lifestyle.push(`${p.possessive} work involves considerable stress`);
             } else if (item.toLowerCase().includes('family history')) {
-                lifestyle.push(`heart disease runs in his family`);
+                lifestyle.push(`heart disease runs in ${p.possessive} family`);
             } else if (!item.toLowerCase().includes('job') && !item.toLowerCase().includes('work')) {
                 lifestyle.push(item.toLowerCase());
             }
@@ -1994,6 +2156,7 @@ class MedicalMysteryGame {
     }
 
     createFamilyNarrative(familyHistory) {
+        const p = this.getPatientPronouns(this.gameState.currentCase?.patientHistory);
         const family = familyHistory.map(item => {
             // Make family history more readable
             if (item.toLowerCase().includes('died suddenly')) {
@@ -2003,16 +2166,17 @@ class MedicalMysteryGame {
         });
         
         if (family.length === 1) {
-            return `His ${family[0].toLowerCase()}.`;
+            return `${p.Possessive} ${family[0].toLowerCase()}.`;
         } else if (family.length === 2) {
-            return `His ${family[0].toLowerCase()}, and his ${family[1].toLowerCase()}.`;
+            return `${p.Possessive} ${family[0].toLowerCase()}, and ${p.possessive} ${family[1].toLowerCase()}.`;
         } else {
             const lastItem = family.pop();
-            return `His ${family.join(', his ').toLowerCase()}, and his ${lastItem.toLowerCase()}.`;
+            return `${p.Possessive} ${family.join(`, ${p.possessive} `).toLowerCase()}, and ${p.possessive} ${lastItem.toLowerCase()}.`;
         }
     }
 
     createMedicationNarrative(medications) {
+        const p = this.getPatientPronouns(this.gameState.currentCase?.patientHistory);
         const meds = medications.map(med => {
             // Add explanations for common medications
             if (med.toLowerCase().includes('metformin')) {
@@ -2031,20 +2195,21 @@ class MedicalMysteryGame {
         });
         
         if (meds.length === 1) {
-            return `He takes ${meds[0].toLowerCase()}.`;
+            return `${p.Subject} takes ${meds[0].toLowerCase()}.`;
         } else if (meds.length === 2) {
-            return `He takes ${meds[0].toLowerCase()} and ${meds[1].toLowerCase()}.`;
+            return `${p.Subject} takes ${meds[0].toLowerCase()} and ${meds[1].toLowerCase()}.`;
         } else {
             const lastMed = meds.pop();
-            return `He takes ${meds.join(', ').toLowerCase()}, and ${lastMed.toLowerCase()}.`;
+            return `${p.Subject} takes ${meds.join(', ').toLowerCase()}, and ${lastMed.toLowerCase()}.`;
         }
     }
 
     createAllergyNarrative(allergies) {
+        const p = this.getPatientPronouns(this.gameState.currentCase?.patientHistory);
         if (allergies.toLowerCase().includes('no known')) {
-            return 'He has no known drug allergies, which is helpful for treatment options.';
+            return `${p.Subject} has no known drug allergies, which is helpful for treatment options.`;
         }
-        return `Important: He is allergic to ${allergies.toLowerCase()}.`;
+        return `Important: ${p.Subject} is allergic to ${allergies.toLowerCase()}.`;
     }
 
     renderCollapsibleFindings() {
@@ -2055,19 +2220,9 @@ class MedicalMysteryGame {
             <div class="section collapsible-section">
                 <div class="collapsible-header" onclick="game.toggleSection('findings')">
                     <h3><i class="fas fa-search"></i> Clinical Findings</h3>
-                    <i class="fas fa-chevron-down toggle-icon" id="findings-toggle"></i>
+                    <i class="fas fa-chevron-up toggle-icon" id="findings-toggle"></i>
                 </div>
                 <div class="collapsible-content" id="findings-content" style="display: block;">
-                    <script>
-                        // Set the toggle icon to up since content is visible
-                        setTimeout(() => {
-                            const toggle = document.getElementById('findings-toggle');
-                            if (toggle) {
-                                toggle.classList.remove('fa-chevron-down');
-                                toggle.classList.add('fa-chevron-up');
-                            }
-                        }, 100);
-                    </script>
                     <div class="findings-grid">
                         <div class="findings-section">
                             <h5>History & Examination (${askedQuestions.length})</h5>
@@ -2094,7 +2249,6 @@ class MedicalMysteryGame {
                                         const test = this.gameState.currentCase.tests.find(t => t.id === tId);
                                         const result = this.generateTestResult(test);
                                         const testImage = test ? this.getTestResultImage(test.id) : null;
-                                        console.log('Rendering test:', test?.id, 'Image:', testImage);
                                         
                                         return test ? `
                                             <div class="finding-item">
@@ -2243,7 +2397,7 @@ class MedicalMysteryGame {
                     ${askedQuestions.map(q => `
                         <div class="question-result">
                             <strong>Q: ${q.text}</strong>
-                            <p class="answer">A: ${this.getQuestionAnswer(q.id)}</p>
+                            <p class="answer">A: ${q.answer || this.getQuestionAnswer(q.id)}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -2264,18 +2418,16 @@ class MedicalMysteryGame {
                     </div>
                 </div>
             `;
+        } else if (this.gameState.questionsRemaining <= 0 && availableQuestions.length > 0) {
+            content += `<p class="no-questions-warning"><i class="fas fa-exclamation-circle"></i> No questions remaining. You must work with what you have.</p>`;
         } else {
-            content += '<p>All questions have been asked.</p>';
+            content += '<p>All available questions have been asked.</p>';
         }
         
         return `
             <div class="section interview-section">
-                <h3><i class="fas fa-comments"></i> Patient Interview (${this.gameState.questionsRemaining} remaining)</h3>
+                <h3><i class="fas fa-comments"></i> Patient Interview</h3>
                 ${content}
-                <div class="question-info">
-                    <p><strong>Questions Asked:</strong> ${this.gameState.askedQuestions.length}</p>
-                    <p><strong>Questions Remaining:</strong> ${this.gameState.questionsRemaining}</p>
-                </div>
             </div>
         `;
     }
@@ -2433,7 +2585,6 @@ class MedicalMysteryGame {
                         ${orderedTests.map(test => {
                             const testObj = this.gameState.currentCase.tests.find(t => t.id === test.id);
                             const testImage = testObj ? this.getTestResultImage(testObj.id) : null;
-                            console.log('Rendering test in Medical Tests:', test.id, 'Image:', testImage);
                             
                             return `
                                 <div class="test-result-item">
@@ -2460,8 +2611,14 @@ class MedicalMysteryGame {
     }
 
     renderDiagnosisOptions() {
-        // Shuffle the diagnosis options to ensure correct answer isn't always first
-        const shuffledOptions = [...this.gameState.currentCase.diagnosisOptions].sort(() => Math.random() - 0.5);
+        // Shuffle diagnosis options once and cache the order to prevent reshuffling on re-render
+        if (!this._shuffledDiagnosisOptions || 
+            this._shuffledCaseId !== this.gameState.currentCase.id) {
+            this._shuffledDiagnosisOptions = [...this.gameState.currentCase.diagnosisOptions]
+                .sort(() => Math.random() - 0.5);
+            this._shuffledCaseId = this.gameState.currentCase.id;
+        }
+        const shuffledOptions = this._shuffledDiagnosisOptions;
         
         const diagnosisCards = shuffledOptions.map(d => `
             <div class="diagnosis-card" onclick="game.makeDiagnosis('${d.id}')">
@@ -2544,11 +2701,6 @@ class MedicalMysteryGame {
         this.timer = setInterval(() => {
             this.gameState.timeRemaining = Math.max(0, this.gameState.timeRemaining - 1);
             
-            // Debug: Log every 10 seconds
-            if (this.gameState.timeRemaining % 10 === 0) {
-                console.log(`⏰ Timer: ${this.gameState.timeRemaining}s, Stability: ${Math.round(this.gameState.patientStability)}%`);
-            }
-            
             // Update patient stability based on time pressure
             this.updatePatientStability();
             
@@ -2559,8 +2711,26 @@ class MedicalMysteryGame {
             
             // Update timer display
             const timerElement = document.querySelector('.status-bar .status-item:first-child span');
+            const timerContainer = document.querySelector('.status-bar .status-item:first-child');
             if (timerElement) {
-                timerElement.textContent = this.formatTime(this.gameState.timeRemaining / 60);
+                timerElement.textContent = this.formatTime(this.gameState.timeRemaining);
+            }
+            
+            // Timer warning states
+            if (timerContainer) {
+                if (this.gameState.timeRemaining <= 30) {
+                    timerContainer.classList.add('timer-critical');
+                    timerContainer.classList.remove('timer-warning');
+                } else if (this.gameState.timeRemaining <= 60) {
+                    timerContainer.classList.add('timer-warning');
+                    timerContainer.classList.remove('timer-critical');
+                    // Play warning sound once at 60 seconds
+                    if (this.gameState.timeRemaining === 60) {
+                        this.playSound('warning');
+                    }
+                } else {
+                    timerContainer.classList.remove('timer-warning', 'timer-critical');
+                }
             }
             
             // Update patient state display
@@ -2636,7 +2806,7 @@ class MedicalMysteryGame {
 
     askQuestion(questionId) {
         if (this.gameState.questionsRemaining <= 0) {
-            this.showError('No questions remaining');
+            this.showNotification('No questions remaining — proceed to diagnosis with the evidence you have.', 'warning');
             return;
         }
         
@@ -2652,22 +2822,21 @@ class MedicalMysteryGame {
         const question = this.gameState.currentCase.questions.find(q => q.id === questionId);
         if (question) {
             if (question.critical) {
-                this.gameState.patientStability += DETERIORATION_FACTORS.IMPROVEMENT;
+                // Critical questions improve patient stability
+                this.gameState.patientStability += Math.abs(DETERIORATION_FACTORS.IMPROVEMENT);
                 this.playSound('success');
                 // Show progress message for critical findings
                 if (Math.random() < 0.3) { // 30% chance
                     setTimeout(() => this.showProgressMessage('examine'), 1000);
                 }
             } else {
-                this.gameState.patientStability -= DETERIORATION_FACTORS.INCORRECT_ACTIONS;
-                this.gameState.incorrectActions++;
-                this.playSound('warning');
+                // Non-critical questions are neutral - valid clinical exploration
+                this.playSound('click');
             }
         }
         
         this.updatePatientStability();
         this.render();
-        this.playSound('click');
     }
 
     orderTest(testId) {
@@ -2687,18 +2856,23 @@ class MedicalMysteryGame {
         }
         if (test) {
             if (test.critical) {
-                this.gameState.patientStability += DETERIORATION_FACTORS.IMPROVEMENT;
-                this.playSound('success');
+                // Critical tests improve patient stability
+                this.gameState.patientStability += Math.abs(DETERIORATION_FACTORS.IMPROVEMENT);
             } else {
-                this.gameState.patientStability -= DETERIORATION_FACTORS.INCORRECT_ACTIONS;
-                this.gameState.incorrectActions++;
-                this.playSound('warning');
+                // Non-critical tests are neutral - cautious medicine is not wrong
+                this.playSound('click');
             }
         }
         
         this.updatePatientStability();
         this.render();
-        this.playSound('click');
+        
+        // Show the narrative test result modal after a short delay (simulates processing)
+        if (test) {
+            setTimeout(() => {
+                this.showTestResult(test);
+            }, 600);
+        }
     }
 
     showTestResult(test) {
@@ -2707,7 +2881,6 @@ class MedicalMysteryGame {
         
         // Add result image if available
         test.resultImage = this.getTestResultImage(test.id);
-        console.log('Test result image for', test.id, ':', test.resultImage);
         
         // Check for narrative results first
         if (test.resultNarrative && test.resultNarrative.length > 0) {
@@ -2722,14 +2895,13 @@ class MedicalMysteryGame {
         const caseId = this.gameState.currentCase?.id;
         const caseCategory = this.gameState.currentCase?.category;
         
-        console.log('Looking for image - testId:', testId, 'caseId:', caseId, 'category:', caseCategory);
-        
         // Map test IDs and cases to image files
         const imageMap = {
             // ECG images
             'ecg': {
+                'cardiac': 'testResults/ecg_58_cardiac.svg',
                 'stroke': 'testResults/12_Lead_ECG_stroke_75.png',
-                'cardiac': 'testResults/xRay_58_heartattack.png' // Using xray as placeholder
+                'ozempic_misuse': 'testResults/ecg_28_ozempic.svg'
             },
             // CT Scan images
             'ct_scan': {
@@ -2754,7 +2926,8 @@ class MedicalMysteryGame {
             },
             // Drug tests
             'drug_screen': {
-                'toxicology': 'testResults/drugTest_25_Overdose.png'
+                'toxicology': 'testResults/drugTest_25_Overdose.png',
+                'ozempic_misuse': 'testResults/tox_screen_28_ozempic.svg'
             },
             'drug_screen_tox': {
                 'toxicology': 'testResults/drugTest_25_Overdose.png'
@@ -2775,27 +2948,64 @@ class MedicalMysteryGame {
             'chest_xray': {
                 'pediatric': 'testResults/x-ray-3-astma:croup.png',
                 'cardiac': 'testResults/xRay_58_heartattack.png'
+            },
+            // Blood work (CBC / metabolic panels)
+            'blood_work': {
+                'trauma': 'testResults/cbc_24_trauma.svg',
+                'pediatric': 'testResults/cbc_3_pediatric.svg',
+                'stroke': 'testResults/cbc_coag_72_stroke.svg',
+                'abdominal_pain': 'testResults/cbc_45_abdominal.svg',
+                'ozempic_misuse': 'testResults/metabolic_panel_28_ozempic.svg'
+            },
+            // X-ray series
+            'xray_series': {
+                'trauma': 'testResults/xray_24_trauma.svg'
+            },
+            // Pulse oximetry
+            'pulse_oximetry': {
+                'pediatric': 'testResults/pulseox_3_pediatric.svg'
+            },
+            // Basic metabolic panel
+            'basic_metabolic': {
+                'toxicology': 'testResults/bmp_25_toxicology.svg'
+            },
+            // Liver function tests
+            'liver_function': {
+                'toxicology': 'testResults/lft_25_toxicology.svg'
+            },
+            // Blood glucose
+            'glucose': {
+                'stroke': 'testResults/glucose_72_stroke.svg'
+            },
+            // Urinalysis
+            'urinalysis': {
+                'surgical': 'testResults/urinalysis_45_abdominal.svg'
+            },
+            // Vitamin panel
+            'vitamin_levels': {
+                'ozempic_misuse': 'testResults/vitamin_panel_28_ozempic.svg'
             }
         };
         
         // Try to find image by test ID and case ID first
         if (imageMap[testId] && imageMap[testId][caseId]) {
-            console.log('Found image by caseId:', imageMap[testId][caseId]);
             return imageMap[testId][caseId];
         }
         
         // Try to find image by test ID and case category
         if (imageMap[testId] && imageMap[testId][caseCategory]) {
-            console.log('Found image by category:', imageMap[testId][caseCategory]);
             return imageMap[testId][caseCategory];
         }
         
         // No image available
-        console.log('No image found for test:', testId);
         return null;
     }
 
     showImageModal(imagePath, testName) {
+        // Close any existing narrative modal so full-size view is unblocked
+        const existingNarrative = document.querySelector('.narrative-result-modal');
+        if (existingNarrative) existingNarrative.remove();
+        
         const modal = document.createElement('div');
         modal.className = 'modal-overlay image-modal';
         modal.innerHTML = `
@@ -2812,6 +3022,11 @@ class MedicalMysteryGame {
             </div>
         `;
         
+        // Click overlay background to close
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        
         document.body.appendChild(modal);
         this.playSound('click');
     }
@@ -2822,7 +3037,7 @@ class MedicalMysteryGame {
         
         const imageHtml = test.resultImage ? `
             <div class="test-result-image">
-                <img src="${test.resultImage}" alt="${test.name} Result" />
+                <img src="${test.resultImage}" alt="${test.name} Result" onclick="game.showImageModal('${test.resultImage}', '${test.name.replace(/'/g, "\\'")}')" title="Click to enlarge" />
             </div>
         ` : '';
         
@@ -2893,7 +3108,7 @@ class MedicalMysteryGame {
         
         const imageHtml = test.resultImage ? `
             <div class="test-result-image">
-                <img src="${test.resultImage}" alt="${test.name} Result" />
+                <img src="${test.resultImage}" alt="${test.name} Result" onclick="game.showImageModal('${test.resultImage}', '${test.name.replace(/'/g, "\\'")}')" title="Click to enlarge" />
             </div>
         ` : '';
         
@@ -3107,6 +3322,74 @@ class MedicalMysteryGame {
                 throw new Error(`Diagnosis ${diagnosisId} not found`);
             }
             
+            // Show confirmation dialog before committing
+            this.showDiagnosisConfirmation(diagnosis);
+            
+        } catch (error) {
+            console.error('Error making diagnosis:', error);
+            this.playSound('error');
+        }
+    }
+
+    showDiagnosisConfirmation(diagnosis) {
+        const overlay = document.createElement('div');
+        overlay.className = 'diagnosis-confirm-overlay';
+        overlay.innerHTML = `
+            <div class="diagnosis-confirm-dialog">
+                <h3><i class="fas fa-exclamation-triangle"></i> Confirm Diagnosis</h3>
+                <p>You are about to submit your final diagnosis:</p>
+                <div class="confirm-diagnosis-name">${diagnosis.name}</div>
+                <p class="confirm-warning">This action cannot be undone. Are you sure?</p>
+                <div class="confirm-actions">
+                    <button class="action-btn primary" onclick="game.confirmDiagnosis('${diagnosis.id}')">
+                        <i class="fas fa-check"></i> Confirm Diagnosis
+                    </button>
+                    <button class="action-btn secondary" onclick="game.dismissConfirmation()">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Close on background click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) this.dismissConfirmation();
+        });
+        
+        // Keyboard shortcuts: Escape to cancel, Enter to confirm
+        this._confirmKeyHandler = (e) => {
+            if (e.key === 'Escape') this.dismissConfirmation();
+            if (e.key === 'Enter') this.confirmDiagnosis(diagnosis.id);
+        };
+        document.addEventListener('keydown', this._confirmKeyHandler);
+        
+        document.body.appendChild(overlay);
+        this.playSound('click');
+    }
+
+    dismissConfirmation() {
+        const overlay = document.querySelector('.diagnosis-confirm-overlay');
+        if (overlay) overlay.remove();
+        if (this._confirmKeyHandler) {
+            document.removeEventListener('keydown', this._confirmKeyHandler);
+            this._confirmKeyHandler = null;
+        }
+        this.playSound('click');
+    }
+
+    confirmDiagnosis(diagnosisId) {
+        // Remove confirmation dialog and key handler
+        const overlay = document.querySelector('.diagnosis-confirm-overlay');
+        if (overlay) overlay.remove();
+        if (this._confirmKeyHandler) {
+            document.removeEventListener('keydown', this._confirmKeyHandler);
+            this._confirmKeyHandler = null;
+        }
+
+        const diagnosis = this.gameState.currentCase.diagnosisOptions.find(d => d.id === diagnosisId);
+        if (!diagnosis) return;
+
+        try {
             // Handle diagnosis based on current investigation phase
             if (this.gameState.investigationPhase === 'diagnose') {
                 // Store diagnosis selection and go straight to final result
@@ -3183,12 +3466,15 @@ class MedicalMysteryGame {
         if (gameContainer) {
             const patientOutcome = this.getPatientOutcome();
             const diagnosisResult = this.getDiagnosisResult();
+            const grade = this.getPerformanceGrade(won);
             
             gameContainer.innerHTML = `
                 <div class="end-game">
                     <h1>${message}</h1>
                     <div class="final-score">
+                        <div class="grade-badge grade-${grade.letter.toLowerCase()}">${grade.letter}</div>
                         <h2>Final Score: ${this.gameState.score}</h2>
+                        <p class="grade-description">${grade.description}</p>
                         <div class="patient-outcome ${patientOutcome.class}">
                             <i class="${patientOutcome.icon}"></i>
                             <span>${patientOutcome.text}</span>
@@ -3197,6 +3483,8 @@ class MedicalMysteryGame {
                     
                     ${diagnosisResult}
                     
+                    ${this.renderMissedCriticalSummary()}
+                    
                     <div class="performance-stats">
                         <div class="stat-item">
                             <span class="stat-label">Patient Stability</span>
@@ -3204,7 +3492,7 @@ class MedicalMysteryGame {
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Time Remaining</span>
-                            <span class="stat-value">${this.formatTime(this.gameState.timeRemaining / 60)}</span>
+                            <span class="stat-value">${this.formatTime(this.gameState.timeRemaining)}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">Actions Taken</span>
@@ -3247,6 +3535,25 @@ class MedicalMysteryGame {
                 class: 'danger',
                 icon: 'fas fa-exclamation-triangle'
             };
+        }
+    }
+
+    getPerformanceGrade(won) {
+        const stability = this.gameState.patientStability;
+        const timeUsed = (this.gameState.currentCase?.timeLimit * 60 || 300) - this.gameState.timeRemaining;
+        const timeLimit = this.gameState.currentCase?.timeLimit * 60 || 300;
+        const timePercent = ((timeLimit - timeUsed) / timeLimit) * 100;
+        
+        if (won && stability >= 80 && timePercent >= 40) {
+            return { letter: 'A', description: 'Outstanding — rapid diagnosis, patient fully stabilised.' };
+        } else if (won && stability >= 60) {
+            return { letter: 'B', description: 'Good work — correct diagnosis with effective management.' };
+        } else if (won && stability >= 40) {
+            return { letter: 'C', description: 'Adequate — correct but the patient suffered needlessly.' };
+        } else if (won) {
+            return { letter: 'D', description: 'Scraped by — right answer but the patient nearly died.' };
+        } else {
+            return { letter: 'F', description: 'Failed — review the case and try again.' };
         }
     }
 
@@ -3315,10 +3622,41 @@ class MedicalMysteryGame {
         }
     }
 
-    formatTime(decimalHours) {
-        const hours = Math.floor(decimalHours);
-        const minutes = Math.floor((decimalHours - hours) * 60);
-        return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    renderMissedCriticalSummary() {
+        const criticalQuestions = this.gameState.currentCase.questions.filter(q => q.critical);
+        const criticalTests = this.gameState.currentCase.tests.filter(t => t.critical);
+        
+        const missedQ = criticalQuestions.filter(q => !this.gameState.askedQuestions.includes(q.id));
+        const missedT = criticalTests.filter(t => !this.gameState.orderedTests.includes(t.id));
+        
+        if (missedQ.length === 0 && missedT.length === 0) {
+            return `
+                <div class="critical-summary all-found">
+                    <i class="fas fa-check-circle"></i>
+                    <span>You identified all critical findings — excellent clinical judgement.</span>
+                </div>
+            `;
+        }
+        
+        const items = [
+            ...missedQ.map(q => `<li><i class="fas fa-comments"></i> ${q.text}</li>`),
+            ...missedT.map(t => `<li><i class="fas fa-flask"></i> ${t.name}</li>`)
+        ];
+        
+        return `
+            <div class="critical-summary missed-items">
+                <h4><i class="fas fa-exclamation-triangle"></i> Critical Findings Missed</h4>
+                <ul>${items.join('')}</ul>
+            </div>
+        `;
+    }
+
+    formatTime(totalSeconds) {
+        // totalSeconds is the raw seconds value (callers should pass this.gameState.timeRemaining directly)
+        const secs = Math.max(0, Math.round(totalSeconds));
+        const minutes = Math.floor(secs / 60);
+        const seconds = secs % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     }
 
     showCaseReview() {
@@ -3458,6 +3796,32 @@ class MedicalMysteryGame {
                 </div>
             `;
         }
+    }
+
+    showNotification(message, type = 'info') {
+        const icons = {
+            info: 'fas fa-info-circle',
+            warning: 'fas fa-exclamation-triangle',
+            success: 'fas fa-check-circle',
+            error: 'fas fa-times-circle'
+        };
+        
+        const notification = document.createElement('div');
+        notification.className = `game-notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="${icons[type] || icons.info}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('notification-exit');
+            setTimeout(() => {
+                if (notification.parentNode) notification.remove();
+            }, 400);
+        }, 3000);
     }
 
     sanitizeHtml(text) {
@@ -3730,12 +4094,12 @@ class MedicalMysteryGame {
 
     consultSpecialist(specialistId) {
         if (this.gameState.consultationSlotsRemaining <= 0) {
-            this.showError('No consultation slots remaining');
+            this.showNotification('No consultation slots remaining.', 'warning');
             return;
         }
         
         if (this.gameState.specialistConsultations.includes(specialistId)) {
-            this.showError('Already consulted this specialist');
+            this.showNotification('You have already consulted this specialist.', 'info');
             return;
         }
         
@@ -3801,6 +4165,21 @@ class MedicalMysteryGame {
         // Special logic for stroke case
         if (caseData.id === 'stroke' && specialist.id === 'neurologist') {
             return true; // Neurologist is always appropriate for stroke
+        }
+        
+        // Special logic for ozempic/GLP-1 misuse case
+        if (caseData.id === 'ozempic_misuse') {
+            if (specialist.id === 'psychiatrist' || specialist.id === 'endocrinologist') {
+                return true; // Both are essential for GLP-1 misuse with malnutrition
+            }
+        }
+        
+        // Check case-specific specialist data if available
+        if (caseData.specialists) {
+            const caseSpecialist = caseData.specialists.find(s => s.id === specialist.id);
+            if (caseSpecialist) {
+                return caseSpecialist.appropriate;
+            }
         }
         
         // General logic based on expertise matching
@@ -3924,7 +4303,28 @@ class MedicalMysteryGame {
                     return `"No surgical intervention required at this time. Continue with medical management."`;
                 }
                 
+            case 'psychiatrist':
+                if (caseData.id === 'ozempic_misuse') {
+                    return `"There's clearly a significant body image component here. She shows signs of disordered eating behaviour but it doesn't quite fit a typical anorexia presentation — she seems distressed about not eating rather than restricting deliberately. I'd want to explore whether there's an external factor driving the weight loss. Her defensiveness and secrecy suggest she's hiding something she knows is harmful. The social media connection is worth probing — I see a lot of young women in her demographic chasing unrealistic body standards."`;
+                } else {
+                    return `"No acute psychiatric concerns identified at this time. The patient appears to be coping appropriately with their medical situation."`;
+                }
+                
+            case 'endocrinologist':
+                if (caseData.id === 'ozempic_misuse') {
+                    return `"The metabolic picture is unusual. The malnutrition is severe but the pattern doesn't quite match typical anorexia — her appetite suppression seems almost pharmacological rather than psychological. The thyroid is in starvation mode and her electrolytes are life-threatening. I'd strongly recommend a targeted drug screen if you haven't already. There are medications circulating online that can cause exactly this pattern of profound appetite loss and rapid weight loss. Check what she's been taking — that's your answer."`;
+                } else {
+                    return `"No significant endocrine pathology identified. The metabolic markers appear appropriate for this clinical context."`;
+                }
+                
             default:
+                // Check for case-specific specialist advice
+                if (caseData.specialists) {
+                    const caseSpecialist = caseData.specialists.find(s => s.id === specialist.id);
+                    if (caseSpecialist && caseSpecialist.advice) {
+                        return `"${caseSpecialist.advice}"`;
+                    }
+                }
                 return `"Based on my review, I recommend further evaluation and monitoring."`;
         }
     }
@@ -3936,80 +4336,10 @@ class MedicalMysteryGame {
         }).filter(result => result);
     }
 
-    resetAndPlayAgain() {
-        // Reset all game state for a fresh start
-        this.gameState = {
-            currentCase: null,
-            timeRemaining: 0,
-            score: 0,
-            askedQuestions: [],
-            orderedTests: [],
-            historyRevealed: false,
-            gamePhase: GAME_PHASES.CASE_SELECTION,
-            finalDiagnosis: null,
-            patientState: PATIENT_STATES.STABLE,
-            patientStability: 100,
-            criticalActionsMissed: 0,
-            incorrectActions: 0,
-            specialistConsultations: [],
-            consultationSlotsRemaining: 3,
-            questionsRemaining: 5
-        };
-        
-        // Stop any running timers
-        if (this.timer) {
-            clearInterval(this.timer);
-            this.timer = null;
-        }
-        
-        // Stop background music
-        this.toggleBackgroundMusic(false);
-        
-        // Show case selection
-        this.showCaseSelection();
-    }
+    // resetAndPlayAgain is defined earlier in the class (see showCaseReview section)
 }
 
-// Initialize game when DOM is loaded
-let game;
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        game = new MedicalMysteryGame();
-    } catch (error) {
-        console.error('Error initializing game:', error);
-        document.getElementById('game-container').innerHTML = `
-            <div class="error-screen">
-                <h1>Game Initialization Error</h1>
-                <p>Failed to start the game. Please refresh the page.</p>
-                <button class="action-btn primary" onclick="location.reload()">
-                    <i class="fas fa-refresh"></i> Refresh Page
-                </button>
-            </div>
-        `;
-        
-    }
-});
-// Helper functions for cases
-function getAllCases() {
-    if (typeof medicalCases === 'undefined') {
-        console.error('medicalCases not defined');
-        return [];
-    }
-    return Object.values(medicalCases);
-}
-
-function getCase(caseId) {
-    if (typeof medicalCases === 'undefined') {
-        console.error('medicalCases not defined');
-        return null;
-    }
-    return medicalCases[caseId];
-}
-
-// Initialize game when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.game = new MedicalMysteryGame();
-});
+// Note: Game initialization is handled in index.html to ensure all scripts are loaded first
 
 // Export for Node.js testing
 if (typeof module !== 'undefined' && module.exports) {
