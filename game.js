@@ -2876,17 +2876,25 @@ class MedicalMysteryGame {
     }
 
     showTestResult(test) {
-        // Play printer sound for test results
-        this.playSound('test_result');
+        // Validate test object BEFORE playing any sounds
+        if (!test || !test.id || !test.name) {
+            console.warn('⚠️ Invalid test object passed to showTestResult, skipping');
+            return;
+        }
         
         // Add result image if available
         test.resultImage = this.getTestResultImage(test.id);
         
-        // Check for narrative results first
-        if (test.resultNarrative && test.resultNarrative.length > 0) {
+        // Check for valid narrative results
+        const hasValidNarrative = test.resultNarrative 
+            && Array.isArray(test.resultNarrative) 
+            && test.resultNarrative.length > 0 
+            && typeof test.resultNarrative[0] === 'string'
+            && test.resultNarrative[0].trim().length > 0;
+        
+        if (hasValidNarrative) {
             this.showNarrativeTestResult(test);
         } else {
-            // Fallback to original system
             this.showStandardTestResult(test);
         }
     }
@@ -3032,6 +3040,13 @@ class MedicalMysteryGame {
     }
 
     showNarrativeTestResult(test) {
+        // Validate narrative content - fallback if empty or invalid
+        if (!test.resultNarrative || !Array.isArray(test.resultNarrative) || test.resultNarrative.length === 0) {
+            console.warn(`⚠️ Test ${test.id} has invalid resultNarrative, falling back to standard view`);
+            this.showStandardTestResult(test);
+            return;
+        }
+
         const modal = document.createElement('div');
         modal.className = 'modal-overlay narrative-result-modal';
         
@@ -3103,20 +3118,36 @@ class MedicalMysteryGame {
         // Original test result system for backwards compatibility
         const results = this.generateTestResult(test);
         
+        console.log(`📝 Standard Result for ${test.id}: "${results?.substring(0, 50) || '(empty)'}"`);
+        
+        // Safety check: don't show empty notifications
+        if (!results || results.trim() === '') {
+            console.warn(`⚠️ Test ${test.id} has no result text, skipping notification`);
+            return;
+        }
+        
         const notification = document.createElement('div');
         notification.className = 'test-result-notification';
         
+        // Safely escape all user content
+        const escapeHtml = (str) => {
+            const map = {'<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;'};
+            return (str || '').replace(/[<>"'&]/g, c => map[c]);
+        };
+        const testName = escapeHtml(test.name || 'Test Result');
+        const resultText = escapeHtml(results || '');
+        
         const imageHtml = test.resultImage ? `
             <div class="test-result-image">
-                <img src="${test.resultImage}" alt="${test.name} Result" onclick="game.showImageModal('${test.resultImage}', '${test.name.replace(/'/g, "\\'")}')" title="Click to enlarge" />
+                <img src="${test.resultImage}" alt="${testName} Result" onclick="game.showImageModal('${test.resultImage}', '${testName.replace(/'/g, "\\'")}')" title="Click to enlarge" />
             </div>
         ` : '';
         
         notification.innerHTML = `
             <div class="test-result-content">
-                <h4><i class="fas fa-flask"></i> ${test.name} Results</h4>
+                <h4><i class="fas fa-flask"></i> ${testName} Results</h4>
                 ${imageHtml}
-                <p>${results}</p>
+                <p>${resultText}</p>
                 <button class="action-btn secondary" onclick="this.parentElement.parentElement.remove()">Close</button>
             </div>
         `;
@@ -3124,6 +3155,7 @@ class MedicalMysteryGame {
         const gameContainer = document.getElementById('game-container');
         if (gameContainer) {
             gameContainer.appendChild(notification);
+            console.log(`✅ Added test result notification to DOM for ${test.id}`);
             
             setTimeout(() => {
                 if (notification.parentElement) {
